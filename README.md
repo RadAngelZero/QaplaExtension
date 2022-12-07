@@ -1,1 +1,1 @@
-# QaplaExtension
+# Qapla Twitch Extension
