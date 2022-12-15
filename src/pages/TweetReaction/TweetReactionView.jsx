@@ -12,6 +12,7 @@ import { ReactComponent as Close } from './../../assets/Icons/Close.svg';
 import { ReactComponent as CheckCircle } from './../../assets/Icons/CheckCircle.svg';
 import { ReactComponent as GiphyText } from './../../assets/Icons/GiphyText.svg';
 import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
+import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
 
 const allMediaOptionsTypes = [
@@ -146,7 +147,8 @@ const CloseIconButton = styled(IconButton)({
 const ActionsContainer = styled(Box)({
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
 });
 
 const PricesButton = styled(Button)({
@@ -155,6 +157,8 @@ const PricesButton = styled(Button)({
     borderRadius: '14px',
     fontSize: '20px',
     fontWeight: '800',
+    lineHeight: '24.2px',
+    textTransform: 'none',
     color: '#FFF',
     '&:hover': {
         background: '#1C1E64',
@@ -163,12 +167,16 @@ const PricesButton = styled(Button)({
 });
 
 const SendButton = styled(Button)({
+    display: 'flex',
     background: '#00FFDD',
     padding: '12px 24px',
     borderRadius: '100px',
     boxShadow: '0px 5px 30px -12.4441px rgba(0, 255, 221, 0.2)',
     fontSize: '20px',
     fontWeight: '600',
+    lineHeight: 'normal',
+    textTransform: 'none',
+    boxSizing: 'border-box',
     color: '#0D1021',
     '&:hover': {
         background: '#00FFDD',
@@ -226,17 +234,142 @@ const TooltipButton = styled(Button)({
 });
 
 const TipButton = styled(Button)({
+    boxSizing: 'border-box',
     background: '#3B4BF9',
     borderRadius: '100px',
     padding: '12px 24px',
     fontSize: '20px',
     fontWeight: '600',
     color: '#FFF',
+    lineHeight: 'normal',
+    textTransform: 'none',
     '&:hover': {
         background: '#3B4BF9',
         opacity: .8
     }
 });
+
+const TipContainer = styled(Box)({
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'space-between',
+    // flexWrap: 'wrap',
+    alignItems: 'flex-end',
+});
+
+const ChooseTipButton = styled(Button)({
+    width: '24%',
+    boxSizing: 'border-box',
+    aspectRatio: '1',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    background: '#141539',
+    boxShadow: '0px 10px 15px rgba(13, 16, 33, 0.75)',
+    borderRadius: '25px',
+    padding: '4px',
+    background: 'linear-gradient(135deg, #3C00FF 0.31%, #AA00F8 100.31%)',
+});
+
+const ChooseTipButtonInnerContainer = styled(Box)({
+    display: 'flex',
+    flex: 1,
+    height: '100%',
+    flexGrow: 1,
+    borderRadius: '24px',
+    justifyContent: 'center',
+    alignItems: 'center',
+});
+
+const ChooseTipButtonText = styled('p')({
+    color: '#fff',
+    fontSize: '24px',
+    fontWeight: '700',
+    lineHeight: '29px',
+    letterSpacing: '0px',
+    textAlign: 'center',
+    margin: 0,
+    marginLeft: '2px',
+});
+
+const NoTipButton = styled(Button)({
+    margin: '0px auto',
+    background: '#3B4BF9',
+    borderRadius: '100px',
+    padding: '12px 24px',
+    fontSize: '20px',
+    fontWeight: '600',
+    alignItems: 'center',
+    lineHeight: 'normal',
+    textTransform: 'none',
+    color: '#FFF',
+    '&:hover': {
+        background: '#3B4BF9',
+        opacity: .8
+    }
+});
+
+const NoTipIcon = styled(Box)({
+    display: 'flex',
+    transform: 'rotate(45deg)',
+    marginRight: '4px',
+});
+
+const BotVoicePill = styled(Box)({
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: '3px',
+
+    // height: '40px',
+    width: 'fit-content',
+    background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%)',
+    borderRadius: '1000px',
+    marginTop: '28px',
+});
+
+const BotVoiceInnerContainer = styled(Box)({
+    display: 'flex',
+    flex: 1,
+    padding: '7.5px 13px',
+    borderRadius: '1000px',
+    alignItems: 'center',
+
+    flexDirection: 'row',
+    backgroundColor: '#141539',
+});
+
+const BotVoiceText = styled('p')({
+    fontSize: '20px',
+    fontWeight: '700',
+    lineHeight: '24px',
+    letterSpacing: '0px',
+    textAlign: 'left',
+    margin: '0',
+
+    background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%), #FFFFFF',
+    webkitBackgroundClip: 'text',
+    webkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    textFillColor: 'transparent',
+});
+
+const RemoveButtonContainer = styled(Box)({
+    display: 'flex',
+    marginLeft: '8px',
+    maxWidth: '24px',
+    maxHeight: '24px',
+    marginTop: '-16px',
+});
+
+const VoiceIconContainer = styled(Box)({
+    marginTop: '-6px',
+    marginRight: '16px',
+    maxWidth: '16px',
+    maxHeight: '16px',
+})
 
 const MediaOptionSelectedIcon = () => {
     return (
@@ -281,15 +414,30 @@ const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSele
                 }
                 {type === EMOTE ?
                     emoteUrl ?
-                        <img source={emoteUrl ? { uri: emoteUrl } : null}
-                            style={{ height: 24, width: 24 }} />
+                        <img src={emoteUrl ? emoteUrl : null}
+                            style={{ height: 32, width: 32 }} />
                         :
                         null
                     :
-                    <mediaOptionData.Icon height={24} width={24} />
+                    <mediaOptionData.Icon height={32} width={32} />
                 }
             </MediaOptionButton>
         </ClickAwayListener>
+    );
+}
+
+const ExtraTipOption = ({ label, onClick, selected }) => {
+    return (
+        <ChooseTipButton onClick={onClick}>
+            <ChooseTipButtonInnerContainer style={{
+                backgroundColor: selected ? 'transparent' : '#0D1021',
+            }}>
+                <Bits />
+                <ChooseTipButtonText>
+                    {label}
+                </ChooseTipButtonText>
+            </ChooseTipButtonInnerContainer>
+        </ChooseTipButton>
     );
 }
 
@@ -300,8 +448,23 @@ const TweetReactionView = ({
     mediaSelectorBarOptions,
     custom3DText,
     voiceBot,
-    emoteRaid
+    emoteRaid,
+    reactionLevel,
+    tipping,
+    tippingHandler,
+    selectedTip,
+    updateTip,
+    onChangeReactionLevel,
+    onVoiceSelected
 }) => {
+    const [tips, setTips] = useState([
+        { quantity: 100 },
+        { quantity: 250 },
+        { quantity: 1000 },
+        { quantity: 5000 },
+    ]);
+    const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
+
     const isMediaOptionSelected = (mediaType) => {
         switch (mediaType) {
             case GIPHY_GIFS:
@@ -332,7 +495,7 @@ const TweetReactionView = ({
                                 style: {
                                     color: '#FFF',
                                     "&::placeholder": {
-                                       color: '#C2C2C2'
+                                        color: '#C2C2C2'
                                     },
                                     padding: 0
                                 }
@@ -342,17 +505,34 @@ const TweetReactionView = ({
                             placeholder='Type to create TTS'
                             fullWidth
                             autoFocus />
-                        <OptionalLabel>
-                            Optional
-                        </OptionalLabel>
+                        {!voiceBot &&
+                            <OptionalLabel>
+                                Optional
+                            </OptionalLabel>
+                        }
+                        {voiceBot &&
+                            <BotVoicePill onClick={() => onVoiceSelected(null)}>
+                                <BotVoiceInnerContainer>
+                                    <VoiceIconContainer>
+                                        <TTSVoice style={{ maxWidth: '24px', maxHeight: '24px' }} />
+                                    </VoiceIconContainer>
+                                    <BotVoiceText>
+                                        {voiceBot.label}
+                                    </BotVoiceText>
+                                    <RemoveButtonContainer>
+                                        <Close />
+                                    </RemoveButtonContainer>
+                                </BotVoiceInnerContainer>
+                            </BotVoicePill>
+                        }
                     </MessageContainer>
                 </TTSContainer>
                 <SelectedMediaContainer>
                     {selectedMedia &&
                         <>
-                        <SelectedMediaImage component='img'
-                            src={selectedMedia.url}
-                            aspectratio={selectedMedia.width / selectedMedia.height} />
+                            <SelectedMediaImage component='img'
+                                src={selectedMedia.url}
+                                aspectratio={selectedMedia.width / selectedMedia.height} />
                             <CloseIconButton onClick={cleanSelectedMedia}>
                                 <Close style={{
                                     position: 'absolute',
@@ -363,31 +543,60 @@ const TweetReactionView = ({
                         </>
                     }
                 </SelectedMediaContainer>
-                <ActionsContainer>
-                    <PricesButton startIcon={<Interactions />}>
-                        1
-                    </PricesButton>
-                    <SendButton>
-                        Send
-                    </SendButton>
-                </ActionsContainer>
+                {!tipping ?
+                    <ActionsContainer>
+                        <PricesButton startIcon={<Interactions />} onClick={onChangeReactionLevel}>
+                            1
+                        </PricesButton>
+                        <SendButton>
+                            Send
+                        </SendButton>
+                    </ActionsContainer>
+                    :
+                    <TipContainer>
+                        {tips.map((tip) => (
+                            <ExtraTipOption label={tip.quantity} selected={tip.quantity === selectedTip} onClick={() => updateTip(tip.quantity)} />
+                        ))}
+                    </TipContainer>
+                }
             </ContentContainer>
             <MediaSelectionContainer>
-                <MediaOptionsContainer>
-                    {mediaSelectorBarOptions.map((mediaType) => (
-                        <MediaOption key={mediaType}
-                            onClick={(type) => onMediaOptionClick(type)}
-                            type={mediaType}
-                            isSelected={isMediaOptionSelected(mediaType)}
-                            excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
-                            onOpenTooltip={(e) => console.log(e)}
-                            tooltipText='👀 Upgrade your reaction to use'
-                            tooltipHighlightedText='Animated Avatar, TTS Bot Voice & 3D Text' />
-                    ))}
-                </MediaOptionsContainer>
-                <TipButton startIcon={<PlusCircle />}>
-                    Tip
-                </TipButton>
+                {!tipping ?
+                    <>
+                        <MediaOptionsContainer>
+                            {mediaSelectorBarOptions.map((mediaType) => (
+                                <MediaOption key={mediaType}
+                                    onClick={(type) => onMediaOptionClick(type)}
+                                    type={mediaType}
+                                    isSelected={isMediaOptionSelected(mediaType)}
+                                    excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
+                                    onOpenTooltip={(e) => console.log(e)}
+                                    tooltipText='👀 Upgrade your reaction to use'
+                                    tooltipHighlightedText='Animated Avatar, TTS Bot Voice & 3D Text' />
+                            ))}
+                            {noEnabledOptions.map((mediaType) => (
+                                <MediaOption key={mediaType}
+                                    type={mediaType}
+                                    onClick={(type) => onMediaOptionClick(type)}
+                                    // disabled
+                                    emoteUrl={/*randomEmoteUrl*/'https://toppng.com/public/uploads/thumbnail/view-pogger-pogchamp-emote-11563056054hofxhb4alo.png'}
+                                    // onUpgradeReaction={this.props.onUpgradeReaction}
+                                    onOpenTooltip={(e) => this.openTooltip(e, mediaType)} />
+                            ))}
+                        </MediaOptionsContainer>
+                        <TipButton startIcon={<PlusCircle />} onClick={tippingHandler} >
+                            Tip
+                        </TipButton>
+                    </>
+                    :
+                    <NoTipButton onClick={tippingHandler}>
+                        <NoTipIcon>
+                            <PlusCircle />
+                        </NoTipIcon>
+                        No Tip
+                    </NoTipButton>
+                }
+
             </MediaSelectionContainer>
         </Container>
     );

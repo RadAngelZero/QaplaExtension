@@ -11,8 +11,8 @@ import { GIPHY_GIFS } from '../constants';
 const gf = new GiphyFetch('Kb3qFoEloWmqsI3ViTJKGkQZjxICJ3bi');
 
 const MediaSelectorContainer = styled(Box)({
-    marginTop: '12%',
-    minHeight: '88vh',
+    marginTop: 'auto',
+    minHeight: '92vh',
     background: '#141539',
     borderTopLeftRadius: '30px',
     borderTopRightRadius: '30px',

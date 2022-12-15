@@ -7,8 +7,8 @@ import { MEMES } from '../constants';
 import { getQaplaMemesLibrary } from '../services/database';
 
 const MediaSelectorContainer = styled(Box)({
-    marginTop: '12%',
-    minHeight: '88vh',
+    marginTop: 'auto',
+    minHeight: '92vh',
     background: '#141539',
     borderTopLeftRadius: '30px',
     borderTopRightRadius: '30px',

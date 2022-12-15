@@ -4,15 +4,34 @@ import TweetReactionView from './TweetReactionView';
 import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
 import GiphyMediaSelectorDialog from '../../components/GiphyMediaSelectorDialog';
 import MemeMediaSelectorDialog from '../../components/MemeMediaSelectorDialog';
+import ReactionTierSelectorDialog from '../../components/ReactionTierSelectorDialog';
+import ChooseBotVoiceDialog from '../../components/ChooseBotVoiceDialog';
 
 const TweetReactionController = () => {
     const [openGiphyDialog, setOpenGiphyDialog] = useState(false);
     const [giphyDialogMediaType, setGiphyDialogMediaType] = useState(GIPHY_GIFS);
     const [openMemeDialog, setOpenMemeDialog] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState(null);
+    const [openReactionLevelModal, setOpenReactionLevelModal] = useState(false);
     const [reactionLevel, setReactionLevel] = useState(1);
+    const [selectedTip, setSelectedTip] = useState(null);
+    const [tipping, setTipping] = useState(false);
+    const [selectedVoiceBot, setSelectedVoiceBot] = useState(null);
+    const [openBotVoiceDialog, setOpenBotVoiceDialog] = useState(false);
+
+    const tippingHandler = () => {
+        setTipping(!tipping);
+    }
+
+    const tipHandler = (num) => {
+        setSelectedTip(num);
+        setTimeout(() => {
+            setTipping(false);
+        }, 350)
+    }
 
     const onMediaOptionClick = (mediaType) => {
+        console.log(mediaType);
         switch (mediaType) {
             case GIPHY_GIFS:
             case GIPHY_STICKERS:
@@ -21,6 +40,10 @@ const TweetReactionController = () => {
                 break;
             case MEMES:
                 setOpenMemeDialog(true);
+                break;
+            case CUSTOM_TTS_VOICE:
+                setOpenBotVoiceDialog(true);
+                break;
             default:
                 break;
         }
@@ -32,7 +55,12 @@ const TweetReactionController = () => {
         setOpenMemeDialog(false);
     }
 
+    const onVoiceSelected = (voice) => {
+        setSelectedVoiceBot(voice);
+    }
+
     let availableContent = [];
+    let lockedContent = [];
     switch (reactionLevel) {
         case 1:
             availableContent = [
@@ -47,7 +75,7 @@ const TweetReactionController = () => {
                 CUSTOM_TTS_VOICE,
                 GIPHY_GIFS,
                 GIPHY_STICKERS,
-                MEMES
+                MEMES,
             ];
             break;
         case 3:
@@ -57,27 +85,36 @@ const TweetReactionController = () => {
                 CUSTOM_TTS_VOICE,
                 GIPHY_GIFS,
                 GIPHY_STICKERS,
-                MEMES
+                MEMES,
             ];
             break;
         default:
             availableContent = [
                 GIPHY_GIFS,
                 GIPHY_STICKERS,
-                MEMES
+                MEMES,
             ];
             break;
     }
 
     return (
         <>
-        <TweetReactionView
-            onMediaOptionClick={onMediaOptionClick}
-            selectedMedia={selectedMedia}
-            cleanSelectedMedia={() => setSelectedMedia(null)}
-            mediaSelectorBarOptions={availableContent}
-            reactionLevel={1} />
-        {/*
+            <TweetReactionView
+                onMediaOptionClick={onMediaOptionClick}
+                selectedMedia={selectedMedia}
+                cleanSelectedMedia={() => setSelectedMedia(null)}
+                mediaSelectorBarOptions={availableContent}
+                lockedContent={lockedContent}
+                reactionLevel={1}
+                tipping={tipping}
+                tippingHandler={tippingHandler}
+                selectedTip={selectedTip}
+                updateTip={tipHandler}
+                onChangeReactionLevel={() => setOpenReactionLevelModal(true)}
+                voiceBot={selectedVoiceBot}
+                onVoiceSelected={onVoiceSelected}
+            />
+            {/*
             <TweetReactionScreen onSend={this.onSendReaction}
                 sending={this.state.sending}
                 qoins={this.state.reactionLevel !== 1}
@@ -109,13 +146,21 @@ const TweetReactionController = () => {
                 onOpenSearchStreamerModal={() => this.setState({ openSearchStreamerModal: true })}
                 onUpgradeReaction={this.onUpgradeReaction} />
          */}
-        <GiphyMediaSelectorDialog open={openGiphyDialog}
-            onClose={() => setOpenGiphyDialog(false)}
-            mediaType={giphyDialogMediaType}
-            onMediaSelected={onMediaSelected} />
-        <MemeMediaSelectorDialog open={openMemeDialog}
-            onClose={() => setOpenMemeDialog(false)}
-            onMediaSelected={onMediaSelected} />
+            <GiphyMediaSelectorDialog open={openGiphyDialog}
+                onClose={() => setOpenGiphyDialog(false)}
+                mediaType={giphyDialogMediaType}
+                onMediaSelected={onMediaSelected} />
+            <MemeMediaSelectorDialog open={openMemeDialog}
+                onClose={() => setOpenMemeDialog(false)}
+                onMediaSelected={onMediaSelected} />
+            <ReactionTierSelectorDialog open={openReactionLevelModal}
+                onClose={() => setOpenReactionLevelModal(false)}
+            />
+            <ChooseBotVoiceDialog open={openBotVoiceDialog}
+                onClose={() => setOpenBotVoiceDialog(false)}
+                currentVoice={selectedVoiceBot}
+                onVoiceSelected={onVoiceSelected}
+            />
         </>
     );
 }
