@@ -135,11 +135,11 @@ const Create3DTextDialog = ({ open, onClose, defaultMessage, on3DTextSelected })
                 </HeaderContainer>
                 <GridContainer>
                     {giphyText.length > 0 &&
-                        <ImageList cols={window.innerWidth <= 320 ? 2 : 3} gap={8}>
+                        <ImageList cols={2} gap={8}>
                             {giphyText.map((giphyText) => (
                                 <ImageListItem key={giphyText.id} style={{ cursor: text === '' ? 'auto' : 'pointer' }}>
                                     <img src={`${giphyText.images.fixed_width_small.url}?w=248&fit=crop&auto=format`}
-                                        onClick={() => text === ''  ? onGiphyTextSelected(giphyText.images.original) : onGiphyTextSelected(giphyText.images.original)}
+                                        onClick={() => text === ''  ? null : onGiphyTextSelected(giphyText.images.original)}
                                         height={giphyText.images.fixed_width_small.height}
                                         width={giphyText.images.fixed_width_small.width}
                                         style={{ color: 'transparent' }}

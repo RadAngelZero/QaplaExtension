@@ -45,6 +45,7 @@ const BotVoiceContainer = styled(Box)({
     marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    cursor: 'pointer'
 });
 
 const BotVoicePill = styled(Box)({

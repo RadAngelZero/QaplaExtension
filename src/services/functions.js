@@ -17,3 +17,17 @@ import { functions } from './firebase';
         console.log(error);
     }
 }
+
+/**
+ * Get the emotes of the given streamer
+ * @param {string} streamerUid Streamer (database) identifier
+ */
+export async function getStreamerEmotes(streamerUid) {
+    const getEmotes = httpsCallable(functions, 'getStreamerEmotes');
+
+    try {
+        return await getEmotes({ streamerUid });
+    } catch (error) {
+        console.log(error);
+    }
+}

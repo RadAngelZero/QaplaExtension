@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { Avatar, Box, Button, ClickAwayListener, IconButton, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, CircularProgress, ClickAwayListener, IconButton, TextField, Typography } from '@mui/material';
 import Tooltip from 'react-power-tooltip'
 
 import { ReactComponent as Interactions } from './../../assets/Icons/Interactions.svg';
@@ -378,7 +378,7 @@ const MediaOptionSelectedIcon = () => {
     );
 }
 
-const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSelected, emoteUrl = null, tooltipText, tooltipHighlightedText }) => {
+const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSelected, emoteUrl, tooltipText, tooltipHighlightedText }) => {
     const mediaOptionData = mediaOptionsData[type];
     const [showTooltip, setShowTooltip] = useState(false);
 
@@ -388,6 +388,18 @@ const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSele
 
     const onCloseTooltip = () => {
         setShowTooltip(false);
+    }
+
+    // emoteUrl === undefined means we are trying to get the emote
+    if (type === EMOTE && emoteUrl === undefined) {
+        return (
+            <CircularProgress size={32} />
+        );
+    }
+
+    // emoteUrl === null means we could not find emotes
+    if (type === EMOTE && emoteUrl === null) {
+        return null;
     }
 
     return (
@@ -461,6 +473,7 @@ const TweetReactionView = ({
     extraTip,
     setExtraTip,
     onChangeReactionLevel,
+    randomEmoteUrl
 }) => {
     const [tips, setTips] = useState([
         { quantity: 100 },
@@ -497,6 +510,8 @@ const TweetReactionView = ({
         setOpenTippingMenu(false);
         setExtraTip(amount);
     }
+
+    console.log(randomEmoteUrl);
 
     return (
         <Container>
@@ -601,6 +616,7 @@ const TweetReactionView = ({
                                     type={mediaType}
                                     isSelected={isMediaOptionSelected(mediaType)}
                                     excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
+                                    emoteUrl={randomEmoteUrl}
                                     onOpenTooltip={(e) => console.log(e)}
                                     tooltipText='👀 Upgrade your reaction to use'
                                     tooltipHighlightedText='Animated Avatar, TTS Bot Voice & 3D Text' />
@@ -610,7 +626,7 @@ const TweetReactionView = ({
                                     type={mediaType}
                                     onClick={(type) => onMediaOptionClick(type)}
                                     disabled
-                                    emoteUrl={/*randomEmoteUrl*/'https://toppng.com/public/uploads/thumbnail/view-pogger-pogchamp-emote-11563056054hofxhb4alo.png'}
+                                    emoteUrl={randomEmoteUrl}
                                     // onUpgradeReaction={this.props.onUpgradeReaction}
                                     onOpenTooltip={(e) => this.openTooltip(e, mediaType)} />
                             ))}

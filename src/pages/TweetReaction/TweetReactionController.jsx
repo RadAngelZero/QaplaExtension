@@ -10,6 +10,7 @@ import { useTwitch } from '../../hooks/TwitchProvider';
 import { useAuth } from '../../hooks/AuthProvider';
 import { getReactionPriceDefault, getStreamerWithTwitchId, loadReactionPriceByLevel } from '../../services/database';
 import Create3DTextDialog from '../../components/Create3DTextDialog';
+import { getStreamerEmotes } from '../../services/functions';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -18,7 +19,7 @@ const TweetReactionController = () => {
     const [openMemeDialog, setOpenMemeDialog] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [openReactionLevelModal, setOpenReactionLevelModal] = useState(false);
-    const [reactionLevel, setReactionLevel] = useState(2);
+    const [reactionLevel, setReactionLevel] = useState(3);
     const [extraTip, setExtraTip] = useState(null);
     const [tipping, setTipping] = useState(false);
     const [selectedVoiceBot, setSelectedVoiceBot] = useState(null);
@@ -27,6 +28,7 @@ const TweetReactionController = () => {
     const [streamerUid, setStreamerUid] = useState(null);
     const [custom3DText, setCustom3DText] = useState(null);
     const [open3DTextDialog, setOpen3DTextDialog] = useState(false);
+    const [randomEmoteUrl, setRandomEmoteUrl] = useState(undefined);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -64,12 +66,44 @@ const TweetReactionController = () => {
             setCosts(costs);
         }
 
+        async function loadStreamerEmotes() {
+            const emotesRequest = await getStreamerEmotes(streamerUid);
+
+            if (emotesRequest && emotesRequest.data) {
+                let emotes = emotesRequest.data ? emotesRequest.data : null;
+                if (emotes) {
+
+                    /**
+                     * Twitch don't allow us to use their global emotes in our extension
+                     * See 4.3 on the next url for more information
+                     * https://dev.twitch.tv/docs/extensions/guidelines-and-policies#4-content-policy
+                     */
+                    emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
+
+                    // Find the first array who has more than 0 elements
+                    const array = emotes.find((typeOfEmote) => typeOfEmote.data[0].length > 0);
+                    if (array) {
+                        const randomNumber = Math.floor(Math.random() * array.data[0].length);
+
+                        return setRandomEmoteUrl(array.data[0][randomNumber].images.url_1x);
+                    }
+                }
+            }
+
+            /**
+             * If for some reason we reach here, that means we could not find an emote, so we set the
+             * randomEmoteUrl as null
+             */
+            setRandomEmoteUrl(null);
+        }
+
         if (!streamerUid) {
             if (user && user.twitchExtensionData && user.twitchExtensionData.channelId) {
                 getStreamerUid(user.twitchExtensionData.channelId);
             }
         } else {
             loadPrices();
+            loadStreamerEmotes();
         }
     }, [user, streamerUid]);
 
@@ -170,7 +204,8 @@ const TweetReactionController = () => {
                 voiceBot={selectedVoiceBot}
                 onVoiceSelected={setSelectedVoiceBot}
                 custom3DText={custom3DText}
-                onRemoveCustom3DText={() => setCustom3DText(null)} />
+                onRemoveCustom3DText={() => setCustom3DText(null)}
+                randomEmoteUrl={randomEmoteUrl} />
             {/*
             <TweetReactionScreen onSend={this.onSendReaction}
                 sending={this.state.sending}
