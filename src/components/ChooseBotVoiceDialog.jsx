@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Dialog, IconButton, ImageList, ImageListItem, Ic } from '@mui/material';
+import { Box, Dialog, IconButton } from '@mui/material';
 import styled from '@emotion/styled';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as CheckCircleWhite } from './../assets/Icons/CheckCircleWhite.svg';
 import { ReactComponent as TTSBot } from './../assets/Icons/TTSBot.svg';
+import { getAvailableBotVoices } from '../services/database';
 
 const VoiceSelectorContainer = styled(Box)({
     marginTop: 'auto',
@@ -117,26 +118,30 @@ const BotVoice = ({ label, selected, onPress }) => {
 }
 
 const ReactionTierSelectorDialog = ({ open, onClose, onVoiceSelected, currentVoice }) => {
-    const [voices, setVoices] = useState([
-        {
-            key: 'port',
-            label: 'Portuguese'
-        },
-        {
-            key: 'alexa',
-            label: 'Alexa(en)'
-        },
-        {
-            key: 'heis',
-            label: 'Heisenberg(en)'
-        }
-    ]);
+    const [voices, setVoices] = useState([]);
 
-    const HandleVoiceSelection = (voiceKey) => {
+    useEffect(() => {
+        async function fetchVoices() {
+            const voices = await getAvailableBotVoices();
+            const voicesArray = [];
+            voices.forEach((voice) => {
+                if (!voice.val().default) {
+                    voicesArray.push({
+                        ...voice.val(),
+                        key: voice.key
+                    });
+                }
+            });
+
+            setVoices(voicesArray);
+        }
+
+        fetchVoices();
+    }, []);
+
+    const voiceSelected = (voiceKey) => {
         onVoiceSelected(voiceKey);
-        setTimeout(() => {
-            onClose();
-        }, 350)
+        onClose();
     }
 
     return (
@@ -158,9 +163,14 @@ const ReactionTierSelectorDialog = ({ open, onClose, onVoiceSelected, currentVoi
                         {`Choose a TTS Bot Voice`}
                     </HeaderText>
                 </HeaderContainer>
-                <BotVoice label={'Google (Default)'} selected={currentVoice === null} onPress={() => HandleVoiceSelection(null)} />
+                <BotVoice label={'Google (Default)'}
+                    selected={currentVoice === null}
+                    onPress={() => voiceSelected(null)} />
                 {voices.map((voice) => (
-                    <BotVoice label={voice.label} selected={currentVoice === voice.key} onPress={() => HandleVoiceSelection(voice)} />
+                    <BotVoice key={voice.key}
+                        label={voice.key}
+                        selected={currentVoice === voice.key}
+                        onPress={() => voiceSelected(voice.key)} />
                 ))}
             </VoiceSelectorContainer>
         </Dialog>);

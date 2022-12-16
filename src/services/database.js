@@ -33,8 +33,8 @@ function createChild(databaseChild) {
 //////////////////////
 
 /**
- * Returns the found uid´s linked to the given Twitch id (it returns an object of objects but we know that
- * the relationship between uid and Twitch id is 1:1)
+ * Returns the found uid´s linked to the given Twitch Id (it returns an object of objects but we know that
+ * the relationship between uid and Twitch Id is 1:1)
  * @param {string} twitchId Twitch identifier
  * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
  */
@@ -105,6 +105,22 @@ function createChild(databaseChild) {
 }
 
 //////////////////////
+// User Streamer
+//////////////////////
+
+/**
+ * Returns the found streamers linked to the given Twitch Id (it returns an object of objects but we know that
+ * the relationship between uid and Twitch Id is 1:1)
+ * @param {string} streamerId Streamer Twitch Id
+ * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ */
+export async function getStreamerWithTwitchId(streamerId) {
+    const userStreamer = createChild(`/UserStreamer`);
+
+    return await get(query(userStreamer, orderByChild('id'), equalTo(streamerId)));
+}
+
+//////////////////////
 // Qapla Memes
 //////////////////////
 
@@ -116,4 +132,70 @@ function createChild(databaseChild) {
     const memesLibrary = createChild('/QaplaInteractions/Memes');
 
     return await get(query(memesLibrary));
+}
+
+//////////////////////
+// Gifs Libraries
+//////////////////////
+
+/**
+ * Returns a random gif from the given library
+ * @param {string} libraryName Name of the library
+ * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ */
+export async function getRandomGifByLibrary(libraryName) {
+    const libraryLength = createChild(`/GifsLibraries/${libraryName}/length`);
+    const length = await get(query(libraryLength));
+
+    const index = Math.floor(Math.random() * length.val());
+    const gif = createChild(`/GifsLibraries/${libraryName}/gifs/${index}`);
+
+    return await get(query(gif));
+}
+
+//////////////////////
+// Reactions Prices Bits
+//////////////////////
+
+/**
+ * Gets the price in Bits of the given reaction level and their Sku on the Twitch catalog (this price
+ * is always the one the streamer selected in their configuration)
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} reactionLevel Reaction level name (e.g: level1)
+ * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ */
+export async function loadReactionPriceByLevel(streamerUid, reactionLevel) {
+    const channelPrices = createChild(`/ReactionsPricesBits/${streamerUid}/${reactionLevel}`);
+
+    return await get(query(channelPrices));
+}
+
+//////////////////////
+// Reactions Prices Default
+//////////////////////
+
+/**
+ * Gets the price in Bits of the given reaction level and their Sku on the Twitch catalog (this price will be
+ * the default, used in cases where the streamer has not selected another price)
+ * @param {string} reactionLevel Reaction level name (e.g: level1)
+ * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ */
+export async function getReactionPriceDefault(reactionLevel) {
+    const defaultPrice = createChild(`/ReactionsPricesDefault/${reactionLevel}/bits`);
+
+    return await get(query(defaultPrice));
+}
+
+//////////////////////
+// Voice Bot Available Voices
+//////////////////////
+
+/**
+ * Load all the available voices for the voice bot
+ * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ */
+export async function getAvailableBotVoices() {
+    const availableVoices = createChild('/VoiceBotAvailableVoices');
+
+    return await get(query(availableVoices));
 }

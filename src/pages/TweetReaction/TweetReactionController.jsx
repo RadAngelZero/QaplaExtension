@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import TweetReactionView from './TweetReactionView';
 import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
@@ -6,32 +6,83 @@ import GiphyMediaSelectorDialog from '../../components/GiphyMediaSelectorDialog'
 import MemeMediaSelectorDialog from '../../components/MemeMediaSelectorDialog';
 import ReactionTierSelectorDialog from '../../components/ReactionTierSelectorDialog';
 import ChooseBotVoiceDialog from '../../components/ChooseBotVoiceDialog';
+import { useTwitch } from '../../hooks/TwitchProvider';
+import { useAuth } from '../../hooks/AuthProvider';
+import { getReactionPriceDefault, getStreamerWithTwitchId, loadReactionPriceByLevel } from '../../services/database';
+import Create3DTextDialog from '../../components/Create3DTextDialog';
 
 const TweetReactionController = () => {
+    const [message, setMessage] = useState('');
     const [openGiphyDialog, setOpenGiphyDialog] = useState(false);
     const [giphyDialogMediaType, setGiphyDialogMediaType] = useState(GIPHY_GIFS);
     const [openMemeDialog, setOpenMemeDialog] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [openReactionLevelModal, setOpenReactionLevelModal] = useState(false);
-    const [reactionLevel, setReactionLevel] = useState(1);
-    const [selectedTip, setSelectedTip] = useState(null);
+    const [reactionLevel, setReactionLevel] = useState(2);
+    const [extraTip, setExtraTip] = useState(null);
     const [tipping, setTipping] = useState(false);
     const [selectedVoiceBot, setSelectedVoiceBot] = useState(null);
     const [openBotVoiceDialog, setOpenBotVoiceDialog] = useState(false);
+    const [costs, setCosts] = useState([0, undefined, undefined]);
+    const [streamerUid, setStreamerUid] = useState(null);
+    const [custom3DText, setCustom3DText] = useState(null);
+    const [open3DTextDialog, setOpen3DTextDialog] = useState(false);
+    const twitch = useTwitch();
+    const user = useAuth();
+
+    useEffect(() => {
+        async function loadProducts() {
+            const products = await twitch.bits.getProducts();
+
+        }
+
+        loadProducts();
+    }, []);
+
+    useEffect(() => {
+        async function getStreamerUid(streamerId) {
+            const streamer = await getStreamerWithTwitchId(streamerId);
+            setStreamerUid(Object.keys(streamer.val())[0]);
+        }
+
+        async function loadPrices() {
+            const costs = [0];
+
+            for (let i = 2; i <= 3; i++) {
+                const costSnapshot = await loadReactionPriceByLevel(streamerUid, `level${i}`);
+                let cost = null;
+                if (costSnapshot.exists()) {
+                    cost = costSnapshot.val();
+                } else {
+                    const defaultCost = await getReactionPriceDefault(`level${i}`);
+                    cost = defaultCost.val();
+                }
+
+                costs.push(cost);
+            }
+
+            setCosts(costs);
+        }
+
+        if (!streamerUid) {
+            if (user && user.twitchExtensionData && user.twitchExtensionData.channelId) {
+                getStreamerUid(user.twitchExtensionData.channelId);
+            }
+        } else {
+            loadPrices();
+        }
+    }, [user, streamerUid]);
 
     const tippingHandler = () => {
         setTipping(!tipping);
     }
 
-    const tipHandler = (num) => {
-        setSelectedTip(num);
-        setTimeout(() => {
-            setTipping(false);
-        }, 350)
+    const setTip = (num) => {
+        setExtraTip(num);
+        setTipping(false);
     }
 
     const onMediaOptionClick = (mediaType) => {
-        console.log(mediaType);
         switch (mediaType) {
             case GIPHY_GIFS:
             case GIPHY_STICKERS:
@@ -44,6 +95,9 @@ const TweetReactionController = () => {
             case CUSTOM_TTS_VOICE:
                 setOpenBotVoiceDialog(true);
                 break;
+            case GIPHY_TEXT:
+                setOpen3DTextDialog(true);
+                break;
             default:
                 break;
         }
@@ -55,12 +109,13 @@ const TweetReactionController = () => {
         setOpenMemeDialog(false);
     }
 
-    const onVoiceSelected = (voice) => {
-        setSelectedVoiceBot(voice);
+    const on3DTextSelected = (message, custom3DText) => {
+        setMessage(message);
+        setCustom3DText(custom3DText);
+        setOpen3DTextDialog(false);
     }
 
     let availableContent = [];
-    let lockedContent = [];
     switch (reactionLevel) {
         case 1:
             availableContent = [
@@ -100,20 +155,22 @@ const TweetReactionController = () => {
     return (
         <>
             <TweetReactionView
+                message={message}
+                setMessage={setMessage}
                 onMediaOptionClick={onMediaOptionClick}
                 selectedMedia={selectedMedia}
                 cleanSelectedMedia={() => setSelectedMedia(null)}
                 mediaSelectorBarOptions={availableContent}
-                lockedContent={lockedContent}
-                reactionLevel={1}
+                reactionLevel={reactionLevel}
                 tipping={tipping}
                 tippingHandler={tippingHandler}
-                selectedTip={selectedTip}
-                updateTip={tipHandler}
+                extraTip={extraTip}
+                setExtraTip={setTip}
                 onChangeReactionLevel={() => setOpenReactionLevelModal(true)}
                 voiceBot={selectedVoiceBot}
-                onVoiceSelected={onVoiceSelected}
-            />
+                onVoiceSelected={setSelectedVoiceBot}
+                custom3DText={custom3DText}
+                onRemoveCustom3DText={() => setCustom3DText(null)} />
             {/*
             <TweetReactionScreen onSend={this.onSendReaction}
                 sending={this.state.sending}
@@ -155,12 +212,16 @@ const TweetReactionController = () => {
                 onMediaSelected={onMediaSelected} />
             <ReactionTierSelectorDialog open={openReactionLevelModal}
                 onClose={() => setOpenReactionLevelModal(false)}
-            />
+                costs={costs}
+                changeReactionLevel={setReactionLevel} />
             <ChooseBotVoiceDialog open={openBotVoiceDialog}
                 onClose={() => setOpenBotVoiceDialog(false)}
                 currentVoice={selectedVoiceBot}
-                onVoiceSelected={onVoiceSelected}
-            />
+                onVoiceSelected={setSelectedVoiceBot} />
+            <Create3DTextDialog open={open3DTextDialog}
+                onClose={() => setOpen3DTextDialog(false)}
+                defaultMessage={message}
+                on3DTextSelected={on3DTextSelected} />
         </>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Dialog, IconButton, ImageList, ImageListItem, Ic } from '@mui/material';
+import { Box, Dialog, IconButton } from '@mui/material';
 import styled from '@emotion/styled';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
@@ -10,10 +10,9 @@ import { ReactComponent as Sticker } from './../assets/Icons/Sticker.svg';
 import { ReactComponent as Avatar } from './../assets/Icons/Avatar.svg';
 import { ReactComponent as GiphyText } from './../assets/Icons/GiphyText.svg';
 import { ReactComponent as TTSBot } from './../assets/Icons/TTSBot.svg';
-
-
 import { ReactComponent as Interactions } from './../assets/Icons/Interactions.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
+import { getRandomGifByLibrary } from '../services/database';
 
 const ReactionTierSelectorContainer = styled(Box)({
     display: 'flex',
@@ -74,6 +73,7 @@ const Tier = styled(Box)({
     backgroundColor: '#3B4BF9',
     padding: '24px',
     justifyContent: 'space-between',
+    cursor: 'pointer'
 });
 
 const IconsContainer = styled(Box)({
@@ -127,7 +127,31 @@ const PriceText = styled('p')({
     marginLeft: '8px',
 });
 
-const ReactionTierSelectorDialog = ({ open, onClose, onMediaSelected }) => {
+const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel }) => {
+    const [level1Gif, setLevel1Gif] = useState(null);
+    const [level2Gif, setLevel2Gif] = useState(null);
+    const [level3Gif, setLevel3Gif] = useState(null);
+
+    useEffect(() => {
+        async function loadGif(setLevel, library) {
+            const gif = await getRandomGifByLibrary(library);
+
+            return setLevel(gif.val());
+        }
+
+        if (!level1Gif && !level2Gif && !level3Gif) {
+            loadGif(setLevel1Gif, 'ChannelPointsReactions');
+            loadGif(setLevel2Gif, 'level2Reactions');
+            loadGif(setLevel3Gif, 'level3Reactions');
+        }
+
+    }, [level1Gif, level2Gif, level3Gif]);
+
+    const onChangeReactionLevel = (level) => {
+        changeReactionLevel(level);
+        onClose();
+    }
+
     return (
         <Dialog open={open}
             onClose={onClose}
@@ -148,7 +172,12 @@ const ReactionTierSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                     </HeaderText>
                 </HeaderContainer>
                 <TiersContainer>
-                    <Tier>
+                    <Tier onClick={() => onChangeReactionLevel(1)}
+                        style={{
+                            background: `url('${level1Gif}')`,
+                            backgroundSize: 'cover',
+                            backgroundRepeat: 'no-repeat'
+                        }}>
                         <IconsContainer>
                             <Icon>
                                 <GIF />
@@ -167,12 +196,17 @@ const ReactionTierSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                             <PriceContainer>
                                 <Interactions />
                                 <PriceText>
-                                    {`1`}
+                                    1
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
                     </Tier>
-                    <Tier>
+                    <Tier onClick={() => onChangeReactionLevel(2)}
+                        style={{
+                            background: `url('${level2Gif}')`,
+                            backgroundSize: 'cover',
+                            backgroundRepeat: 'no-repeat'
+                        }}>
                         <IconsContainer>
                             <Icon>
                                 <UpgradeArrow />
@@ -191,12 +225,17 @@ const ReactionTierSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                             <PriceContainer>
                                 <Bits />
                                 <PriceText>
-                                    {`100`}
+                                    {costs[1] && costs[1].price}
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
                     </Tier>
-                    <Tier>
+                    <Tier onClick={() => onChangeReactionLevel(3)}
+                        style={{
+                            background: `url('${level3Gif}')`,
+                            backgroundSize: 'cover',
+                            backgroundRepeat: 'no-repeat'
+                        }}>
                         <IconsContainer>
                             <Icon>
                                 <UpgradeArrow />
@@ -212,7 +251,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                             <PriceContainer>
                                 <Bits />
                                 <PriceText>
-                                    {`5,000`}
+                                    {costs[2] && costs[2].price}
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
@@ -220,7 +259,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                 </TiersContainer>
             </ReactionTierSelectorContainer>
         </Dialog>
-    )
+    );
 }
 
 export default ReactionTierSelectorDialog;

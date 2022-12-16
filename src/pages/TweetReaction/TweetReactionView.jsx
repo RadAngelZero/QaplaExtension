@@ -200,10 +200,7 @@ const MediaOptionsContainer = styled(Box)({
 
 const MediaOptionButton = styled(IconButton)({
     padding: 0,
-    position: 'relative',
-    '&:disabled': {
-        opacity: .2
-    }
+    position: 'relative'
 });
 
 const TooltipText = styled(Typography)({
@@ -385,10 +382,17 @@ const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSele
     const mediaOptionData = mediaOptionsData[type];
     const [showTooltip, setShowTooltip] = useState(false);
 
+    const onOpenTooltip = () => {
+        setShowTooltip(true);
+    }
+
+    const onCloseTooltip = () => {
+        setShowTooltip(false);
+    }
+
     return (
-        <ClickAwayListener onClickAway={() => setShowTooltip(false)}>
-            <MediaOptionButton onClick={() => !disabled && !excluded ? onClick(type) : setShowTooltip(true)}
-                active={!disabled && !excluded}>
+        <ClickAwayListener onClickAway={() => onCloseTooltip()}>
+            <MediaOptionButton onClick={() => !disabled && !excluded ? onClick(type) : onOpenTooltip()}>
                 <Tooltip show={showTooltip}
                     position='top center'
                     backgroundColor='#3B4BF9'
@@ -442,20 +446,21 @@ const ExtraTipOption = ({ label, onClick, selected }) => {
 }
 
 const TweetReactionView = ({
+    message,
+    setMessage,
     onMediaOptionClick,
     selectedMedia,
     cleanSelectedMedia,
     mediaSelectorBarOptions,
     custom3DText,
+    onRemoveCustom3DText,
     voiceBot,
+    onVoiceSelected,
     emoteRaid,
     reactionLevel,
-    tipping,
-    tippingHandler,
-    selectedTip,
-    updateTip,
+    extraTip,
+    setExtraTip,
     onChangeReactionLevel,
-    onVoiceSelected
 }) => {
     const [tips, setTips] = useState([
         { quantity: 100 },
@@ -463,6 +468,7 @@ const TweetReactionView = ({
         { quantity: 1000 },
         { quantity: 5000 },
     ]);
+    const [openTippingMenu, setOpenTippingMenu] = useState(false);
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
 
     const isMediaOptionSelected = (mediaType) => {
@@ -482,6 +488,16 @@ const TweetReactionView = ({
         }
     }
 
+    const noTipButtonHandler = () => {
+        setOpenTippingMenu(false);
+        setExtraTip(0);
+    }
+
+    const setSelectedTip = (amount) => {
+        setOpenTippingMenu(false);
+        setExtraTip(amount);
+    }
+
     return (
         <Container>
             <ContentContainer>
@@ -489,26 +505,38 @@ const TweetReactionView = ({
                     <AvatarImage
                         src='https://static-cdn.jtvnw.net/jtv_user_pictures/ac4d7937-4dd8-47b8-8e15-d3226f1405b3-profile_image-300x300.png' />
                     <MessageContainer>
-                        <MessageInput variant='standard'
-                            InputProps={{
-                                disableUnderline: true,
-                                style: {
-                                    color: '#FFF',
-                                    "&::placeholder": {
-                                        color: '#C2C2C2'
-                                    },
-                                    padding: 0
-                                }
-                            }}
-                            inputProps={{ maxLength: 100 }}
-                            multiline
-                            placeholder='Type to create TTS'
-                            fullWidth
-                            autoFocus />
-                        {!voiceBot &&
-                            <OptionalLabel>
-                                Optional
-                            </OptionalLabel>
+                        {!custom3DText ?
+                            <>
+                            <MessageInput variant='standard'
+                                InputProps={{
+                                    disableUnderline: true,
+                                    style: {
+                                        color: '#FFF',
+                                        "&::placeholder": {
+                                            color: '#C2C2C2'
+                                        },
+                                        padding: 0
+                                    }
+                                }}
+                                inputProps={{ maxLength: 100 }}
+                                multiline
+                                placeholder='Type to create TTS'
+                                fullWidth
+                                autoFocus
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)} />
+                            {!voiceBot &&
+                                <OptionalLabel>
+                                    Optional
+                                </OptionalLabel>
+                            }
+                            </>
+                            :
+                            <img src={custom3DText.url}
+                                style={{
+                                    width: window.innerWidth * .35,
+                                    aspectRatio: custom3DText.width / custom3DText.height
+                                }} />
                         }
                         {voiceBot &&
                             <BotVoicePill onClick={() => onVoiceSelected(null)}>
@@ -517,7 +545,7 @@ const TweetReactionView = ({
                                         <TTSVoice style={{ maxWidth: '24px', maxHeight: '24px' }} />
                                     </VoiceIconContainer>
                                     <BotVoiceText>
-                                        {voiceBot.label}
+                                        {voiceBot}
                                     </BotVoiceText>
                                     <RemoveButtonContainer>
                                         <Close />
@@ -543,7 +571,7 @@ const TweetReactionView = ({
                         </>
                     }
                 </SelectedMediaContainer>
-                {!tipping ?
+                {!openTippingMenu ?
                     <ActionsContainer>
                         <PricesButton startIcon={<Interactions />} onClick={onChangeReactionLevel}>
                             1
@@ -555,13 +583,16 @@ const TweetReactionView = ({
                     :
                     <TipContainer>
                         {tips.map((tip) => (
-                            <ExtraTipOption label={tip.quantity} selected={tip.quantity === selectedTip} onClick={() => updateTip(tip.quantity)} />
+                            <ExtraTipOption key={`tip-${tip.quantity}`}
+                                label={tip.quantity}
+                                selected={tip.quantity === extraTip}
+                                onClick={() => setSelectedTip(tip.quantity)} />
                         ))}
                     </TipContainer>
                 }
             </ContentContainer>
             <MediaSelectionContainer>
-                {!tipping ?
+                {!openTippingMenu ?
                     <>
                         <MediaOptionsContainer>
                             {mediaSelectorBarOptions.map((mediaType) => (
@@ -578,25 +609,24 @@ const TweetReactionView = ({
                                 <MediaOption key={mediaType}
                                     type={mediaType}
                                     onClick={(type) => onMediaOptionClick(type)}
-                                    // disabled
+                                    disabled
                                     emoteUrl={/*randomEmoteUrl*/'https://toppng.com/public/uploads/thumbnail/view-pogger-pogchamp-emote-11563056054hofxhb4alo.png'}
                                     // onUpgradeReaction={this.props.onUpgradeReaction}
                                     onOpenTooltip={(e) => this.openTooltip(e, mediaType)} />
                             ))}
                         </MediaOptionsContainer>
-                        <TipButton startIcon={<PlusCircle />} onClick={tippingHandler} >
+                        <TipButton startIcon={<PlusCircle />} onClick={() => setOpenTippingMenu(!openTippingMenu)} >
                             Tip
                         </TipButton>
                     </>
                     :
-                    <NoTipButton onClick={tippingHandler}>
+                    <NoTipButton onClick={noTipButtonHandler}>
                         <NoTipIcon>
                             <PlusCircle />
                         </NoTipIcon>
                         No Tip
                     </NoTipButton>
                 }
-
             </MediaSelectionContainer>
         </Container>
     );
