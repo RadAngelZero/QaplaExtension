@@ -140,8 +140,8 @@ const ReactionTierSelectorDialog = ({ open, onClose, onVoiceSelected, currentVoi
         fetchVoices();
     }, []);
 
-    const voiceSelected = (voiceKey) => {
-        onVoiceSelected(voiceKey);
+    const voiceSelected = (voiceData) => {
+        onVoiceSelected(voiceData);
         onClose();
     }
 
@@ -171,7 +171,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, onVoiceSelected, currentVoi
                     <BotVoice key={voice.key}
                         label={voice.key}
                         selected={currentVoice === voice.key}
-                        onPress={() => voiceSelected(voice.key)} />
+                        onPress={() => voiceSelected(voice)} />
                 ))}
             </VoiceSelectorContainer>
         </Dialog>);

@@ -30,7 +30,6 @@ const CloseIconButton = styled(IconButton)({
 
 const GridContainer = styled(Box)({
     marginTop: '16px',
-    padding: '0px !important',
     padding: 16,
     backgroundColor: '#141539'
 });

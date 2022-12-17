@@ -11,6 +11,7 @@ import { useAuth } from '../../hooks/AuthProvider';
 import { getReactionPriceDefault, getStreamerWithTwitchId, loadReactionPriceByLevel } from '../../services/database';
 import Create3DTextDialog from '../../components/Create3DTextDialog';
 import { getStreamerEmotes } from '../../services/functions';
+import EmoteRainDialog from '../../components/EmoteRainDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -29,6 +30,9 @@ const TweetReactionController = () => {
     const [custom3DText, setCustom3DText] = useState(null);
     const [open3DTextDialog, setOpen3DTextDialog] = useState(false);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState(undefined);
+    const [emotes, setEmotes] = useState([]);
+    const [openEmoteRainDialog, setOpenEmoteRainDialog] = useState(false);
+    const [selectedEmote, setSelectedEmote] = useState(null);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -78,7 +82,9 @@ const TweetReactionController = () => {
                      * See 4.3 on the next url for more information
                      * https://dev.twitch.tv/docs/extensions/guidelines-and-policies#4-content-policy
                      */
-                    emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
+                    // emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
+
+                    setEmotes(emotes);
 
                     // Find the first array who has more than 0 elements
                     const array = emotes.find((typeOfEmote) => typeOfEmote.data[0].length > 0);
@@ -132,6 +138,9 @@ const TweetReactionController = () => {
             case GIPHY_TEXT:
                 setOpen3DTextDialog(true);
                 break;
+            case EMOTE:
+                setOpenEmoteRainDialog(true);
+                break;
             default:
                 break;
         }
@@ -147,6 +156,31 @@ const TweetReactionController = () => {
         setMessage(message);
         setCustom3DText(custom3DText);
         setOpen3DTextDialog(false);
+    }
+
+    const onVoiceSelected = (selectedVoiceBot) => {
+        if (selectedVoiceBot) {
+            setSelectedVoiceBot({
+                ...selectedVoiceBot,
+                title: selectedVoiceBot.key,
+                type: CUSTOM_TTS_VOICE,
+                onRemove: () => setSelectedVoiceBot(null),
+                timestamp: new Date().getTime()
+            });
+        } else {
+            setSelectedVoiceBot(null);
+        }
+    }
+
+    const onEmoteSelected = (emote) => {
+        setSelectedEmote({
+            url: emote,
+            title: 'Emote Raid',
+            type: EMOTE,
+            onRemove: () => setSelectedEmote(null),
+            timestamp: new Date().getTime()
+        });
+        setOpenEmoteRainDialog(false);
     }
 
     let availableContent = [];
@@ -202,10 +236,11 @@ const TweetReactionController = () => {
                 setExtraTip={setTip}
                 onChangeReactionLevel={() => setOpenReactionLevelModal(true)}
                 voiceBot={selectedVoiceBot}
-                onVoiceSelected={setSelectedVoiceBot}
                 custom3DText={custom3DText}
                 onRemoveCustom3DText={() => setCustom3DText(null)}
-                randomEmoteUrl={randomEmoteUrl} />
+                randomEmoteUrl={randomEmoteUrl}
+                userImage={user && user.photoUrl ? user.photoUrl : null}
+                emoteRaid={selectedEmote} />
             {/*
             <TweetReactionScreen onSend={this.onSendReaction}
                 sending={this.state.sending}
@@ -251,12 +286,16 @@ const TweetReactionController = () => {
                 changeReactionLevel={setReactionLevel} />
             <ChooseBotVoiceDialog open={openBotVoiceDialog}
                 onClose={() => setOpenBotVoiceDialog(false)}
-                currentVoice={selectedVoiceBot}
-                onVoiceSelected={setSelectedVoiceBot} />
+                currentVoice={selectedVoiceBot ? selectedVoiceBot.key : null}
+                onVoiceSelected={onVoiceSelected} />
             <Create3DTextDialog open={open3DTextDialog}
                 onClose={() => setOpen3DTextDialog(false)}
                 defaultMessage={message}
                 on3DTextSelected={on3DTextSelected} />
+            <EmoteRainDialog open={openEmoteRainDialog}
+                onClose={() => setOpenEmoteRainDialog(false)}
+                emotes={emotes}
+                onEmoteSelected={onEmoteSelected} />
         </>
     );
 }

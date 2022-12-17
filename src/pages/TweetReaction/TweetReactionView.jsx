@@ -314,12 +314,25 @@ const NoTipIcon = styled(Box)({
     marginRight: '4px',
 });
 
-const BotVoicePill = styled(Box)({
+const PillsList = styled(Box)({
+    display: 'flex',
+    flexDirection: 'row',
+    gap: '16px',
+    flexWrap: 'nowrap',
+    overflowX: 'auto',
+    maxWidth: '100%',
+    marginRight: '64px',
+    '&::-webkit-scrollbar': {
+        display: 'none'
+    }
+});
+
+const Pill = styled(Box)({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     padding: '3px',
-
+    flex: '0 0 auto',
     // height: '40px',
     width: 'fit-content',
     background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%)',
@@ -327,7 +340,7 @@ const BotVoicePill = styled(Box)({
     marginTop: '28px',
 });
 
-const BotVoiceInnerContainer = styled(Box)({
+const PillInnerContainer = styled(Box)({
     display: 'flex',
     flex: 1,
     padding: '7.5px 13px',
@@ -338,7 +351,7 @@ const BotVoiceInnerContainer = styled(Box)({
     backgroundColor: '#141539',
 });
 
-const BotVoiceText = styled('p')({
+const PillText = styled('p')({
     fontSize: '20px',
     fontWeight: '700',
     lineHeight: '24px',
@@ -361,12 +374,12 @@ const RemoveButtonContainer = styled(Box)({
     marginTop: '-16px',
 });
 
-const VoiceIconContainer = styled(Box)({
+const PillIconContainer = styled(Box)({
     marginTop: '-6px',
     marginRight: '16px',
     maxWidth: '16px',
     maxHeight: '16px',
-})
+});
 
 const MediaOptionSelectedIcon = () => {
     return (
@@ -467,13 +480,13 @@ const TweetReactionView = ({
     custom3DText,
     onRemoveCustom3DText,
     voiceBot,
-    onVoiceSelected,
     emoteRaid,
     reactionLevel,
     extraTip,
     setExtraTip,
     onChangeReactionLevel,
-    randomEmoteUrl
+    randomEmoteUrl,
+    userImage
 }) => {
     const [tips, setTips] = useState([
         { quantity: 100 },
@@ -511,14 +524,25 @@ const TweetReactionView = ({
         setExtraTip(amount);
     }
 
-    console.log(randomEmoteUrl);
+    let pills = [
+        voiceBot,
+        emoteRaid
+    ];
+
+    pills = pills.filter((item) => item).sort((a, b) => {
+        return b.timestamp - a.timestamp;
+    });
+
+    pills.forEach((item) => {
+        item.Icon = mediaOptionsData[item.type].Icon;
+    });
 
     return (
         <Container>
             <ContentContainer>
                 <TTSContainer>
                     <AvatarImage
-                        src='https://static-cdn.jtvnw.net/jtv_user_pictures/ac4d7937-4dd8-47b8-8e15-d3226f1405b3-profile_image-300x300.png' />
+                        src={userImage} />
                     <MessageContainer>
                         {!custom3DText ?
                             <>
@@ -540,7 +564,7 @@ const TweetReactionView = ({
                                 autoFocus
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)} />
-                            {!voiceBot &&
+                            {!message &&
                                 <OptionalLabel>
                                     Optional
                                 </OptionalLabel>
@@ -553,20 +577,35 @@ const TweetReactionView = ({
                                     aspectRatio: custom3DText.width / custom3DText.height
                                 }} />
                         }
-                        {voiceBot &&
-                            <BotVoicePill onClick={() => onVoiceSelected(null)}>
-                                <BotVoiceInnerContainer>
-                                    <VoiceIconContainer>
-                                        <TTSVoice style={{ maxWidth: '24px', maxHeight: '24px' }} />
-                                    </VoiceIconContainer>
-                                    <BotVoiceText>
-                                        {voiceBot}
-                                    </BotVoiceText>
-                                    <RemoveButtonContainer>
-                                        <Close />
-                                    </RemoveButtonContainer>
-                                </BotVoiceInnerContainer>
-                            </BotVoicePill>
+                        {pills.length > 0 &&
+                            <PillsList>
+                                {pills.map((pill) => (
+                                    <Pill>
+                                        <PillInnerContainer>
+                                            <PillIconContainer>
+                                                {pill.Icon ?
+                                                    <pill.Icon style={{
+                                                        height: '24px',
+                                                        width: '24px'
+                                                    }} />
+                                                    :
+                                                    <img src={pill.url}
+                                                        style={{
+                                                            height: '24px',
+                                                            width: '24px'
+                                                        }} />
+                                                }
+                                            </PillIconContainer>
+                                            <PillText>
+                                                {pill.title}
+                                            </PillText>
+                                            <RemoveButtonContainer onClick={pill.onRemove}>
+                                                <Close />
+                                            </RemoveButtonContainer>
+                                        </PillInnerContainer>
+                                    </Pill>
+                                ))}
+                            </PillsList>
                         }
                     </MessageContainer>
                 </TTSContainer>

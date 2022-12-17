@@ -2,7 +2,7 @@ export async function getUserData(twitchId, token) {
     const request = await fetch(`https://api.twitch.tv/helix/users?id=${twitchId}`, {
         method: 'GET',
         headers: {
-            'Client-Id': '5p2e8qphalcukdi9zztvfirx4licoh',
+            'Client-Id': '04ixhlbfcbpalxysybqrs4mjfbldhb',
             Authorization: `Extension ${token}`
         }
     });
