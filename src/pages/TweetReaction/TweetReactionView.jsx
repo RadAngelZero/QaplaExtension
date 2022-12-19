@@ -13,6 +13,7 @@ import { ReactComponent as CheckCircle } from './../../assets/Icons/CheckCircle.
 import { ReactComponent as GiphyText } from './../../assets/Icons/GiphyText.svg';
 import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
 import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
+import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
 import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
 
 const allMediaOptionsTypes = [
@@ -126,7 +127,8 @@ const SelectedMediaContainer = styled(Box)({
     paddingLeft: '72px',
     display: 'flex',
     flex: 1,
-    position: 'relative'
+    position: 'relative',
+    marginTop: '16px'
 });
 
 const SelectedMediaImage = styled(Box)((props) => ({
@@ -333,7 +335,6 @@ const Pill = styled(Box)({
     alignItems: 'center',
     padding: '3px',
     flex: '0 0 auto',
-    // height: '40px',
     width: 'fit-content',
     background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%)',
     borderRadius: '1000px',
@@ -346,7 +347,6 @@ const PillInnerContainer = styled(Box)({
     padding: '7.5px 13px',
     borderRadius: '1000px',
     alignItems: 'center',
-
     flexDirection: 'row',
     backgroundColor: '#141539',
 });
@@ -391,17 +391,9 @@ const MediaOptionSelectedIcon = () => {
     );
 }
 
-const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSelected, emoteUrl, tooltipText, tooltipHighlightedText }) => {
+const MediaOption = ({ index, type, disabled = false, excluded = false, onClick, isSelected, emoteUrl, tooltipText, tooltipHighlightedText, tooltipButtonText, reactionCost, onTooltipClick }) => {
     const mediaOptionData = mediaOptionsData[type];
     const [showTooltip, setShowTooltip] = useState(false);
-
-    const onOpenTooltip = () => {
-        setShowTooltip(true);
-    }
-
-    const onCloseTooltip = () => {
-        setShowTooltip(false);
-    }
 
     // emoteUrl === undefined means we are trying to get the emote
     if (type === EMOTE && emoteUrl === undefined) {
@@ -416,15 +408,21 @@ const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSele
     }
 
     return (
-        <ClickAwayListener onClickAway={() => onCloseTooltip()}>
-            <MediaOptionButton onClick={() => !disabled && !excluded ? onClick(type) : onOpenTooltip()}>
+        <ClickAwayListener onClickAway={() => setShowTooltip(false)}>
+            <MediaOptionButton onClick={() => !disabled && !excluded ? onClick(type) : setShowTooltip(true)}
+                style={{
+                    opacity: (!disabled && !excluded) || showTooltip ? 1 : .2
+                }}>
                 <Tooltip show={showTooltip}
+                    hoverBackground='#3B4BF9'
+                    hoverColor='#FFF'
                     position='top center'
                     backgroundColor='#3B4BF9'
                     color='#FFF'
                     alert='rgb(0, 255, 221)'
                     padding='16px 24px 32px 16px'
-                    textBoxWidth='314px'
+                    arrowAlign={index === 0 || index === 1 || index === 2 ? 'start' : (index > 2 && 'center')}
+                    textBoxWidth='350px'
                     borderRadius='15px'>
                     <TooltipText>
                         {tooltipText}
@@ -433,8 +431,31 @@ const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSele
                         </HighlightedText>
                     </TooltipText>
                     <TooltipButtonContainer>
-                        <TooltipButton>
-                            Upgrade Reaction
+                        <TooltipButton endIcon={<Arrow style={{ marginTop: '6px' }} />}
+                            onClick={() => onTooltipClick(mediaOptionsData[type].level, type)}>
+                            {tooltipButtonText}
+                            {reactionCost ?
+                                <>
+                                <HighlightedText style={{
+                                        fontSize: '16px',
+                                        fontWeight: '800',
+                                        display: 'flex',
+                                        marginLeft: '8px',
+                                        marginRight: '4px',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        maxWidth: '32px'
+                                    }}>
+                                    {reactionCost}
+                                </HighlightedText>
+                                <Bits style={{
+                                        height: '16px',
+                                        width: '16px'
+                                    }} />
+                                </>
+                                :
+                                null
+                            }
                         </TooltipButton>
                     </TooltipButtonContainer>
                 </Tooltip>
@@ -471,14 +492,16 @@ const ExtraTipOption = ({ label, onClick, selected }) => {
 }
 
 const TweetReactionView = ({
+    numberOfReactions,
     message,
     setMessage,
+    currentReactionCost,
+    costsPerReactionLevel,
     onMediaOptionClick,
     selectedMedia,
     cleanSelectedMedia,
     mediaSelectorBarOptions,
     custom3DText,
-    onRemoveCustom3DText,
     voiceBot,
     emoteRaid,
     reactionLevel,
@@ -486,14 +509,10 @@ const TweetReactionView = ({
     setExtraTip,
     onChangeReactionLevel,
     randomEmoteUrl,
-    userImage
+    userImage,
+    onUpgradeReaction,
+    availableTips
 }) => {
-    const [tips, setTips] = useState([
-        { quantity: 100 },
-        { quantity: 250 },
-        { quantity: 1000 },
-        { quantity: 5000 },
-    ]);
     const [openTippingMenu, setOpenTippingMenu] = useState(false);
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
 
@@ -516,12 +535,12 @@ const TweetReactionView = ({
 
     const noTipButtonHandler = () => {
         setOpenTippingMenu(false);
-        setExtraTip(0);
+        setExtraTip(null);
     }
 
-    const setSelectedTip = (amount) => {
+    const setSelectedTip = (tipObject) => {
         setOpenTippingMenu(false);
-        setExtraTip(amount);
+        setExtraTip(tipObject);
     }
 
     let pills = [
@@ -551,7 +570,7 @@ const TweetReactionView = ({
                                     disableUnderline: true,
                                     style: {
                                         color: '#FFF',
-                                        "&::placeholder": {
+                                        '&::placeholder': {
                                             color: '#C2C2C2'
                                         },
                                         padding: 0
@@ -627,8 +646,13 @@ const TweetReactionView = ({
                 </SelectedMediaContainer>
                 {!openTippingMenu ?
                     <ActionsContainer>
-                        <PricesButton startIcon={<Interactions />} onClick={onChangeReactionLevel}>
-                            1
+                        <PricesButton startIcon={reactionLevel === 1 ? <Interactions /> : <Bits />}
+                            onClick={onChangeReactionLevel}>
+                            {reactionLevel === 1 ?
+                                numberOfReactions
+                                :
+                                currentReactionCost && currentReactionCost.price
+                            }
                         </PricesButton>
                         <SendButton>
                             Send
@@ -636,11 +660,11 @@ const TweetReactionView = ({
                     </ActionsContainer>
                     :
                     <TipContainer>
-                        {tips.map((tip) => (
-                            <ExtraTipOption key={`tip-${tip.quantity}`}
-                                label={tip.quantity}
-                                selected={tip.quantity === extraTip}
-                                onClick={() => setSelectedTip(tip.quantity)} />
+                        {availableTips.map((tip) => (
+                            <ExtraTipOption key={`tip-${tip.twitchSku}`}
+                                label={tip.cost}
+                                selected={extraTip && tip.cost === extraTip.cost}
+                                onClick={() => setSelectedTip(tip)} />
                         ))}
                     </TipContainer>
                 }
@@ -649,25 +673,31 @@ const TweetReactionView = ({
                 {!openTippingMenu ?
                     <>
                         <MediaOptionsContainer>
-                            {mediaSelectorBarOptions.map((mediaType) => (
+                            {mediaSelectorBarOptions.map((mediaType, index) => (
                                 <MediaOption key={mediaType}
+                                    index={index}
                                     onClick={(type) => onMediaOptionClick(type)}
                                     type={mediaType}
                                     isSelected={isMediaOptionSelected(mediaType)}
                                     excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
                                     emoteUrl={randomEmoteUrl}
-                                    onOpenTooltip={(e) => console.log(e)}
-                                    tooltipText='👀 Upgrade your reaction to use'
-                                    tooltipHighlightedText='Animated Avatar, TTS Bot Voice & 3D Text' />
+                                    tooltipText='😯 You can only use one of '
+                                    tooltipHighlightedText={mediaType}
+                                    tooltipButtonText={`Use ${mediaType}`}
+                                    onTooltipClick={(level, media) => onMediaOptionClick(media)} />
                             ))}
-                            {noEnabledOptions.map((mediaType) => (
+                            {noEnabledOptions.map((mediaType, index) => (
                                 <MediaOption key={mediaType}
+                                    index={index + mediaSelectorBarOptions.length}
                                     type={mediaType}
                                     onClick={(type) => onMediaOptionClick(type)}
                                     disabled
                                     emoteUrl={randomEmoteUrl}
-                                    // onUpgradeReaction={this.props.onUpgradeReaction}
-                                    onOpenTooltip={(e) => this.openTooltip(e, mediaType)} />
+                                    tooltipText='👀 Upgrade your reaction to use '
+                                    tooltipHighlightedText='Custom TTS Bot Voice & 3D Text'
+                                    tooltipButtonText={`Upgrade Reaction `}
+                                    reactionCost={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].price : 0}
+                                    onTooltipClick={onUpgradeReaction} />
                             ))}
                         </MediaOptionsContainer>
                         <TipButton startIcon={<PlusCircle />} onClick={() => setOpenTippingMenu(!openTippingMenu)} >

@@ -15,9 +15,10 @@ import {
     orderByValue,
     remove
 } from 'firebase/database';
-import { getCurrentLanguage } from '../i18n';
-
 import { database } from './firebase';
+
+import { getCurrentLanguage } from '../i18n';
+import { BITS } from '../constants';
 
 /**
  * Gets a reference for the specified locatoin on database
@@ -198,4 +199,80 @@ export async function getAvailableBotVoices() {
     const availableVoices = createChild('/VoiceBotAvailableVoices');
 
     return await get(query(availableVoices));
+}
+
+//////////////////////
+// Users Reactions Count
+//////////////////////
+
+/**
+ * Listen and execute a callback every time the reaction count node is updated
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Steamer identifier
+ * @param {function} callback Handler for database values
+ */
+export function listenToUserReactionsCount(uid, streamerUid, callback) {
+    const userReactionsCount = createChild(`/UsersReactionsCount/${uid}/${streamerUid}`);
+
+    return onValue(query(userReactionsCount), callback);
+}
+
+//////////////////////
+// Twitch Extension Products
+//////////////////////
+
+/**
+ * Load all the available extra tips
+ * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ */
+export function getAvailableExtraTips() {
+    const availableExtraTips = createChild('/TwitchExtensionProducts/ExtraTips');
+
+    return get(query(availableExtraTips),);
+}
+
+//////////////////////
+// Streamers Donations
+//////////////////////
+
+export async function sendReaction(bits, media, message, messageExtraData, emoteRaid, timestamp, streamerName, uid, userName, twitchUserName, userPhotoURL, streamerUid, avatarId, avatarBackground, pointsChannelInteractions) {
+    const streamerDonations = createChild(`/StreamersDonations/${streamerUid}`);
+
+    const reactionReference = await push(streamerDonations, {
+        avatar: {
+            avatarId,
+            avatarBackground
+        },
+        /**
+         * amountQoins and donationType are filled even if the reaction is sent free with reaction points, our
+         * overlay handle it, amountQoins must be 0 if no Bits are present in the reaction
+         */
+        amountQoins: bits, // Named like this for historical reasons in our database structure
+        donationType: BITS, // Flag to identify the reaction was sent with Bits
+        media,
+        message,
+        messageExtraData,
+        emoteRaid,
+        timestamp,
+        uid,
+        twitchUserName,
+        userName,
+        photoURL: userPhotoURL,
+        pointsChannelInteractions, // Flag to identify if the reaction was sent with Channel Points or Bits
+        read: false
+    });
+
+    const streamerDonationsAdministrative = createChild(`/StreamersDonationAdministrative/${reactionReference.key}`);
+
+    return await set(streamerDonationsAdministrative, {
+        amountQoins: bits,
+        message,
+        timestamp,
+        uid,
+        sent: false,
+        twitchUserName,
+        userName,
+        streamerName,
+        pointsChannelInteractions
+    });
 }

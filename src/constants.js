@@ -7,3 +7,5 @@ export const GIPHY_TEXT = 'text';
 export const MEMES = 'memes';
 export const EMOTE = 'emote';
 export const CUSTOM_TTS_VOICE = 'customTTSVoice';
+
+export const BITS = 'bits';
