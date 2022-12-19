@@ -3,7 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useTwitch } from '../../hooks/TwitchProvider';
 import { useAuth } from '../../hooks/AuthProvider';
 
-import { getAvailableExtraTips, getReactionPriceDefault, getStreamerWithTwitchId, listenToUserReactionsCount, loadReactionPriceByLevel, sendReaction } from '../../services/database';
+import {
+    getAvailableExtraTips,
+    getReactionPriceDefault,
+    getStreamerWithTwitchId,
+    listenToUserReactionsCount,
+    loadReactionPriceByLevel,
+    sendReaction,
+    substractChannelPointReaction
+} from '../../services/database';
 import { getStreamerEmotes } from '../../services/functions';
 
 import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
@@ -15,6 +23,8 @@ import ReactionTierSelectorDialog from '../../components/ReactionTierSelectorDia
 import ChooseBotVoiceDialog from '../../components/ChooseBotVoiceDialog';
 import Create3DTextDialog from '../../components/Create3DTextDialog';
 import EmoteRainDialog from '../../components/EmoteRainDialog';
+import ReactionSentDialog from '../../components/ReactionSentDialog';
+import NoReactionsDialog from '../../components/NoReactionsDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -42,12 +52,12 @@ const TweetReactionController = () => {
     const [reactionPaid, setReactionPaid] = useState(false);
     const [streamerName, setStreamerName] = useState('');
     const [openSentDialog, setOpenSentDialog] = useState(false);
+    const [openNoReactionsDialog, setOpenNoReactionsDialog] = useState(false);
     const twitch = useTwitch();
     const user = useAuth();
 
     useEffect(() => {
         async function loadTips() {
-            // const products = await twitch.bits.getProducts();
             const extraTips = await getAvailableExtraTips();
 
             if (extraTips.exists()) {
@@ -102,7 +112,7 @@ const TweetReactionController = () => {
                      * See 4.3 on the next url for more information
                      * https://dev.twitch.tv/docs/extensions/guidelines-and-policies#4-content-policy
                      */
-                    // emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
+                    emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
 
                     setEmotes(emotes);
 
@@ -232,6 +242,7 @@ const TweetReactionController = () => {
         }
 
         await sendReaction(
+            bits,
             user.uid,
             user.userName,
             user.twitchUsername,
@@ -250,11 +261,13 @@ const TweetReactionController = () => {
                 type: EMOTE,
                 emojis: emoteArray
             },
-            bits,
+            (new Date()).getTime(),
             user.avatarId,
             user.avatarBackground,
             channelPointsReaction
         );
+
+        await substractChannelPointReaction(user.uid, streamerUid);
 
         setOpenSentDialog(true);
     }
@@ -262,6 +275,7 @@ const TweetReactionController = () => {
     const onSendReaction = () => {
         if (!sending) {
             setSending(true);
+            twitch.bits.setUseLoopback();
             if (reactionLevel !== 1) {
                 twitch.bits.onTransactionComplete((transactionObject) => {
                     if (transactionObject.initiator === 'CURRENT_USER') {
@@ -285,22 +299,43 @@ const TweetReactionController = () => {
 
                 twitch.bits.useBits(costs[reactionLevel - 1].twitchSku);
             } else {
-                if (extraTip) {
-                    // Channel point reaction but with extra tip
-                    twitch.bits.onTransactionComplete((transactionObject) => {
-                        if (transactionObject.initiator === 'CURRENT_USER') {
-                            // Extra tip paid, write reaction
-                            writeReaction(extraTip.cost, true);
-                        }
-                    });
+                // Check if user has enough reactions
+                if (numberOfReactions >= 1) {
+                    if (extraTip) {
+                        // Channel point reaction but with extra tip
+                        twitch.bits.onTransactionComplete((transactionObject) => {
+                            if (transactionObject.initiator === 'CURRENT_USER') {
+                                // Extra tip paid, write reaction
+                                writeReaction(extraTip.cost, true);
+                            }
+                        });
 
-                    twitch.bits.useBits(extraTip.twitchSku);
+                        twitch.bits.useBits(extraTip.twitchSku);
+                    } else {
+                        // Channel point reaction, don't charge products and write reaction
+                        writeReaction(0, true);
+                    }
                 } else {
-                    // Channel point reaction, don't charge products and write reaction
-                    writeReaction(0, true);
+                    setOpenNoReactionsDialog(true);
+                    setSending(false);
                 }
             }
         }
+    }
+
+    const resetReaction = () => {
+        // Reset all variables
+        setMessage('');
+        setSelectedMedia(null);
+        setExtraTip(null);
+        setSelectedVoiceBot(null);
+        setCustom3DText(null);
+        setSelectedEmote(null);
+        setReactionPaid(false);
+        setSending(false);
+
+        // Close modal
+        setOpenSentDialog(false);
     }
 
     let availableContent = [];
@@ -343,6 +378,7 @@ const TweetReactionController = () => {
     return (
         <>
             <TweetReactionView onSend={onSendReaction}
+                sending={sending}
                 numberOfReactions={numberOfReactions}
                 message={message}
                 setMessage={setMessage}
@@ -421,6 +457,12 @@ const TweetReactionController = () => {
                 onClose={() => setOpenEmoteRainDialog(false)}
                 emotes={emotes}
                 onEmoteSelected={onEmoteSelected} />
+            <ReactionSentDialog open={openSentDialog}
+                onClose={resetReaction} />
+            <NoReactionsDialog open={openNoReactionsDialog}
+                onClose={() => setOpenNoReactionsDialog(false)}
+                price={costs[1] ? costs[1].price : 0}
+                onUpgradeReaction={() => { onUpgradeReaction(2, null); setOpenNoReactionsDialog(false); }} />
         </>
     );
 }

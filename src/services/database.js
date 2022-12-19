@@ -13,7 +13,8 @@ import {
     onValue,
     set,
     orderByValue,
-    remove
+    remove,
+    increment
 } from 'firebase/database';
 import { database } from './firebase';
 
@@ -217,6 +218,19 @@ export function listenToUserReactionsCount(uid, streamerUid, callback) {
     return onValue(query(userReactionsCount), callback);
 }
 
+/**
+ * Substracts one channel point reaction
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Streamer identifier
+ */
+export async function substractChannelPointReaction(uid, streamerUid) {
+    const userReactionsCount = createChild(`/UsersReactionsCount/${uid}`);
+
+    await update(userReactionsCount, {
+        [streamerUid]: increment(-1)
+    });
+}
+
 //////////////////////
 // Twitch Extension Products
 //////////////////////
@@ -235,7 +249,35 @@ export function getAvailableExtraTips() {
 // Streamers Donations
 //////////////////////
 
-export async function sendReaction(bits, media, message, messageExtraData, emoteRaid, timestamp, streamerName, uid, userName, twitchUserName, userPhotoURL, streamerUid, avatarId, avatarBackground, pointsChannelInteractions) {
+/**
+ * Store reactions on the database
+ * @param {number} bits Cost of the reaction (+ extra tip) in Bits
+ * @param {string} uid User identifier
+ * @param {string} userName Qapla Username
+ * @param {string} twitchUserName Twitch username
+ * @param {string} userPhotoURL User photo URL
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} streamerName Streamer display name
+ * @param {object | null} media Media objects
+ * @param {string} media.type Type of media ("GIF", "EMOTE" or "MEME", etc.)
+ * @param {string} media.url Url of the media
+ * @param {string} media.width Width of the media
+ * @param {string} media.height Height of the media
+ * @param {string} message Message for TTS
+ * @param {object | undefined} messageExtraData Extra data for message (voice bot, giphy text)
+ * @param {string | undefined} messageExtraData.voiceAPIName Text to speech API voice for the voice bot
+ * @param {object | undefined} messageExtraData.giphyText Giphy text object
+ * @param {object} emoteRaid Emote raid data
+ * @param {("emote")} emoteRaid.type Type of rain (emote is the only valid value right now)
+ * @param {Array<string>} emoteRaid.emojis Array of strings with emotes (as urls)
+ * @param {number} timestamp Timestamp in milliseconds where the reaction was sent
+ * @param {string | undefined} avatarId Avatar identifier
+ * @param {object | undefined} avatarBackground Avatar background data
+ * @param {number} avatarBackground.angle Avatar gradient angle
+ * @param {Array<string>} avatarBackground.colors Array of colors for gradient background
+ * @param {boolean} pointsChannelInteractions True if reaction was sent with channel points
+ */
+export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, pointsChannelInteractions) {
     const streamerDonations = createChild(`/StreamersDonations/${streamerUid}`);
 
     const reactionReference = await push(streamerDonations, {
@@ -252,7 +294,7 @@ export async function sendReaction(bits, media, message, messageExtraData, emote
         media,
         message,
         messageExtraData,
-        emoteRaid,
+        emojiRain: emoteRaid, // Named like this for historical reasons in our database structure
         timestamp,
         uid,
         twitchUserName,
@@ -264,7 +306,7 @@ export async function sendReaction(bits, media, message, messageExtraData, emote
 
     const streamerDonationsAdministrative = createChild(`/StreamersDonationAdministrative/${reactionReference.key}`);
 
-    return await set(streamerDonationsAdministrative, {
+    await set(streamerDonationsAdministrative, {
         amountQoins: bits,
         message,
         timestamp,

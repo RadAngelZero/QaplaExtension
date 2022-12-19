@@ -492,6 +492,8 @@ const ExtraTipOption = ({ label, onClick, selected }) => {
 }
 
 const TweetReactionView = ({
+    onSend,
+    sending,
     numberOfReactions,
     message,
     setMessage,
@@ -542,6 +544,8 @@ const TweetReactionView = ({
         setOpenTippingMenu(false);
         setExtraTip(tipObject);
     }
+
+    const sendButtonDisabled = (!message && !selectedMedia) || currentReactionCost === undefined || sending;
 
     let pills = [
         voiceBot,
@@ -654,7 +658,8 @@ const TweetReactionView = ({
                                 currentReactionCost && currentReactionCost.price
                             }
                         </PricesButton>
-                        <SendButton>
+                        <SendButton onClick={onSend}
+                            disabled={sendButtonDisabled}>
                             Send
                         </SendButton>
                     </ActionsContainer>
