@@ -220,6 +220,20 @@ const TweetReactionController = () => {
     const onUpgradeReaction = (reactionLevel, mediaUnlocked) => {
         onMediaOptionClick(mediaUnlocked);
         setReactionLevel(reactionLevel);
+
+        // Remove options not available in the selected tier
+        switch (reactionLevel) {
+            case 1:
+                setSelectedVoiceBot(null);
+                setCustom3DText(null);
+                setSelectedEmote(null);
+                break;
+            case 2:
+                setSelectedEmote(null);
+                break;
+            default:
+                break;
+        }
     }
 
     const writeReaction = async (bits, channelPointsReaction = false) => {
@@ -278,7 +292,6 @@ const TweetReactionController = () => {
     const onSendReaction = () => {
         if (!sending) {
             setSending(true);
-            twitch.bits.setUseLoopback();
             if (reactionLevel !== 1) {
                 twitch.bits.onTransactionComplete((transactionObject) => {
                     if (transactionObject.initiator === 'current_user') {
@@ -287,19 +300,31 @@ const TweetReactionController = () => {
                             reactionPaid = true
 
                             if (extraTip) {
-                                // Reaction paid, charge extra tip
+                                // Reaction paid, charge extra tip now
                                 twitch.bits.useBits(extraTip.twitchSku);
                             } else {
                                 // Reaction paid and no extra tip, write reaction
                                 writeReaction(costs[reactionLevel - 1].price);
                             }
                         } else {
-                            // Reaction is paid and extra tip is paid, write reaction
+                            // Reaction and extra tip are paid, write reaction
                             writeReaction(costs[reactionLevel - 1].price + extraTip.cost);
                         }
                     }
                 });
 
+                twitch.bits.onTransactionCancelled(() => {
+                    // If the user already paid the reaction, but he cancel the extra tip
+                    if (reactionPaid) {
+                        // Send the reaction only with the Bits he actually paid
+                        writeReaction(costs[reactionLevel - 1].price);
+                    }
+
+                    // In any case, unlock the sending button
+                    setSending(false);
+                });
+
+                // Listeners are set, start the purchase attempt
                 twitch.bits.useBits(costs[reactionLevel - 1].twitchSku);
             } else {
                 // Check if user has enough reactions
@@ -313,6 +338,12 @@ const TweetReactionController = () => {
                             }
                         });
 
+                        twitch.bits.onTransactionCancelled(() => {
+                            // If the user cancels the purchase unlock the sending button
+                            setSending(false);
+                        });
+
+                        // Listeners are set, start the purchase attempt
                         twitch.bits.useBits(extraTip.twitchSku);
                     } else {
                         // Channel point reaction, don't charge products and write reaction
@@ -447,7 +478,7 @@ const TweetReactionController = () => {
             <ReactionTierSelectorDialog open={openReactionLevelModal}
                 onClose={() => setOpenReactionLevelModal(false)}
                 costs={costs}
-                changeReactionLevel={setReactionLevel} />
+                changeReactionLevel={(level) =>onUpgradeReaction(level, null)} />
             <ChooseBotVoiceDialog open={openBotVoiceDialog}
                 onClose={() => setOpenBotVoiceDialog(false)}
                 currentVoice={selectedVoiceBot ? selectedVoiceBot.key : null}

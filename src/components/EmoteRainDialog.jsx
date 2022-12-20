@@ -7,6 +7,7 @@ import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 
 const EmoteRainContainer = styled(Box)({
     marginTop: '56px',
+    minHeight: '92vh',
     background: '#141539',
     borderTopLeftRadius: '30px',
     borderTopRightRadius: '30px',

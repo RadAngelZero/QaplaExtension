@@ -14,6 +14,7 @@ import { ReactComponent as GiphyText } from './../../assets/Icons/GiphyText.svg'
 import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
 import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
+import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
 import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
 
 const allMediaOptionsTypes = [
@@ -93,7 +94,8 @@ const ContentContainer = styled(Box)({
 });
 
 const TTSContainer = styled(Box)({
-    display: 'flex'
+    display: 'flex',
+    alignItems: 'center'
 });
 
 const AvatarImage = styled(Avatar)({
@@ -120,6 +122,19 @@ const OptionalLabel = styled(Typography)({
     fontWeight: '400',
     fontSize: '16px',
     lineHeight: '19px'
+});
+
+const Custom3DTextContainer = styled(Box)({
+    display: 'flex',
+    alignItems: 'center'
+});
+
+const Edit3DTextButton = styled(IconButton)({
+    
+});
+
+const Remove3DTextButton = styled(IconButton)({
+
 });
 
 const SelectedMediaContainer = styled(Box)({
@@ -504,6 +519,7 @@ const TweetReactionView = ({
     cleanSelectedMedia,
     mediaSelectorBarOptions,
     custom3DText,
+    onRemoveCustom3DText,
     voiceBot,
     emoteRaid,
     reactionLevel,
@@ -594,16 +610,27 @@ const TweetReactionView = ({
                             }
                             </>
                             :
-                            <img src={custom3DText.url}
-                                style={{
-                                    width: window.innerWidth * .35,
-                                    aspectRatio: custom3DText.width / custom3DText.height
-                                }} />
+                            <Custom3DTextContainer>
+                                <img src={custom3DText.url}
+                                    style={{
+                                        width: window.innerWidth * .5,
+                                        aspectRatio: custom3DText.width / custom3DText.height
+                                    }} />
+                                <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
+                                    <EditCircle />
+                                </Edit3DTextButton>
+                                <Remove3DTextButton onClick={onRemoveCustom3DText}>
+                                    <Close style={{
+                                            height: 24,
+                                            width: 24
+                                        }} />
+                                </Remove3DTextButton>
+                            </Custom3DTextContainer>
                         }
                         {pills.length > 0 &&
                             <PillsList>
                                 {pills.map((pill) => (
-                                    <Pill>
+                                    <Pill key={pill.type}>
                                         <PillInnerContainer>
                                             <PillIconContainer>
                                                 {pill.Icon ?

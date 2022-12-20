@@ -9,3 +9,5 @@ export const EMOTE = 'emote';
 export const CUSTOM_TTS_VOICE = 'customTTSVoice';
 
 export const BITS = 'bits';
+
+export const ELASTIC_URL = 'https://qapla.es.us-central1.gcp.cloud.es.io';
