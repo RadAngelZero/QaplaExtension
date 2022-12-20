@@ -49,12 +49,13 @@ const TweetReactionController = () => {
     const [numberOfReactions, setNumberOfReactions] = useState(0);
     const [availableTips, setAvailableTips] = useState([]);
     const [sending, setSending] = useState(false);
-    const [reactionPaid, setReactionPaid] = useState(false);
     const [streamerName, setStreamerName] = useState('');
     const [openSentDialog, setOpenSentDialog] = useState(false);
     const [openNoReactionsDialog, setOpenNoReactionsDialog] = useState(false);
     const twitch = useTwitch();
     const user = useAuth();
+
+    let reactionPaid = false; // Flag for purchases with Twitch, it does not work using useState but it works this way
 
     useEffect(() => {
         async function loadTips() {
@@ -267,7 +268,9 @@ const TweetReactionController = () => {
             channelPointsReaction
         );
 
-        await substractChannelPointReaction(user.uid, streamerUid);
+        if (channelPointsReaction) {
+            await substractChannelPointReaction(user.uid, streamerUid);
+        }
 
         setOpenSentDialog(true);
     }
@@ -278,10 +281,10 @@ const TweetReactionController = () => {
             twitch.bits.setUseLoopback();
             if (reactionLevel !== 1) {
                 twitch.bits.onTransactionComplete((transactionObject) => {
-                    if (transactionObject.initiator === 'CURRENT_USER') {
+                    if (transactionObject.initiator === 'current_user') {
                         // Transaction comes from reaction payment
                         if (!reactionPaid) {
-                            setReactionPaid(true);
+                            reactionPaid = true
 
                             if (extraTip) {
                                 // Reaction paid, charge extra tip
@@ -304,7 +307,7 @@ const TweetReactionController = () => {
                     if (extraTip) {
                         // Channel point reaction but with extra tip
                         twitch.bits.onTransactionComplete((transactionObject) => {
-                            if (transactionObject.initiator === 'CURRENT_USER') {
+                            if (transactionObject.initiator === 'current_user') {
                                 // Extra tip paid, write reaction
                                 writeReaction(extraTip.cost, true);
                             }
@@ -331,8 +334,8 @@ const TweetReactionController = () => {
         setSelectedVoiceBot(null);
         setCustom3DText(null);
         setSelectedEmote(null);
-        setReactionPaid(false);
         setSending(false);
+        reactionPaid = false;
 
         // Close modal
         setOpenSentDialog(false);
