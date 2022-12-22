@@ -89,7 +89,6 @@ const ContentContainer = styled(Box)({
     paddingRight: '24px',
     display: 'flex',
     flexDirection: 'column',
-    display: 'flex',
     flex: 1
 });
 
@@ -279,8 +278,6 @@ const ChooseTipButton = styled(Button)({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-
-    background: '#141539',
     boxShadow: '0px 10px 15px rgba(13, 16, 33, 0.75)',
     borderRadius: '25px',
     padding: '4px',
@@ -480,7 +477,8 @@ const MediaOption = ({ index, type, disabled = false, excluded = false, onClick,
                 {type === EMOTE ?
                     emoteUrl ?
                         <img src={emoteUrl ? emoteUrl : null}
-                            style={{ height: 32, width: 32 }} />
+                            style={{ height: 32, width: 32 }}
+                            alt='Selected Emote' />
                         :
                         null
                     :
@@ -596,6 +594,7 @@ const TweetReactionView = ({
                                         padding: 0
                                     }
                                 }}
+                                // eslint-disable-next-line
                                 inputProps={{ maxLength: 100 }}
                                 multiline
                                 placeholder='Type to create TTS'
@@ -615,7 +614,8 @@ const TweetReactionView = ({
                                     style={{
                                         width: window.innerWidth * .5,
                                         aspectRatio: custom3DText.width / custom3DText.height
-                                    }} />
+                                    }}
+                                    alt='Message' />
                                 <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
                                     <EditCircle />
                                 </Edit3DTextButton>
@@ -643,7 +643,8 @@ const TweetReactionView = ({
                                                         style={{
                                                             height: '24px',
                                                             width: '24px'
-                                                        }} />
+                                                        }}
+                                                        alt={pill.type} />
                                                 }
                                             </PillIconContainer>
                                             <PillText>

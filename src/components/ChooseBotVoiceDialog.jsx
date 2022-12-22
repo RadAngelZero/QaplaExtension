@@ -109,8 +109,10 @@ const BotVoice = ({ label, selected, onPress }) => {
                 </BotVoiceInnerContainer>
             </BotVoicePill>
             <BotVoiceSideIconsContainer>
-                <BotVoiceText>
-                    🤖
+                <BotVoiceText style={{ marginRight: '8px' }}>
+                    <span role='img' aria-label='Bot icon'>
+                        🤖
+                    </span>
                 </BotVoiceText>
                 <TTSBot />
             </BotVoiceSideIconsContainer>

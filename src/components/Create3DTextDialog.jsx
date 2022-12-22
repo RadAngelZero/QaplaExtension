@@ -128,7 +128,8 @@ const Create3DTextDialog = ({ open, onClose, defaultMessage, on3DTextSelected })
                             id='searchInput' />
                         {text === '' &&
                             <img src={require('./../assets/Images/PoweredByGiphy.png')}
-                                onClick={focusSearch} />
+                                onClick={focusSearch}
+                                alt='Powered by Giphy' />
                         }
                     </SearchContainer>
                 </HeaderContainer>

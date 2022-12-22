@@ -1,4 +1,13 @@
-import { onAuthStateChanged, signInWithCustomToken, User, UserCredential, NextOrObserver } from 'firebase/auth';
+import {
+    onAuthStateChanged,
+    signInWithCustomToken,
+    // eslint-disable-next-line
+    User,
+    // eslint-disable-next-line
+    UserCredential,
+    // eslint-disable-next-line
+    NextOrObserver
+} from 'firebase/auth';
 
 import { auth } from './firebase';
 import { createUserProfile, getUserProfileWithTwitchId, updateUserProfile } from './database';

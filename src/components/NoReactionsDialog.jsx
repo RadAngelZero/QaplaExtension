@@ -70,7 +70,7 @@ const NoReactionsDialog = ({ open, onClose, price, onUpgradeReaction }) => {
             </CloseIconButton>
             <Content>
                 <img src={ChannelPointsReaction}
-                    alt='Channel Points Image' />
+                    alt='Channel Points' />
                 <TextContainer>
                     <Title>
                         You don't have reactions

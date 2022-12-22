@@ -157,10 +157,6 @@ const MemeMediaSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                             placeholder={'Search Memes'}
                             ref={searchInput}
                             id='searchInput' />
-                        {searchTerm === '' &&
-                            <img src={require('./../assets/Images/PoweredByGiphy.png')}
-                                onClick={focusSearch} />
-                        }
                     </SearchContainer>
                 </HeaderContainer>
                 <GridContainer>

@@ -91,7 +91,7 @@ const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
                     <img src={gif} style={{
                         width: '100%',
                         borderRadius: '25px'
-                    }} />
+                    }} alt='Streamer Emote' />
                 </GifContainer>
                 <EmotesListContainer>
                     {Object.keys(emotes)

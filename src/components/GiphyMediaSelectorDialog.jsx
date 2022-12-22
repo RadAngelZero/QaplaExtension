@@ -52,7 +52,6 @@ const SearchInput = styled(TextField)({
 
 const GridContainer = styled(Box)({
     marginTop: '16px',
-    padding: '0px !important',
     padding: 16,
     backgroundColor: '#141539'
 });
@@ -102,7 +101,8 @@ const GiphyMediaSelectorDialog = ({ open, onClose, mediaType, onMediaSelected })
                             id='searchInput' />
                         {searchTerm === '' &&
                             <img src={require('./../assets/Images/PoweredByGiphy.png')}
-                                onClick={focusSearch} />
+                                onClick={focusSearch}
+                                alt='Powered by Giphy' />
                         }
                     </SearchContainer>
                 </HeaderContainer>

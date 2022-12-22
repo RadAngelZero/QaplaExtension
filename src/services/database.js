@@ -1,19 +1,15 @@
 import {
     child,
+    // eslint-disable-next-line
     DataSnapshot,
     equalTo,
     get,
     orderByChild,
     push,
     query,
-    runTransaction,
-    ThenableReference,
-    TransactionResult,
     update,
     onValue,
     set,
-    orderByValue,
-    remove,
     increment
 } from 'firebase/database';
 import { database } from './firebase';
