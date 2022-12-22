@@ -102,7 +102,7 @@ const TweetReactionController = () => {
         }
 
         async function loadStreamerEmotes() {
-            const emotesRequest = await getStreamerEmotes(streamerUid);
+            const emotesRequest = null; // await getStreamerEmotes(streamerUid);
 
             if (emotesRequest && emotesRequest.data) {
                 let emotes = emotesRequest.data ? emotesRequest.data : null;
@@ -147,7 +147,7 @@ const TweetReactionController = () => {
         }
     }, [user, streamerUid]);
 
-    const tippingHandler = () => {
+    const toggleTipping = () => {
         setTipping(!tipping);
     }
 
@@ -339,8 +339,9 @@ const TweetReactionController = () => {
                         });
 
                         twitch.bits.onTransactionCancelled(() => {
-                            // If the user cancels the purchase unlock the sending button
+                            // If the user cancels the purchase unlock the sending button and show tip menu
                             setSending(false);
+                            toggleTipping();
                         });
 
                         // Listeners are set, start the purchase attempt
@@ -424,7 +425,7 @@ const TweetReactionController = () => {
                 mediaSelectorBarOptions={availableContent}
                 reactionLevel={reactionLevel}
                 tipping={tipping}
-                tippingHandler={tippingHandler}
+                toggleTipping={toggleTipping}
                 extraTip={extraTip}
                 setExtraTip={setTip}
                 onChangeReactionLevel={() => setOpenReactionLevelModal(true)}

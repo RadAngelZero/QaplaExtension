@@ -169,11 +169,9 @@ const Custom3DTextContainer = styled(Box)({
 });
 
 const Edit3DTextButton = styled(IconButton)({
-    
 });
 
 const Remove3DTextButton = styled(IconButton)({
-
 });
 
 const SelectedMediaContainer = styled(Box)({
@@ -289,7 +287,6 @@ const TooltipButton = styled(Button)({
 
 const TipButton = styled(Button)({
     boxSizing: 'border-box',
-    background: '#3B4BF9',
     borderRadius: '100px',
     padding: '12px 24px',
     fontSize: '20px',
@@ -298,8 +295,7 @@ const TipButton = styled(Button)({
     lineHeight: 'normal',
     textTransform: 'none',
     '&:hover': {
-        background: '#3B4BF9',
-        opacity: .8
+        opacity: .9
     }
 });
 
@@ -359,7 +355,7 @@ const NoTipButton = styled(Button)({
     color: '#FFF',
     '&:hover': {
         background: '#3B4BF9',
-        opacity: .8
+        opacity: .9
     }
 });
 
@@ -499,7 +495,7 @@ const MediaOption = ({ index, type, disabled = false, excluded = false, onClick,
                                         textOverflow: 'ellipsis',
                                         maxWidth: '32px'
                                     }}>
-                                    {reactionCost}
+                                    {reactionCost.toLocaleString()}
                                 </HighlightedText>
                                 <Bits style={{
                                         height: '16px',
@@ -562,6 +558,8 @@ const TweetReactionView = ({
     voiceBot,
     emoteRaid,
     reactionLevel,
+    tipping,
+    toggleTipping,
     extraTip,
     setExtraTip,
     onChangeReactionLevel,
@@ -570,7 +568,6 @@ const TweetReactionView = ({
     onUpgradeReaction,
     availableTips
 }) => {
-    const [openTippingMenu, setOpenTippingMenu] = useState(false);
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
 
@@ -592,12 +589,12 @@ const TweetReactionView = ({
     }
 
     const noTipButtonHandler = () => {
-        setOpenTippingMenu(false);
+        toggleTipping();
         setExtraTip(null);
     }
 
     const setSelectedTip = (tipObject) => {
-        setOpenTippingMenu(false);
+        toggleTipping();
         setExtraTip(tipObject);
     }
 
@@ -718,14 +715,14 @@ const TweetReactionView = ({
                         </>
                     }
                 </SelectedMediaContainer>
-                {!openTippingMenu ?
+                {!tipping ?
                     <ActionsContainer>
                         <PricesButton startIcon={reactionLevel === 1 ? <Interactions /> : <Bits />}
                             onClick={onChangeReactionLevel}>
                             {reactionLevel === 1 ?
                                 numberOfReactions
                                 :
-                                currentReactionCost && currentReactionCost.price
+                                currentReactionCost && (currentReactionCost.price).toLocaleString()
                             }
                         </PricesButton>
                         <SendButton onClick={onSend}
@@ -737,7 +734,7 @@ const TweetReactionView = ({
                     <TipContainer>
                         {availableTips.map((tip) => (
                             <ExtraTipOption key={`tip-${tip.twitchSku}`}
-                                label={tip.cost}
+                                label={(tip.cost).toLocaleString()}
                                 selected={extraTip && tip.cost === extraTip.cost}
                                 onClick={() => setSelectedTip(tip)} />
                         ))}
@@ -745,7 +742,7 @@ const TweetReactionView = ({
                 }
             </ContentContainer>
             <MediaSelectionContainer>
-                {!openTippingMenu ?
+                {!tipping ?
                     <>
                         <MediaOptionsContainer>
                             {mediaSelectorBarOptions.map((mediaType, index) => (
@@ -775,8 +772,17 @@ const TweetReactionView = ({
                                     onTooltipClick={onUpgradeReaction} />
                             ))}
                         </MediaOptionsContainer>
-                        <TipButton startIcon={<PlusCircle />} onClick={() => setOpenTippingMenu(!openTippingMenu)} >
-                            Tip
+                        <TipButton startIcon={extraTip ? <EditCircle /> : <PlusCircle />}
+                            endIcon={extraTip ? <Bits /> : null}
+                            onClick={toggleTipping}
+                            style={{
+                                background: extraTip ? 'linear-gradient(118.67deg, #A716EE -6.39%, #2D07FA 101.45%), #141539' : '#3B4BF9',
+                            }}>
+                            {extraTip ?
+                                (extraTip.cost).toLocaleString()
+                                :
+                                'Tip'
+                            }
                         </TipButton>
                     </>
                     :
