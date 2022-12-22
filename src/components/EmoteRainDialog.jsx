@@ -86,7 +86,9 @@ const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
                         <Close />
                     </CloseIconButton>
                     <HeaderText>
-                        Let it rain 👇
+                        <span role='img' aria-label='Title'>
+                            Let it rain 👇
+                        </span>
                     </HeaderText>
                 </HeaderContainer>
                 <GifContainer>
