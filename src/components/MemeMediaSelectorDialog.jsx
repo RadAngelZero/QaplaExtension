@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Dialog, IconButton, ImageList, ImageListItem, TextField } from '@mui/material';
 import styled from '@emotion/styled';
+import { useTranslation } from 'react-i18next';
 
 import { searchMemesWithTag, searchMostViewedMemes, updateMemeLastViewed } from '../services/elastic';
 
@@ -60,6 +61,7 @@ const MemeMediaSelectorDialog = ({ open, onClose, onMediaSelected }) => {
     const [memes, setMemes] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const searchInput = useRef(null);
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.MemeMediaSelectorDialog' });
     let fetchTimeout = null;
 
     useEffect(() => {
@@ -154,7 +156,7 @@ const MemeMediaSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                             }}
                             value={searchTerm}
                             onChange={(e) => searchHandler(e.target.value)}
-                            placeholder={'Search Memes'}
+                            placeholder={t('searchMemes')}
                             ref={searchInput}
                             id='searchInput' />
                     </SearchContainer>

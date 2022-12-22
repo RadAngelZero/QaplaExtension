@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Dialog, IconButton } from '@mui/material';
 import styled from '@emotion/styled';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as UpgradeArrow } from './../assets/Icons/UpgradeArrow.svg';
@@ -131,6 +132,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
     const [level1Gif, setLevel1Gif] = useState(null);
     const [level2Gif, setLevel2Gif] = useState(null);
     const [level3Gif, setLevel3Gif] = useState(null);
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.ReactionTierSelectorDialog' });
 
     useEffect(() => {
         async function loadGif(setLevel, library) {
@@ -168,7 +170,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                         <Close />
                     </CloseIconButton>
                     <HeaderText>
-                        {`Reaction Tiers`}
+                        {t('reactionTiers')}
                     </HeaderText>
                 </HeaderContainer>
                 <TiersContainer>
@@ -191,7 +193,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                         </IconsContainer>
                         <BottomContainer>
                             <Title>
-                                Memes + TTS
+                                {t('level1')}
                             </Title>
                             <PriceContainer>
                                 <Interactions />
@@ -220,7 +222,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                         </IconsContainer>
                         <BottomContainer>
                             <Title>
-                                {'+ 3D Text,\nTTS Voice'}
+                                {t('level2')}
                             </Title>
                             <PriceContainer>
                                 <Bits />
@@ -246,7 +248,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                         </IconsContainer>
                         <BottomContainer>
                             <Title>
-                                + Emote Animation
+                                {t('level3')}
                             </Title>
                             <PriceContainer>
                                 <Bits />

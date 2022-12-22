@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Dialog, IconButton } from '@mui/material';
 import styled from '@emotion/styled';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as CheckCircleWhite } from './../assets/Icons/CheckCircleWhite.svg';
@@ -120,8 +121,9 @@ const BotVoice = ({ label, selected, onPress }) => {
     );
 }
 
-const ReactionTierSelectorDialog = ({ open, onClose, onVoiceSelected, currentVoice }) => {
+const ChooseBotVoiceDialog = ({ open, onClose, onVoiceSelected, currentVoice }) => {
     const [voices, setVoices] = useState([]);
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.ChooseBotVoiceDialog' });
 
     useEffect(() => {
         async function fetchVoices() {
@@ -163,7 +165,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, onVoiceSelected, currentVoi
                         <Close />
                     </CloseIconButton>
                     <HeaderText>
-                        {`Choose a TTS Bot Voice`}
+                        {t('chooseAVoice')}
                     </HeaderText>
                 </HeaderContainer>
                 <BotVoice label={'Google (Default)'}
@@ -176,7 +178,8 @@ const ReactionTierSelectorDialog = ({ open, onClose, onVoiceSelected, currentVoi
                         onPress={() => voiceSelected(voice)} />
                 ))}
             </VoiceSelectorContainer>
-        </Dialog>);
+        </Dialog>
+    );
 }
 
-export default ReactionTierSelectorDialog;
+export default ChooseBotVoiceDialog;

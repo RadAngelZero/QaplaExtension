@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Dialog, DialogContent, IconButton, Typography } from '@mui/material';
 import styled from '@emotion/styled';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
@@ -55,6 +56,8 @@ const UpgradeReactionButton = styled(Button)({
 });
 
 const NoReactionsDialog = ({ open, onClose, price, onUpgradeReaction }) => {
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.NoReactionsDialog' });
+
     return (
         <Dialog open={open}
             onClose={onClose}
@@ -73,15 +76,21 @@ const NoReactionsDialog = ({ open, onClose, price, onUpgradeReaction }) => {
                     alt='Channel Points' />
                 <TextContainer>
                     <Title>
-                        You don't have reactions
+                        {t('noReactions')}
                     </Title>
                     <Description>
-                        <b>Get a Qapla Reaction Reward or<br/>upgrade your reaction</b> to send<br/>your alert using Bits
+                        <b>
+                            {t('descriptionBold')}
+                        </b>
+                        {t('description')}
                     </Description>
                 </TextContainer>
                 <UpgradeReactionButton onClick={onUpgradeReaction}
                     endIcon={<Bits style={{ height: '16px', width: '16px' }} />}>
-                    Upgrade for <span style={{ marginLeft: '4px', color: '#00FFDD' }}>{price}</span>
+                    {t('upgradeFor')}
+                    <span style={{ marginLeft: '4px', color: '#00FFDD' }}>
+                        {price}
+                    </span>
                 </UpgradeReactionButton>
             </Content>
         </Dialog>

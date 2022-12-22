@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Dialog, DialogContent, IconButton, Typography } from '@mui/material';
 import styled from '@emotion/styled';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as SuccessCircle } from './../assets/Icons/SuccessCircle.svg';
@@ -53,6 +54,8 @@ const SendMoreButton = styled(Button)({
 });
 
 const ReactionSentDialog = ({ open, onClose }) => {
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.ReactionSentDialog' });
+
     return (
         <Dialog open={open}
             onClose={onClose}
@@ -69,14 +72,14 @@ const ReactionSentDialog = ({ open, onClose }) => {
                 <SuccessCircle />
                 <TextContainer>
                     <Title>
-                        Boom. Sent.
+                        {t('sent')}
                     </Title>
                     <Description>
-                        Your alert will show up<br/>shortly on stream
+                        {t('alertWillShowUp')}
                     </Description>
                 </TextContainer>
                 <SendMoreButton onClick={onClose}>
-                    Send More Reactions
+                    {t('sendMoreReactions')}
                 </SendMoreButton>
             </Content>
         </Dialog>

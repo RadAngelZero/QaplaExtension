@@ -14,6 +14,45 @@
             "excluded": "Gif, Meme o Sticker",
             "use": "Usar {{mediaType}}",
             "upgradeToUse": "👀 Sube de nivel tu tu reacción para usar "
+        },
+        "dialogs": {
+            "GiphyMediaSelectorDialog": {
+                "searchGiphy": "Buscar en Giphy"
+            },
+            "MemeMediaSelectorDialog": {
+                "searchMemes": "Buscar Memes"
+            },
+            "ReactionTierSelectorDialog": {
+                "reactionTiers": "Nivel de reacción",
+                "level1": "Memes + TTS",
+                "level2": "+ Texto 3D,\nVoz para TTS",
+                "level3": "+ Animaciones de Emotes"
+            },
+            "ChooseBotVoiceDialog": {
+                "chooseAVoice": "Escoge una voz para el bot de TTS"
+            },
+            "Create3DTextDialog": {
+                "sample": "Ejemplo",
+                "typeToCreate": "Escribe para crear"
+            },
+            "EmoteRainDialog": {
+                "follower": "Seguidor",
+                "bits": "Bits",
+                "subTier1": "Sub Nivel 1",
+                "subTier2": "Sub Nivel 2",
+                "subTier3": "Sub Nivel 3"
+            },
+            "ReactionSentDialog": {
+                "sent": "Boom. Enviado.",
+                "alertWillShowUp": "Tu alerta se mostrara pronto\nen el stream",
+                "sendMoreReactions": "Enviar más Reacciones"
+            },
+            "NoReactionsDialog": {
+                "noReactions": "No tienes reacciones",
+                "descriptionBold": "Canjea la recompensa \"Zap\" en Twitch\n",
+                "description": "o actualiza tu reacción",
+                "upgradeFor": "Actualiza por"
+            }
         }
     }
 }

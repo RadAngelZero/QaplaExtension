@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Box, Dialog, IconButton, ImageList, ImageListItem, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { GiphyFetch } from '@giphy/js-fetch-api';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Search } from './../assets/Icons/Search.svg';
@@ -59,12 +60,13 @@ const Create3DTextDialog = ({ open, onClose, defaultMessage, on3DTextSelected })
     const [text, setText] = useState('');
     const [giphyText, setGiphyText] = useState([]);
     const searchInput = useRef(null);
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.Create3DTextDialog' });
     let timeout = null;
 
     useEffect(() => {
         if (open) {
             if (!defaultMessage) {
-                loadGiphyText('sample');
+                loadGiphyText(t('sample'));
             } else {
                 setText(defaultMessage);
                 loadGiphyText(defaultMessage);
@@ -123,7 +125,7 @@ const Create3DTextDialog = ({ open, onClose, defaultMessage, on3DTextSelected })
                             }}
                             value={text}
                             onChange={(e) => handleText(e.target.value)}
-                            placeholder={'Search Giphy'}
+                            placeholder={t('typeToCreate')}
                             ref={searchInput}
                             id='searchInput' />
                         {text === '' &&

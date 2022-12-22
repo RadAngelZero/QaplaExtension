@@ -14,6 +14,45 @@
             "excluded": "Gif, Meme or Sticker",
             "use": "Use {{mediaType}}",
             "upgradeToUse": "👀 Upgrade your reaction to use "
+        },
+        "dialogs": {
+            "GiphyMediaSelectorDialog": {
+                "searchGiphy": "Search Giphy"
+            },
+            "MemeMediaSelectorDialog": {
+                "searchMemes": "Search Memes"
+            },
+            "ReactionTierSelectorDialog": {
+                "reactionTiers": "Reaction Tier",
+                "level1": "Memes + TTS",
+                "level2": "+ 3D Text,\nTTS Voice",
+                "level3": "+ Emote Animation"
+            },
+            "ChooseBotVoiceDialog": {
+                "chooseAVoice": "Choose a TTS Bot Voice"
+            },
+            "Create3DTextDialog": {
+                "sample": "Sample",
+                "typeToCreate": "Type to create"
+            },
+            "EmoteRainDialog": {
+                "follower": "Follower",
+                "bits": "Bits",
+                "subTier1": "Sub Tier 1",
+                "subTier2": "Sub Tier 2",
+                "subTier3": "Sub Tier 3"
+            },
+            "ReactionSentDialog": {
+                "sent": "Boom. Sent.",
+                "alertWillShowUp": "Your alert will show up\nshortly on stream",
+                "sendMoreReactions": "Send More Reactions"
+            },
+            "NoReactionsDialog": {
+                "noReactions": "You don't have reactions",
+                "descriptionBold": "Get a Qapla Reaction Reward or\nupgrade your reaction",
+                "description": "to send\nyour alert using Bits",
+                "upgradeFor": "Upgrade for"
+            }
         }
     }
 }

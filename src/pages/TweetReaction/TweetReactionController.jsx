@@ -102,7 +102,7 @@ const TweetReactionController = () => {
         }
 
         async function loadStreamerEmotes() {
-            const emotesRequest = null; // await getStreamerEmotes(streamerUid);
+            const emotesRequest = await getStreamerEmotes(streamerUid);
 
             if (emotesRequest && emotesRequest.data) {
                 let emotes = emotesRequest.data ? emotesRequest.data : null;

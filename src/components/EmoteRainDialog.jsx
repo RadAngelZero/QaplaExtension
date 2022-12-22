@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Dialog, IconButton, ImageList, ImageListItem, Typography } from '@mui/material';
 import styled from '@emotion/styled';
+import { useTranslation } from 'react-i18next';
 
 import { getRandomGifByLibrary } from '../services/database';
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
@@ -57,6 +58,7 @@ const EmoteCategoryTitle = styled(Typography)({
 
 const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
     const [gif, setGif] = useState(null);
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.EmoteRainDialog' });
 
     useEffect(() => {
         async function loadGif() {
@@ -84,7 +86,7 @@ const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
                         <Close />
                     </CloseIconButton>
                     <HeaderText>
-                        {`Let it rain 👇`}
+                        Let it rain 👇
                     </HeaderText>
                 </HeaderContainer>
                 <GifContainer>
@@ -99,7 +101,7 @@ const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
                         .map((emoteCategory) => (
                         <React.Fragment key={emoteCategory}>
                             <EmoteCategoryTitle>
-                                {emotes[emoteCategory].key}
+                                {t(emotes[emoteCategory].key)}
                             </EmoteCategoryTitle>
                             <ImageList cols={5} gap={32}>
                                 {emotes[emoteCategory].data[0].map((emote) => (

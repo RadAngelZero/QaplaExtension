@@ -3,6 +3,7 @@ import { Box, Dialog, IconButton, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Grid } from '@giphy/react-components';
 import { GiphyFetch } from '@giphy/js-fetch-api';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Search } from './../assets/Icons/Search.svg';
@@ -59,6 +60,7 @@ const GridContainer = styled(Box)({
 const GiphyMediaSelectorDialog = ({ open, onClose, mediaType, onMediaSelected }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const searchInput = useRef(null);
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.GiphyMediaSelectorDialog' });
 
     const fetchTrending = (offset) => gf.trending({ offset, type: mediaType, limit: 20, rating: 'pg-13' });
 
@@ -96,7 +98,7 @@ const GiphyMediaSelectorDialog = ({ open, onClose, mediaType, onMediaSelected })
                             }}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder={'Search Giphy'}
+                            placeholder={t('searchGiphy')}
                             ref={searchInput}
                             id='searchInput' />
                         {searchTerm === '' &&
