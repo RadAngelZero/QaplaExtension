@@ -1,0 +1,19 @@
+{
+    "translation": {
+        "TweetReactionView": {
+            "gifs": "Gif",
+            "stickers": "Sticker",
+            "memes": "Meme",
+            "emotes": "Animaciones de Emotes",
+            "text3D": "Texto 3D",
+            "botVoice": "Voz de bot para TTS",
+            "typeToCreateTTS": "Escribe para crear TTS",
+            "optional": "Opcional",
+            "send": "Enviar",
+            "youCanOnlyUseOne": "😯 Solo puedes usar uno",
+            "excluded": "Gif, Meme o Sticker",
+            "use": "Usar {{mediaType}}",
+            "upgradeToUse": "👀 Sube de nivel tu tu reacción para usar "
+        }
+    }
+}

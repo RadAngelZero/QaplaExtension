@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import { Avatar, Box, Button, CircularProgress, ClickAwayListener, IconButton, TextField, Typography } from '@mui/material';
-import Tooltip from 'react-power-tooltip'
+import Tooltip from 'react-power-tooltip';
+import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 
 import { ReactComponent as Interactions } from './../../assets/Icons/Interactions.svg';
 import { ReactComponent as Gif } from './../../assets/Icons/GIF.svg';
@@ -26,37 +28,75 @@ const allMediaOptionsTypes = [
     CUSTOM_TTS_VOICE
 ];
 
-const mediaOptionsData = {
+console.log('Creation');
+
+// Create mediaOptionsData
+let mediaOptionsData = {
     [GIPHY_GIFS]: {
         Icon: Gif,
-        label: 'gif',
+        label: i18n.t('TweetReactionView.gifs'),
         level: 1
     },
     [GIPHY_STICKERS]: {
         Icon: Sticker,
-        label: 'sticker',
+        label: i18n.t('TweetReactionView.stickers'),
         level: 1
     },
     [MEMES]: {
         Icon: Meme,
-        label: 'meme',
+        label: i18n.t('TweetReactionView.memes'),
         level: 1
     },
     [EMOTE]: {
-        label: 'emote',
+        label: i18n.t('TweetReactionView.emotes'),
         level: 3
     },
     [GIPHY_TEXT]: {
         Icon: GiphyText,
-        label: '3D Text',
+        label: i18n.t('TweetReactionView.text3D'),
         level: 2
     },
     [CUSTOM_TTS_VOICE]: {
         Icon: TTSVoice,
-        label: 'TTS Voice',
+        label: i18n.t('TweetReactionView.botVoice'),
         level: 2
     }
 };
+
+// // Update mediaOptionsData if language changes
+i18n.on('languageChanged', () => {
+    mediaOptionsData = {
+        [GIPHY_GIFS]: {
+            Icon: Gif,
+            label: i18n.t('TweetReactionView.gifs'),
+            level: 1
+        },
+        [GIPHY_STICKERS]: {
+            Icon: Sticker,
+            label: i18n.t('TweetReactionView.stickers'),
+            level: 1
+        },
+        [MEMES]: {
+            Icon: Meme,
+            label: i18n.t('TweetReactionView.memes'),
+            level: 1
+        },
+        [EMOTE]: {
+            label: i18n.t('TweetReactionView.emotes'),
+            level: 3
+        },
+        [GIPHY_TEXT]: {
+            Icon: GiphyText,
+            label: i18n.t('TweetReactionView.text3D'),
+            level: 2
+        },
+        [CUSTOM_TTS_VOICE]: {
+            Icon: TTSVoice,
+            label: i18n.t('TweetReactionView.botVoice'),
+            level: 2
+        }
+    };
+});
 
 const excludingOptions = {
     [GIPHY_GIFS]: {
@@ -243,7 +283,8 @@ const TooltipButton = styled(Button)({
     color: '#FFF',
     fontSize: '16px',
     fontWeight: '700',
-    borderRadius: '100px'
+    borderRadius: '100px',
+    textTransform: 'none'
 });
 
 const TipButton = styled(Button)({
@@ -531,6 +572,7 @@ const TweetReactionView = ({
 }) => {
     const [openTippingMenu, setOpenTippingMenu] = useState(false);
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
+    const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
 
     const isMediaOptionSelected = (mediaType) => {
         switch (mediaType) {
@@ -597,14 +639,14 @@ const TweetReactionView = ({
                                 // eslint-disable-next-line
                                 inputProps={{ maxLength: 100 }}
                                 multiline
-                                placeholder='Type to create TTS'
+                                placeholder={t('typeToCreateTTS')}
                                 fullWidth
                                 autoFocus
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)} />
                             {!message &&
                                 <OptionalLabel>
-                                    Optional
+                                    {t('optional')}
                                 </OptionalLabel>
                             }
                             </>
@@ -615,7 +657,7 @@ const TweetReactionView = ({
                                         width: window.innerWidth * .5,
                                         aspectRatio: custom3DText.width / custom3DText.height
                                     }}
-                                    alt='Message' />
+                                    alt={message} />
                                 <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
                                     <EditCircle />
                                 </Edit3DTextButton>
@@ -688,7 +730,7 @@ const TweetReactionView = ({
                         </PricesButton>
                         <SendButton onClick={onSend}
                             disabled={sendButtonDisabled}>
-                            Send
+                            {t('send')}
                         </SendButton>
                     </ActionsContainer>
                     :
@@ -714,9 +756,9 @@ const TweetReactionView = ({
                                     isSelected={isMediaOptionSelected(mediaType)}
                                     excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
                                     emoteUrl={randomEmoteUrl}
-                                    tooltipText='😯 You can only use one of '
-                                    tooltipHighlightedText={mediaType}
-                                    tooltipButtonText={`Use ${mediaType}`}
+                                    tooltipText={t('youCanOnlyUseOne')}
+                                    tooltipHighlightedText={t('excluded')}
+                                    tooltipButtonText={t('use', { mediaType: t(mediaType) })}
                                     onTooltipClick={(level, media) => onMediaOptionClick(media)} />
                             ))}
                             {noEnabledOptions.map((mediaType, index) => (
@@ -726,8 +768,8 @@ const TweetReactionView = ({
                                     onClick={(type) => onMediaOptionClick(type)}
                                     disabled
                                     emoteUrl={randomEmoteUrl}
-                                    tooltipText='👀 Upgrade your reaction to use '
-                                    tooltipHighlightedText='Custom TTS Bot Voice & 3D Text'
+                                    tooltipText={t('upgradeToUse')}
+                                    tooltipHighlightedText={mediaOptionsData[mediaType].label}
                                     tooltipButtonText={`Upgrade Reaction `}
                                     reactionCost={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].price : 0}
                                     onTooltipClick={onUpgradeReaction} />
