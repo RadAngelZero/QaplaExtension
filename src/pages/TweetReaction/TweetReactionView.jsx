@@ -28,8 +28,6 @@ const allMediaOptionsTypes = [
     CUSTOM_TTS_VOICE
 ];
 
-console.log('Creation');
-
 // Create mediaOptionsData
 let mediaOptionsData = {
     [GIPHY_GIFS]: {

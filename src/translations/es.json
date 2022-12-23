@@ -1,5 +1,10 @@
 {
     "translation": {
+        "Config": {
+            "welcome": "Bienvenido",
+            "instructions": "Porfavor vista el Dashboard de Qapla GG para\nconfigurar la extensión",
+            "openDashboard": "Abrir Dashboard"
+        },
         "TweetReactionView": {
             "gifs": "Gif",
             "stickers": "Sticker",

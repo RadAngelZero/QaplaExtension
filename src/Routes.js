@@ -3,12 +3,16 @@ import { createHashRouter, createRoutesFromElements, Route, useRouteError } from
 
 import Root from './pages/Root';
 import TweetReactionController from './pages/TweetReaction/TweetReactionController';
+import Config from './pages/Config';
 
 function ErrorBoundary() {
     let error = useRouteError();
     console.error(error);
 
-    return <div>Dang!</div>;
+    return (<h2 style={{ color: '#FFF' }}>
+            {JSON.stringify(error)}
+        </h2>
+    );
 }
 
 export default createHashRouter(
@@ -16,13 +20,13 @@ export default createHashRouter(
         <Route path='/'
             element={<Root />}
             errorElement={<ErrorBoundary />} >
-            <Route index element={
-                <TweetReactionController />
-            }
+            <Route path='/react' element={
+                    <TweetReactionController />
+                }
                 errorElement={<ErrorBoundary />} />
-            <Route path='/index.html' element={
-                <TweetReactionController />
-            }
+            <Route path='/config' element={
+                    <Config />
+                }
                 errorElement={<ErrorBoundary />} />
         </Route>
     )
