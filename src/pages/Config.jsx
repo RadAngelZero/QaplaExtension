@@ -3,13 +3,11 @@ import styled from '@emotion/styled';
 import { Box, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-import QaplaExtensionBackground from './../assets/Images/QaplaExtensionBackground.jpg';
-
 import { ReactComponent as ExternalLink } from './../assets/Icons/ExternalLink.svg';
 
 const Container = styled(Box)({
     height: '100vh',
-    background: `url('${QaplaExtensionBackground}') no-repeat center center fixed`,
+    background: `url('./assets/QaplaExtensionBackground.jpg') no-repeat center center fixed`,
     backgroundSize: 'cover',
     justifyContent: 'center',
     alignContent: 'center',
