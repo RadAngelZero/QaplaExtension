@@ -132,6 +132,11 @@ const ContentContainer = styled(Box)({
 
 const TTSContainer = styled(Box)({
     display: 'flex',
+    flexDirection: 'column'
+});
+
+const UserMessageContainer = styled(Box)({
+    display: 'flex',
     alignItems: 'center'
 });
 
@@ -615,56 +620,61 @@ const TweetReactionView = ({
         <Container>
             <ContentContainer>
                 <TTSContainer>
-                    <AvatarImage
-                        src={userImage} />
-                    <MessageContainer>
-                        {!custom3DText ?
-                            <>
-                            <MessageInput variant='standard'
-                                InputProps={{
-                                    disableUnderline: true,
-                                    style: {
-                                        color: '#FFF',
-                                        '&::placeholder': {
-                                            color: '#C2C2C2'
-                                        },
-                                        padding: 0
-                                    }
-                                }}
-                                // eslint-disable-next-line
-                                inputProps={{ maxLength: 100 }}
-                                multiline
-                                placeholder={t('typeToCreateTTS')}
-                                fullWidth
-                                autoFocus
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)} />
-                            {!message &&
-                                <OptionalLabel>
-                                    {t('optional')}
-                                </OptionalLabel>
-                            }
-                            </>
-                            :
-                            <Custom3DTextContainer>
-                                <img src={custom3DText.url}
-                                    style={{
-                                        width: window.innerWidth * .5,
-                                        aspectRatio: custom3DText.width / custom3DText.height
+                    <UserMessageContainer>
+                        <AvatarImage
+                            src={userImage} />
+                        <MessageContainer>
+                            {!custom3DText ?
+                                <>
+                                <MessageInput variant='standard'
+                                    InputProps={{
+                                        disableUnderline: true,
+                                        style: {
+                                            fontSize: '22px',
+                                            fontWeight: '400',
+                                            color: '#FFF',
+                                            '&::placeholder': {
+                                                color: '#C2C2C2'
+                                            },
+                                            padding: 0
+                                        }
                                     }}
-                                    alt={message} />
-                                <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
-                                    <EditCircle />
-                                </Edit3DTextButton>
-                                <Remove3DTextButton onClick={onRemoveCustom3DText}>
-                                    <Close style={{
-                                            height: 24,
-                                            width: 24
-                                        }} />
-                                </Remove3DTextButton>
-                            </Custom3DTextContainer>
-                        }
-                        {pills.length > 0 &&
+                                    // eslint-disable-next-line
+                                    inputProps={{ maxLength: 100 }}
+                                    multiline
+                                    placeholder={t('typeToCreateTTS')}
+                                    fullWidth
+                                    autoFocus
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)} />
+                                {!message &&
+                                    <OptionalLabel>
+                                        {t('optional')}
+                                    </OptionalLabel>
+                                }
+                                </>
+                                :
+                                <Custom3DTextContainer>
+                                    <img src={custom3DText.url}
+                                        style={{
+                                            width: window.innerWidth * .5,
+                                            aspectRatio: custom3DText.width / custom3DText.height
+                                        }}
+                                        alt={message} />
+                                    <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
+                                        <EditCircle />
+                                    </Edit3DTextButton>
+                                    <Remove3DTextButton onClick={onRemoveCustom3DText}>
+                                        <Close style={{
+                                                height: 24,
+                                                width: 24
+                                            }} />
+                                    </Remove3DTextButton>
+                                </Custom3DTextContainer>
+                            }
+                        </MessageContainer>
+                    </UserMessageContainer>
+                    {pills.length > 0 &&
                             <PillsList>
                                 {pills.map((pill) => (
                                     <Pill key={pill.type}>
@@ -695,7 +705,6 @@ const TweetReactionView = ({
                                 ))}
                             </PillsList>
                         }
-                    </MessageContainer>
                 </TTSContainer>
                 <SelectedMediaContainer>
                     {selectedMedia &&

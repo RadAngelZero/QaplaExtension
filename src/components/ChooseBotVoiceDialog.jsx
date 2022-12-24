@@ -33,7 +33,6 @@ const CloseIconButton = styled(IconButton)({
 const HeaderText = styled('p')({
     width: '100%',
     margin: 0,
-
     fontWeight: '900',
     fontSize: '20px',
     lineHeight: '24px',
@@ -54,10 +53,7 @@ const BotVoicePill = styled(Box)({
     flexDirection: 'row',
     alignItems: 'center',
     gap: '10px',
-
     height: '56px',
-    width: '248px',
-
     background: 'linear-gradient(93.1deg, #4301FF 0%, #9F01FA 100%)',
     borderRadius: '1000px',
 });
@@ -110,12 +106,15 @@ const BotVoice = ({ label, selected, onPress }) => {
                 </BotVoiceInnerContainer>
             </BotVoicePill>
             <BotVoiceSideIconsContainer>
-                <BotVoiceText style={{ marginRight: '8px' }}>
+                <BotVoiceText style={{ marginRight: '2px' }}>
                     <span role='img' aria-label='Bot icon'>
                         🤖
                     </span>
                 </BotVoiceText>
-                <TTSBot />
+                <TTSBot style={{
+                        height: '20px',
+                        width: '20px'
+                    }} />
             </BotVoiceSideIconsContainer>
         </BotVoiceContainer>
     );

@@ -46,6 +46,7 @@ const SearchContainer = styled(Box)({
 });
 
 const SearchInput = styled(TextField)({
+    marginLeft: '8px',
     padding: 0,
     border: 'none',
     width: '100%'
@@ -86,6 +87,7 @@ const GiphyMediaSelectorDialog = ({ open, onClose, mediaType, onMediaSelected })
                     <SearchContainer onClick={focusSearch}>
                         <Search style={{ opacity: 0.6 }} />
                         <SearchInput autoFocus
+                            variant='standard'
                             InputProps={{
                                 disableUnderline: true,
                                 style: {

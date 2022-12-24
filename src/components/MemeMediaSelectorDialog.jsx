@@ -44,6 +44,7 @@ const SearchContainer = styled(Box)({
 });
 
 const SearchInput = styled(TextField)({
+    marginLeft: '8px',
     padding: 0,
     border: 'none',
     width: '100%'
@@ -144,6 +145,7 @@ const MemeMediaSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                     <SearchContainer onClick={focusSearch}>
                         <Search style={{ opacity: 0.6 }} />
                         <SearchInput autoFocus
+                            variant='standard'
                             InputProps={{
                                 disableUnderline: true,
                                 style: {

@@ -15,7 +15,7 @@
             "typeToCreateTTS": "Type to create TTS",
             "optional": "Optional",
             "send": "Send",
-            "youCanOnlyUseOne": "😯 You can only use one",
+            "youCanOnlyUseOne": "😯 You can only use one of",
             "excluded": "Gif, Meme or Sticker",
             "use": "Use {{mediaType}}",
             "upgradeToUse": "👀 Upgrade your reaction to use "

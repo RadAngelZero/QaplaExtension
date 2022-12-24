@@ -45,6 +45,7 @@ const SearchContainer = styled(Box)({
 });
 
 const SearchInput = styled(TextField)({
+    marginLeft: '8px',
     padding: 0,
     border: 'none',
     width: '100%'
@@ -113,6 +114,7 @@ const Create3DTextDialog = ({ open, onClose, defaultMessage, on3DTextSelected })
                     <SearchContainer onClick={focusSearch}>
                         <Search style={{ opacity: 0.6 }} />
                         <SearchInput autoFocus
+                            variant='standard'
                             InputProps={{
                                 disableUnderline: true,
                                 style: {
