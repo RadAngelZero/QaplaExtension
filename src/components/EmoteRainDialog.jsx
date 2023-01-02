@@ -3,8 +3,13 @@ import { Box, Dialog, IconButton, ImageList, ImageListItem, Typography } from '@
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 
+import { useTwitch } from '../hooks/TwitchProvider';
+import { useAuth } from '../hooks/AuthProvider';
+
 import { getRandomGifByLibrary } from '../services/database';
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
+import { ReactComponent as Lock } from './../assets/Icons/Lock.svg';
+import { isUserFollowing } from '../services/twitch';
 
 const EmoteRainContainer = styled(Box)({
     marginTop: '56px',
@@ -56,9 +61,18 @@ const EmoteCategoryTitle = styled(Typography)({
     color: 'rgba(255, 255, 255, 0.8)'
 });
 
+const LockedIcon = styled(Box)({
+    position: 'absolute',
+    bottom: '-8px',
+    right: '-3px'
+});
+
 const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
     const [gif, setGif] = useState(null);
+    const [isFollower, setIsFollower] = useState(false);
     const { t } = useTranslation('translation', { keyPrefix: 'dialogs.EmoteRainDialog' });
+    const twitch = useTwitch();
+    const user = useAuth();
 
     useEffect(() => {
         async function loadGif() {
@@ -67,8 +81,58 @@ const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
             setGif(gif.val());
         }
 
-        loadGif();
-    }, []);
+        async function checkFollowStatus() {
+            const isFollower = await isUserFollowing(twitch.viewer.id, user.twitchExtensionData.channelId, user.twitchExtensionData.helixToken);
+
+            setIsFollower(isFollower);
+        }
+
+        if (user && user.twitchExtensionData && user.twitchExtensionData.channelId && user.twitchExtensionData.helixToken) {
+            loadGif();
+            checkFollowStatus();
+        }
+    }, [user]);
+
+    const renderEmoteSection = (emoteCategory, key) => {
+        let locked = false;
+
+        /* Only allow user to user emotes who have unlocked on the channel (by follow or subscriptions)
+         * Bits are unlocked by default because the user sending the reaction is sending it with bits
+         */
+        switch (key) {
+            case 'follower':
+                locked = !isFollower;
+                break;
+            case 'subTier1':
+                locked = !twitch.viewer.subscriptionStatus;
+                break;
+            case 'subTier2':
+                locked = !twitch.viewer.subscriptionStatus || twitch.viewer.subscriptionStatus < 2000;
+                break;
+            case 'subTier3':
+                locked = !twitch.viewer.subscriptionStatus || twitch.viewer.subscriptionStatus < 3000;
+                break;
+            default:
+                break;
+        }
+
+        return (emoteCategory.map((emote) => (
+            <ImageListItem key={emote.id} style={{
+                    cursor: 'pointer',
+                    opacity: locked ? .4 : 1
+                }}
+                onClick={() => locked ? null : onEmoteSelected(emote.images.url_4x)}>
+                <img src={`${emote.images.url_2x}?w=56&h=56&fit=crop&auto=format`}
+                    alt='Giphy text'
+                    loading='lazy' />
+                {locked &&
+                    <LockedIcon>
+                        <Lock />
+                    </LockedIcon>
+                }
+            </ImageListItem>
+        )));
+    }
 
     return (
         <Dialog open={open}
@@ -106,16 +170,7 @@ const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
                                 {t(emotes[emoteCategory].key)}
                             </EmoteCategoryTitle>
                             <ImageList cols={5} gap={32}>
-                                {emotes[emoteCategory].data[0].map((emote) => (
-                                    <ImageListItem key={emote.id} style={{
-                                        cursor: 'pointer'
-                                    }}
-                                    onClick={() => onEmoteSelected(emote.images.url_4x)}>
-                                        <img src={`${emote.images.url_2x}?w=56&h=56&fit=crop&auto=format`}
-                                            alt='Giphy text'
-                                            loading='lazy' />
-                                    </ImageListItem>
-                                ))}
+                                {renderEmoteSection(emotes[emoteCategory].data[0], emotes[emoteCategory].key)}
                             </ImageList>
                         </React.Fragment>
                     ))}
