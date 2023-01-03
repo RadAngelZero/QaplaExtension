@@ -69,6 +69,17 @@ const CardButton = styled(Button)({
 const Config = () => {
     const { t } = useTranslation('translation', { keyPrefix: 'Config' });
 
+    /**
+     * In another tab of the browser request the user autorization to link their Twitch Account with our Twitch App
+     * The redirect_uri is the link to our dashboard, where user can configure their settings and get their overlay
+     * url for their OBS
+     */
+    const uri = `https://id.twitch.tv/oauth2/authorize?` +
+        `client_id=3cwpzmazn716nmz6g1087kh4ciu4sp&` +
+        `redirect_uri=https://dashboard.qapla.gg/&` +
+        `response_type=code&` +
+        `scope=user:read:email%20user:edit%20bits:read%20user:edit%20channel:read:subscriptions%20channel:manage:redemptions%20channel:read:redemptions%20moderation:read`;
+
     return (
         <Container>
             <Card>
@@ -80,7 +91,7 @@ const Config = () => {
                 </CardInstructions>
                 <CardButton fullWidth
                     endIcon={<ExternalLink />}
-                    href='https://dashboard.qapla.gg'
+                    href={uri}
                     target='_blank'>
                     {t('openDashboard')}
                 </CardButton>
