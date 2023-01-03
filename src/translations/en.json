@@ -18,7 +18,9 @@
             "youCanOnlyUseOne": "😯 You can only use one of",
             "excluded": "Gif, Meme or Sticker",
             "use": "Use {{mediaType}}",
-            "upgradeToUse": "👀 Upgrade your reaction to use "
+            "upgradeToUse": "👀 Upgrade your reaction to use ",
+            "contentAvailableWhenUpgradeTo2": "TTS Bot Voice & 3D Text",
+            "contentAvailableWhenUpgradeTo3": "Emotes Animations"
         },
         "dialogs": {
             "GiphyMediaSelectorDialog": {

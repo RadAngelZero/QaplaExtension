@@ -18,7 +18,9 @@
             "youCanOnlyUseOne": "😯 Solo puedes usar uno",
             "excluded": "Gif, Meme o Sticker",
             "use": "Usar {{mediaType}}",
-            "upgradeToUse": "👀 Sube de nivel tu tu reacción para usar "
+            "upgradeToUse": "👀 Sube de nivel tu tu reacción para usar ",
+            "contentAvailableWhenUpgradeTo2": "Voz de bot para TTS & Texto 3D",
+            "contentAvailableWhenUpgradeTo3": "Animaciones de Emotes"
         },
         "dialogs": {
             "GiphyMediaSelectorDialog": {

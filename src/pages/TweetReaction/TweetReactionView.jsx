@@ -773,7 +773,7 @@ const TweetReactionView = ({
                                     disabled
                                     emoteUrl={randomEmoteUrl}
                                     tooltipText={t('upgradeToUse')}
-                                    tooltipHighlightedText={mediaOptionsData[mediaType].label}
+                                    tooltipHighlightedText={t(`contentAvailableWhenUpgradeTo${mediaOptionsData[mediaType].level}`)}
                                     tooltipButtonText={`Upgrade Reaction `}
                                     reactionCost={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].price : 0}
                                     onTooltipClick={onUpgradeReaction} />
