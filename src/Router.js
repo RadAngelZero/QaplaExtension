@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { RouterProvider } from 'react-router-dom';
 
 import { changeLanguage } from './i18n';
-import Routes from './Routes';
+import Config from './pages/Config';
+import TweetReactionController from './pages/TweetReaction/TweetReactionController';
 
 const Router = () => {
     useEffect(() => {
@@ -12,9 +12,17 @@ const Router = () => {
         changeLanguage(language);
     }, []);
 
-    return (
-        <RouterProvider router={Routes} />
-    );
+    const query = new URLSearchParams(window.location.href);
+    const mode = query.get('mode') ? query.get('mode') : 'viewer';
+
+    switch (mode) {
+        case 'viewer':
+            return <TweetReactionController />;
+        case 'config':
+            return <Config />;
+        default:
+            return null;
+    }
 }
 
 export default Router;
