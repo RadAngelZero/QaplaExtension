@@ -44,7 +44,7 @@ export async function isUserFollowing(userTwitchId, channelId, token) {
 
     if (followingData) {
         // If the user is following total = 1 otherwise total = 0
-        isFollowing = followingData.data.total ? true : false;
+        isFollowing = followingData.total === 1 ? true : false;
     }
 
     return isFollowing;
