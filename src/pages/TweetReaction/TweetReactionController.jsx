@@ -290,6 +290,11 @@ const TweetReactionController = () => {
     }
 
     const onSendReaction = () => {
+        const sendButtonDisabled = (!message && !selectedMedia);
+        if (sendButtonDisabled) {
+            // Feedback
+        }
+
         if (!sending) {
             setSending(true);
             if (reactionLevel !== 1) {

@@ -601,7 +601,8 @@ const TweetReactionView = ({
         setExtraTip(tipObject);
     }
 
-    const sendButtonDisabled = (!message && !selectedMedia) || currentReactionCost === undefined || sending;
+    // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
+    const sendButtonDisabled = currentReactionCost === undefined || sending;
 
     let pills = [
         voiceBot,
