@@ -1,10 +1,15 @@
 import React, { useEffect } from 'react';
+import WeNeedPermissionDialog from './components/WeNeedPermissionDialog';
+
+import { useAuth } from './hooks/AuthProvider';
 
 import { changeLanguage } from './i18n';
 import Config from './pages/Config';
 import TweetReactionController from './pages/TweetReaction/TweetReactionController';
 
 const Router = () => {
+    const user = useAuth();
+
     useEffect(() => {
         // Get and set user language from query params
         const query = new URLSearchParams(window.location.href);
@@ -17,7 +22,15 @@ const Router = () => {
 
     switch (mode) {
         case 'viewer':
-            return <TweetReactionController />;
+            if (user) {
+                if (user.notLinked) {
+                    return <WeNeedPermissionDialog />;
+                }
+
+                return <TweetReactionController />;
+            }
+
+            return null;
         case 'config':
             return <Config />;
         default:

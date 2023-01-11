@@ -63,7 +63,7 @@ const EmoteCategoryTitle = styled(Typography)({
 
 const LockedIcon = styled(Box)({
     position: 'absolute',
-    bottom: '-8px',
+    bottom: '0px',
     right: '-3px'
 });
 

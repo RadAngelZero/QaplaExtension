@@ -4,8 +4,7 @@ import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
-import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
-import ChannelPointsReaction from './../assets/Images/ChannelPointsReaction.png';
+import ReactionsCarousel from './../assets/Images/ReactionsCarousel.png';
 
 const CloseIconButton = styled(IconButton)({
     position: 'absolute',
@@ -21,7 +20,7 @@ const Content = styled(DialogContent)({
 });
 
 const TextContainer = styled(Box)({
-    marginTop: '32px',
+    marginTop: '24px',
 });
 
 const Title = styled(Typography)({
@@ -56,8 +55,8 @@ const UpgradeReactionButton = styled(Button)({
     }
 });
 
-const NoReactionsDialog = ({ open, onClose, price, onUpgradeReaction }) => {
-    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.NoReactionsDialog' });
+const EmptyReactionDialog = ({ open, onClose }) => {
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.EmptyReactionDialog' });
 
     return (
         <Dialog open={open}
@@ -73,29 +72,26 @@ const NoReactionsDialog = ({ open, onClose, price, onUpgradeReaction }) => {
                 <Close />
             </CloseIconButton>
             <Content>
-                <img src={ChannelPointsReaction}
-                    alt='Channel Points' />
+                <img src={ReactionsCarousel}
+                    style={{
+                        width: '222px',
+                        height: '40px'
+                    }}
+                    alt='Options Carousel' />
                 <TextContainer>
                     <Title>
-                        {t('noReactions')}
+                        {t('reactionEmpty')}
                     </Title>
                     <Description>
-                        <b>
-                            {t('descriptionBold')}
-                        </b>
-                        {t('description')}
+                        {t('instructions')}
                     </Description>
                 </TextContainer>
-                <UpgradeReactionButton onClick={onUpgradeReaction}
-                    endIcon={<Bits style={{ height: '16px', width: '16px' }} />}>
-                    {t('upgradeFor')}
-                    <span style={{ marginLeft: '4px', color: '#00FFDD' }}>
-                        {price}
-                    </span>
+                <UpgradeReactionButton onClick={onClose}>
+                    {t('addContent')}
                 </UpgradeReactionButton>
             </Content>
         </Dialog>
     );
 }
 
-export default NoReactionsDialog;
+export default EmptyReactionDialog;

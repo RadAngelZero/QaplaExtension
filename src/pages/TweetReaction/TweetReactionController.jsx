@@ -25,6 +25,7 @@ import Create3DTextDialog from '../../components/Create3DTextDialog';
 import EmoteRainDialog from '../../components/EmoteRainDialog';
 import ReactionSentDialog from '../../components/ReactionSentDialog';
 import NoReactionsDialog from '../../components/NoReactionsDialog';
+import EmptyReactionDialog from '../../components/EmptyReactionDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -52,6 +53,7 @@ const TweetReactionController = () => {
     const [streamerName, setStreamerName] = useState('');
     const [openSentDialog, setOpenSentDialog] = useState(false);
     const [openNoReactionsDialog, setOpenNoReactionsDialog] = useState(false);
+    const [openEmptyReactionDialog, setOpenEmptyReactionDialog] = useState(false);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -292,7 +294,7 @@ const TweetReactionController = () => {
     const onSendReaction = () => {
         const sendButtonDisabled = (!message && !selectedMedia);
         if (sendButtonDisabled) {
-            // Feedback
+            return setOpenEmptyReactionDialog(true);
         }
 
         if (!sending) {
@@ -503,6 +505,8 @@ const TweetReactionController = () => {
                 onClose={() => setOpenNoReactionsDialog(false)}
                 price={costs[1] ? costs[1].price : 0}
                 onUpgradeReaction={() => { onUpgradeReaction(2, null); setOpenNoReactionsDialog(false); }} />
+            <EmptyReactionDialog open={openEmptyReactionDialog}
+                onClose={() => setOpenEmptyReactionDialog(false)} />
         </>
     );
 }

@@ -789,7 +789,7 @@ const TweetReactionView = ({
                             {extraTip ?
                                 (extraTip.cost).toLocaleString()
                                 :
-                                'Tip'
+                                'Bits'
                             }
                         </TipButton>
                     </>
@@ -798,7 +798,7 @@ const TweetReactionView = ({
                         <NoTipIcon>
                             <PlusCircle />
                         </NoTipIcon>
-                        No Tip
+                        No Bits
                     </NoTipButton>
                 }
             </MediaSelectionContainer>

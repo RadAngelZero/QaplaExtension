@@ -55,10 +55,20 @@
                 "sendMoreReactions": "Send More Reactions"
             },
             "NoReactionsDialog": {
-                "noReactions": "You don't have reactions",
-                "descriptionBold": "Get a Qapla Reaction Reward or\nupgrade your reaction",
-                "description": "to send\nyour alert using Bits",
+                "noReactions": "Not enough zaps!",
+                "descriptionBold": "Get a Zap Reward or upgrade\nyour reaction",
+                "description": " to send your alert\nusing Bits",
                 "upgradeFor": "Upgrade for"
+            },
+            "EmptyReactionDialog": {
+                "reactionEmpty": "Your reaction is empty 🥺",
+                "instructions": "Type to create a TTS, or add a\nMeme, GIF, Sticker or any\ncontent to send a reaction",
+                "addContent": "Add TTS or Content"
+            },
+            "WeNeedPermissionDialog": {
+                "weNeedPermission": "We need permission 🙏",
+                "permissionReason": "To send reactions on screen you\nmust grant access to your Twitch ID",
+                "managePermission": "Manage Permissions"
             }
         }
     }

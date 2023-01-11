@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+
 import { authWithTwitch, listenToAuthState } from '../services/auth';
 import { getUserProfile } from '../services/database';
 import { getUserData } from '../services/twitch';
@@ -25,7 +26,7 @@ const AuthProvider = ({ children }) => {
              * twitchExtensionData is important as it contains tokens to call the Twitch API and to make requests
              * to our own backend, so we merge all the relevant information in one object
              */
-            setUser({ uid, ...user.val(), twitchExtensionData });
+            setUser({ uid, ...user.val(), twitchExtensionData, notLinked: false });
         }
 
         if (twitch) {
@@ -36,11 +37,18 @@ const AuthProvider = ({ children }) => {
                         twitchExtensionData: {
                             ...auth,
                             ...twitch.viewer
-                        }
+                        },
+                        notLinked: true
                     });
 
-                    // Request the user to link their Twitch account with the extension
-                    return twitch.actions.requestIdShare();
+                    const firstTime = localStorage.getItem('firstTime');
+
+                    if (firstTime === null) {
+                        localStorage.setItem('firstTime', 'false');
+
+                        // Request the user to link their Twitch account with the extension
+                        return twitch.actions.requestIdShare();
+                    }
                 } else {
                     // Listen to auth state from firebase
                     listenToAuthState((user) => {
