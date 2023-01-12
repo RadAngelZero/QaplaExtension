@@ -444,38 +444,6 @@ const TweetReactionController = () => {
                 emoteRaid={selectedEmote}
                 onUpgradeReaction={onUpgradeReaction}
                 availableTips={availableTips} />
-            {/*
-            <TweetReactionScreen onSend={this.onSendReaction}
-                sending={this.state.sending}
-                qoins={this.state.reactionLevel !== 1}
-                currentReactioncost={this.state.costs[this.state.reactionLevel - 1]}
-                costsPerReactionLevel={this.state.costs}
-                mediaSelectorBarOptions={availableContent}
-                numberOfReactions={this.state.numberOfReactions}
-                avatarReaction={this.state.avatarReaction}
-                custom3DText={this.state.custom3DText}
-                onRemoveCustom3DText={() => this.setState({ custom3DText: null })}
-                voiceBot={this.state.selectedVoiceBot}
-                emoteRaid={this.state.selectedEmote}
-                openTutorial={!this.state.tutorialDone}
-                onChangeReactionLevel={() => this.setState({ openReactionLevelModal: true })}
-                onClosingTutorial={this.onClosingTutorial}
-                disableExtraTip={this.state.disableExtraTip}
-                message={this.state.message}
-                onMessageChanged={(message) => this.setState({ message })}
-                onMediaOptionPress={this.onMediaOptionPress}
-                randomEmoteUrl={this.state.randomEmoteUrl}
-                mediaType={this.state.mediaType}
-                selectedMedia={this.state.selectedMedia}
-                cleanSelectedMedia={() => this.setState({ selectedMedia: null })}
-                extraTip={this.state.extraTip}
-                setExtraTip={this.setExtraTip}
-                streamerImage={this.state.streamerData.streamerImage}
-                streamerUid={this.state.streamerData.streamerUid}
-                onCancel={() => this.props.navigation.dismiss()}
-                onOpenSearchStreamerModal={() => this.setState({ openSearchStreamerModal: true })}
-                onUpgradeReaction={this.onUpgradeReaction} />
-         */}
             <GiphyMediaSelectorDialog open={openGiphyDialog}
                 onClose={() => setOpenGiphyDialog(false)}
                 mediaType={giphyDialogMediaType}

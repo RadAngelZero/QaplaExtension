@@ -10,7 +10,8 @@ import {
     update,
     onValue,
     set,
-    increment
+    increment,
+    off
 } from 'firebase/database';
 import { database } from './firebase';
 
@@ -92,14 +93,24 @@ function createChild(databaseChild) {
 }
 
 /**
- * Returns the profile of the given user
+ * Listen the profile of the given user
  * @param {string} uid User identifier
- * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ * @param {function} callback Handler for database values
  */
- export async function getUserProfile(uid) {
-    const userChild = createChild(`/Users/${uid}`);
+export async function listenToUserProfile(uid, callback) {
+    const userProfile = createChild(`/Users/${uid}`);
 
-    return await get(query(userChild));
+    return onValue(query(userProfile), callback);
+}
+
+/**
+ * Removes any "on" listener attached to the profile of the given user
+ * @param {string} uid User identifier
+ */
+export async function unlistenUserProfile(uid) {
+    const userProfile = createChild(`/Users/${uid}`);
+
+    return off(userProfile);
 }
 
 //////////////////////
