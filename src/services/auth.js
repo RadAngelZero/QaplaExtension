@@ -34,7 +34,7 @@ export async function authWithTwitch(twitchUserData) {
 
     if (user.isNewUser) {
         // For a new user their uid and userName are the same than their twitch id and twitch display name
-        await createUserProfile(user.uid, user.email, user.displayName, user.photoURL, user.uid, user.displayName);
+        await createUserProfile(user.uid, twitchUserData.email ? twitchUserData.email : '', twitchUserData.display_name, twitchUserData.profile_image_url, twitchUserData.id, twitchUserData.display_name);
     } else {
         await updateUserProfile(user.uid, {
             email: user.email,
@@ -61,7 +61,7 @@ export async function authWithTwitch(twitchUserData) {
 
     // If there is a profile and have an id field use that field, otherwise (new user) use Twitch id
     const qaplaCustomAuthToken = await generateAuthTokenForTwitchSignIn(
-        userProfile.id ? userProfile.id : twitchUserData.id,
+        (userProfile && userProfile.id) ? userProfile.id : twitchUserData.id,
         twitchUserData.display_name,
         twitchUserData.email || null
     );

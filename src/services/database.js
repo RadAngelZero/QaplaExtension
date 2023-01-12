@@ -278,8 +278,8 @@ export async function sendReaction(bits, uid, userName, twitchUserName, userPhot
 
     const reactionReference = await push(streamerDonations, {
         avatar: {
-            avatarId,
-            avatarBackground
+            avatarId: avatarId ? avatarId : null,
+            avatarBackground: avatarBackground ? avatarBackground : null
         },
         /**
          * amountQoins and donationType are filled even if the reaction is sent free with reaction points, our

@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import WeNeedPermissionDialog from './components/WeNeedPermissionDialog';
+import { CircularProgress } from '@mui/material';
 
 import { useAuth } from './hooks/AuthProvider';
 
 import { changeLanguage } from './i18n';
 import Config from './pages/Config';
 import TweetReactionController from './pages/TweetReaction/TweetReactionController';
+import WeNeedPermissionDialog from './components/WeNeedPermissionDialog';
 
 const Router = () => {
     const user = useAuth();
@@ -30,7 +31,7 @@ const Router = () => {
                 return <TweetReactionController />;
             }
 
-            return null;
+            return <CircularProgress style={{ color: '#00FFDD', position: 'absolute', top: '50%', left: '50%' }} />;;
         case 'config':
             return <Config />;
         default:
