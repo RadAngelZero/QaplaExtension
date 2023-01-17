@@ -330,7 +330,12 @@ const TweetReactionController = () => {
 
         if (!sending) {
             setSending(true);
-            if (costs[reactionLevel - 1].type !== ZAP) {
+            /**
+             * If the streamer is a Qapla premium user and the user using the extension is a subscriber of the channel, show the
+             * preferential reactions costs for subs defined by the streamer
+             */
+            const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
+            if (currentReactionCost.type !== ZAP) {
                 twitch.bits.onTransactionComplete((transactionObject) => {
                     if (transactionObject.initiator === 'current_user') {
                         // Transaction comes from reaction payment
@@ -342,11 +347,11 @@ const TweetReactionController = () => {
                                 twitch.bits.useBits(extraTip.twitchSku);
                             } else {
                                 // Reaction paid and no extra tip, write reaction
-                                writeReaction(costs[reactionLevel - 1].price);
+                                writeReaction(currentReactionCost.price);
                             }
                         } else {
                             // Reaction and extra tip are paid, write reaction
-                            writeReaction(costs[reactionLevel - 1].price + extraTip.cost);
+                            writeReaction(currentReactionCost.price + extraTip.cost);
                         }
                     }
                 });
@@ -355,7 +360,7 @@ const TweetReactionController = () => {
                     // If the user already paid the reaction, but he canceled the extra tip
                     if (reactionPaid) {
                         // Send the reaction only with the Bits he actually paid
-                        writeReaction(costs[reactionLevel - 1].price);
+                        writeReaction(currentReactionCost.price);
                     }
 
                     // In any case, unlock the sending button
@@ -363,16 +368,16 @@ const TweetReactionController = () => {
                 });
 
                 // Listeners are set, start the purchase attempt
-                twitch.bits.useBits(costs[reactionLevel - 1].twitchSku);
+                twitch.bits.useBits(currentReactionCost.twitchSku);
             } else {
                 // Check if user has enough Zaps to react
-                if (numberOfReactions >= costs[reactionLevel - 1].price) {
+                if (numberOfReactions >= currentReactionCost.price) {
                     if (extraTip) {
                         // Channel point reaction but with extra tip
                         twitch.bits.onTransactionComplete((transactionObject) => {
                             if (transactionObject.initiator === 'current_user') {
                                 // Extra tip paid, write reaction
-                                writeReaction(extraTip.cost, true, costs[reactionLevel - 1].price);
+                                writeReaction(extraTip.cost, true, currentReactionCost.price);
                             }
                         });
 
@@ -386,7 +391,7 @@ const TweetReactionController = () => {
                         twitch.bits.useBits(extraTip.twitchSku);
                     } else {
                         // Channel point reaction, don't charge products and write reaction
-                        writeReaction(0, true, costs[reactionLevel - 1].price);
+                        writeReaction(0, true, currentReactionCost.price);
                     }
                 } else {
                     setOpenNoReactionsDialog(true);
