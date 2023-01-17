@@ -167,14 +167,14 @@ export async function getRandomGifByLibrary(libraryName) {
 //////////////////////
 
 /**
- * Gets the price in Bits of the given reaction level and their Sku on the Twitch catalog (this price
- * is always the one the streamer selected in their configuration)
+ * Gets the price of the given reaction level and their Sku on the Twitch catalog (if it applies) (this price
+ * is the one the streamer selected in their configuration)
  * @param {string} streamerUid Streamer identifier
  * @param {string} reactionLevel Reaction level name (e.g: level1)
  * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
  */
-export async function loadReactionPriceByLevel(streamerUid, reactionLevel) {
-    const channelPrices = createChild(`/ReactionsPricesBits/${streamerUid}/${reactionLevel}`);
+export async function getStreamerReactionPrice(streamerUid, reactionLevel) {
+    const channelPrices = createChild(`/ReactionsPricesLevels/${streamerUid}/${reactionLevel}`);
 
     return await get(query(channelPrices));
 }
@@ -184,15 +184,47 @@ export async function loadReactionPriceByLevel(streamerUid, reactionLevel) {
 //////////////////////
 
 /**
- * Gets the price in Bits of the given reaction level and their Sku on the Twitch catalog (this price will be
- * the default, used in cases where the streamer has not selected another price)
+ * Gets the price of the given reaction level and their Sku on the Twitch catalog (if it applies) this price will be
+ * the default, used in cases where the streamer has not selected another price
  * @param {string} reactionLevel Reaction level name (e.g: level1)
  * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
  */
 export async function getReactionPriceDefault(reactionLevel) {
-    const defaultPrice = createChild(`/ReactionsPricesDefault/${reactionLevel}/bits`);
+    const defaultPrice = createChild(`/ReactionsPricesLevelsDefaults/${reactionLevel}`);
 
     return await get(query(defaultPrice));
+}
+
+
+//////////////////////
+// Reactions Prices Levels Subs
+//////////////////////
+
+/**
+ * Gets the price of the given reaction level for subs
+ * @param {string} streamerUid Streamer identifier
+ * @param {string} reactionLevel Name of reaction level
+ * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ */
+export async function getStreamerReactionPriceForSubs(streamerUid, reactionLevel) {
+    const reactionPriceLevelForSub = createChild(`/ReactionsPricesLevelsSubs/${streamerUid}/${reactionLevel}`);
+
+    return await get(query(reactionPriceLevelForSub));
+}
+
+//////////////////////
+// Reactions Prices Levels Subs Defaults
+//////////////////////
+
+/**
+ * Gets the default price of the given reaction level for subs
+ * @param {string} reactionLevel Name of reaction level
+ * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
+ */
+export async function getReactionPriceDefaultForSubs(reactionLevel) {
+    const reactionPriceLevelForSubDefault = createChild(`/ReactionsPricesLevelsSubsDefaults/${reactionLevel}`);
+
+    return await get(query(reactionPriceLevelForSubDefault));
 }
 
 //////////////////////
@@ -230,11 +262,12 @@ export function listenToUserReactionsCount(uid, streamerUid, callback) {
  * @param {string} uid User identifier
  * @param {string} streamerUid Streamer identifier
  */
-export async function substractChannelPointReaction(uid, streamerUid) {
+export async function substractZaps(uid, streamerUid, zapsCost) {
     const userReactionsCount = createChild(`/UsersReactionsCount/${uid}`);
 
     await update(userReactionsCount, {
-        [streamerUid]: increment(-1)
+        // Increment a negative amount in order to decrease the number of reactions
+        [streamerUid]: increment(-1 * zapsCost)
     });
 }
 
@@ -284,7 +317,7 @@ export function getAvailableExtraTips() {
  * @param {Array<string>} avatarBackground.colors Array of colors for gradient background
  * @param {boolean} pointsChannelInteractions True if reaction was sent with channel points
  */
-export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, pointsChannelInteractions) {
+export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, pointsChannelInteractions, zapsToRemove) {
     const streamerDonations = createChild(`/StreamersDonations/${streamerUid}`);
 
     const reactionReference = await push(streamerDonations, {

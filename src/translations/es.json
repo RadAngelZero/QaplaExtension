@@ -58,7 +58,8 @@
                 "noReactions": "No tienes suficientes Zaps",
                 "descriptionBold": "Canjea la recompensa \"Zap\" en Twitch\no actualiza tu reacción",
                 "description": " para enviar tu alerta\nusando Bits",
-                "upgradeFor": "Actualiza por"
+                "upgradeFor": "Actualiza por",
+                "understood": "Entendido"
             },
             "EmptyReactionDialog": {
                 "reactionEmpty": "Tu reacción está vacía 🥺",

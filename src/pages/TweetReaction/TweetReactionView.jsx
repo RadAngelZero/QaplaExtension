@@ -17,7 +17,7 @@ import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
 import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
 import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
-import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
+import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP } from '../../constants';
 
 const allMediaOptionsTypes = [
     GIPHY_GIFS,
@@ -443,7 +443,7 @@ const MediaOptionSelectedIcon = () => {
     );
 }
 
-const MediaOption = ({ index, type, disabled = false, excluded = false, onClick, isSelected, emoteUrl, tooltipText, tooltipHighlightedText, tooltipButtonText, reactionCost, onTooltipClick }) => {
+const MediaOption = ({ index, type, disabled = false, excluded = false, onClick, isSelected, emoteUrl, tooltipText, tooltipHighlightedText, tooltipButtonText, reactionCost, reactionType, onTooltipClick }) => {
     const mediaOptionData = mediaOptionsData[type];
     const [showTooltip, setShowTooltip] = useState(false);
 
@@ -500,10 +500,17 @@ const MediaOption = ({ index, type, disabled = false, excluded = false, onClick,
                                     }}>
                                     {reactionCost.toLocaleString()}
                                 </HighlightedText>
-                                <Bits style={{
+                                {reactionType === ZAP ?
+                                    <Interactions style={{
                                         height: '16px',
                                         width: '16px'
                                     }} />
+                                    :
+                                    <Bits style={{
+                                        height: '16px',
+                                        width: '16px'
+                                    }} />
+                                }
                                 </>
                                 :
                                 null
@@ -725,18 +732,18 @@ const TweetReactionView = ({
                 </SelectedMediaContainer>
                 {!tipping ?
                     <ActionsContainer>
-                        <PricesButton startIcon={reactionLevel === 1 ? <Interactions /> : <Bits />}
-                            onClick={onChangeReactionLevel}>
-                            {reactionLevel === 1 ?
-                                numberOfReactions
-                                :
-                                currentReactionCost && (currentReactionCost.price).toLocaleString()
-                            }
-                        </PricesButton>
-                        <SendButton onClick={onSend}
-                            disabled={sendButtonDisabled}>
-                            {t('send')}
-                        </SendButton>
+                        {currentReactionCost &&
+                            <>
+                            <PricesButton startIcon={currentReactionCost.type === ZAP ? <Interactions /> : <Bits />}
+                                onClick={onChangeReactionLevel}>
+                                {currentReactionCost && currentReactionCost.price.toLocaleString()}
+                            </PricesButton>
+                            <SendButton onClick={onSend}
+                                disabled={sendButtonDisabled}>
+                                {t('send')}
+                            </SendButton>
+                            </>
+                        }
                     </ActionsContainer>
                     :
                     <TipContainer>
@@ -777,6 +784,7 @@ const TweetReactionView = ({
                                     tooltipHighlightedText={t(`contentAvailableWhenUpgradeTo${mediaOptionsData[mediaType].level}`)}
                                     tooltipButtonText={`Upgrade Reaction `}
                                     reactionCost={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].price : 0}
+                                    reactionType={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].type : 0}
                                     onTooltipClick={onUpgradeReaction} />
                             ))}
                         </MediaOptionsContainer>

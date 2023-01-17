@@ -58,7 +58,10 @@
                 "noReactions": "Not enough zaps!",
                 "descriptionBold": "Get a Zap Reward or upgrade\nyour reaction",
                 "description": " to send your alert\nusing Bits",
-                "upgradeFor": "Upgrade for"
+                "descriptionBoldNoZaps": "You need {{numberOfReactions}} extra Zap Rewards",
+                "descriptionNoZaps": " to send your reaction",
+                "upgradeFor": "Upgrade for",
+                "understood": "Understood"
             },
             "EmptyReactionDialog": {
                 "reactionEmpty": "Your reaction is empty 🥺",

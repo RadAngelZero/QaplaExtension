@@ -8,13 +8,15 @@ import {
     getReactionPriceDefault,
     getStreamerWithTwitchId,
     listenToUserReactionsCount,
-    loadReactionPriceByLevel,
+    getStreamerReactionPrice,
     sendReaction,
-    substractChannelPointReaction
+    substractZaps,
+    getStreamerReactionPriceForSubs,
+    getReactionPriceDefaultForSubs
 } from '../../services/database';
 import { getStreamerEmotes } from '../../services/functions';
 
-import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
+import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP } from '../../constants';
 
 import TweetReactionView from './TweetReactionView';
 import GiphyMediaSelectorDialog from '../../components/GiphyMediaSelectorDialog';
@@ -39,7 +41,8 @@ const TweetReactionController = () => {
     const [tipping, setTipping] = useState(false);
     const [selectedVoiceBot, setSelectedVoiceBot] = useState(null);
     const [openBotVoiceDialog, setOpenBotVoiceDialog] = useState(false);
-    const [costs, setCosts] = useState([0, undefined, undefined]);
+    const [costs, setCosts] = useState([undefined, undefined, undefined]);
+    const [subscribersCosts, setSubscribersCosts] = useState([undefined, undefined, undefined]);
     const [streamerUid, setStreamerUid] = useState(null);
     const [custom3DText, setCustom3DText] = useState(null);
     const [open3DTextDialog, setOpen3DTextDialog] = useState(false);
@@ -54,6 +57,7 @@ const TweetReactionController = () => {
     const [openSentDialog, setOpenSentDialog] = useState(false);
     const [openNoReactionsDialog, setOpenNoReactionsDialog] = useState(false);
     const [openEmptyReactionDialog, setOpenEmptyReactionDialog] = useState(false);
+    const [streamerIsPremium, setStreamerIsPremium] = useState(false);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -72,35 +76,62 @@ const TweetReactionController = () => {
     }, []);
 
     useEffect(() => {
-        async function getStreamerUid(streamerId) {
+        async function getStreamerData(streamerId) {
             const streamer = await getStreamerWithTwitchId(streamerId);
             let uid = '';
             let streamerName = '';
+            let streamerIsPremium = false;
             streamer.forEach((streamer) => {
                 uid = streamer.key;
-                streamerName = streamer.val().displayName
+                streamerName = streamer.val().displayName;
+                streamerIsPremium = streamer.val().premium;
             });
             setStreamerUid(uid);
             setStreamerName(streamerName);
+            setStreamerIsPremium(streamerIsPremium);
         }
 
         async function loadPrices() {
-            const costs = [0];
+            const costs = [];
 
-            for (let i = 2; i <= 3; i++) {
-                const costSnapshot = await loadReactionPriceByLevel(streamerUid, `level${i}`);
-                let cost = null;
+            for (let i = 1; i <= 3; i++) {
+                const costSnapshot = await getStreamerReactionPrice(streamerUid, `level${i}`);
+                let costObject = null;
                 if (costSnapshot.exists()) {
-                    cost = costSnapshot.val();
+                    costObject = costSnapshot.val();
                 } else {
                     const defaultCost = await getReactionPriceDefault(`level${i}`);
-                    cost = defaultCost.val();
+                    costObject = defaultCost.val();
                 }
 
-                costs.push(cost);
+                // Overwrite price value if price is for bits reaction
+                costObject.price = costObject.type === ZAP ? costObject.price : costObject.bitsPrice;
+
+                costs.push(costObject);
             }
 
             setCosts(costs);
+
+            if (streamerIsPremium) {
+                const subscribersCosts = [];
+                for (let i = 1; i <= 3; i++) {
+                    const subscribersCostsSnap = await getStreamerReactionPriceForSubs(streamerUid, `level${i}`);
+                    let costObject = null;
+                    if (subscribersCostsSnap.exists()) {
+                        costObject = subscribersCostsSnap.val();
+                    } else {
+                        const defaultCost = await getReactionPriceDefaultForSubs(`level${i}`);
+                        costObject = defaultCost.val();
+                    }
+
+                    // Overwrite price value if price is for bits reaction
+                    costObject.price = costObject.type === ZAP ? costObject.price : costObject.bitsPrice;
+
+                    subscribersCosts.push(costObject);
+                }
+
+                setSubscribersCosts(subscribersCosts);
+            }
         }
 
         async function loadStreamerEmotes() {
@@ -138,7 +169,7 @@ const TweetReactionController = () => {
 
         if (!streamerUid) {
             if (user && user.twitchExtensionData && user.twitchExtensionData.channelId) {
-                getStreamerUid(user.twitchExtensionData.channelId);
+                getStreamerData(user.twitchExtensionData.channelId);
             }
         } else {
             loadPrices();
@@ -238,7 +269,7 @@ const TweetReactionController = () => {
         }
     }
 
-    const writeReaction = async (bits, channelPointsReaction = false) => {
+    const writeReaction = async (bits, channelPointsReaction = false, zapsCost) => {
         let messageExtraData = selectedVoiceBot ?
             {
                 voiceAPIName: selectedVoiceBot.voiceAPIName,
@@ -285,7 +316,7 @@ const TweetReactionController = () => {
         );
 
         if (channelPointsReaction) {
-            await substractChannelPointReaction(user.uid, streamerUid);
+            await substractZaps(user.uid, streamerUid, zapsCost);
         }
 
         setOpenSentDialog(true);
@@ -299,7 +330,7 @@ const TweetReactionController = () => {
 
         if (!sending) {
             setSending(true);
-            if (reactionLevel !== 1) {
+            if (costs[reactionLevel - 1].type !== ZAP) {
                 twitch.bits.onTransactionComplete((transactionObject) => {
                     if (transactionObject.initiator === 'current_user') {
                         // Transaction comes from reaction payment
@@ -321,7 +352,7 @@ const TweetReactionController = () => {
                 });
 
                 twitch.bits.onTransactionCancelled(() => {
-                    // If the user already paid the reaction, but he cancel the extra tip
+                    // If the user already paid the reaction, but he canceled the extra tip
                     if (reactionPaid) {
                         // Send the reaction only with the Bits he actually paid
                         writeReaction(costs[reactionLevel - 1].price);
@@ -334,14 +365,14 @@ const TweetReactionController = () => {
                 // Listeners are set, start the purchase attempt
                 twitch.bits.useBits(costs[reactionLevel - 1].twitchSku);
             } else {
-                // Check if user has enough reactions
-                if (numberOfReactions >= 1) {
+                // Check if user has enough Zaps to react
+                if (numberOfReactions >= costs[reactionLevel - 1].price) {
                     if (extraTip) {
                         // Channel point reaction but with extra tip
                         twitch.bits.onTransactionComplete((transactionObject) => {
                             if (transactionObject.initiator === 'current_user') {
                                 // Extra tip paid, write reaction
-                                writeReaction(extraTip.cost, true);
+                                writeReaction(extraTip.cost, true, costs[reactionLevel - 1].price);
                             }
                         });
 
@@ -355,7 +386,7 @@ const TweetReactionController = () => {
                         twitch.bits.useBits(extraTip.twitchSku);
                     } else {
                         // Channel point reaction, don't charge products and write reaction
-                        writeReaction(0, true);
+                        writeReaction(0, true, costs[reactionLevel - 1].price);
                     }
                 } else {
                     setOpenNoReactionsDialog(true);
@@ -417,6 +448,13 @@ const TweetReactionController = () => {
             break;
     }
 
+    /**
+     * If the streamer is a Qapla premium user and the user using the extension is a subscriber of the channel, show the
+     * preferential reactions costs for subs defined by the streamer
+     */
+    const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
+    const costsPerReactionLevel = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts : costs;
+
     return (
         <>
             <TweetReactionView onSend={onSendReaction}
@@ -424,8 +462,8 @@ const TweetReactionController = () => {
                 numberOfReactions={numberOfReactions}
                 message={message}
                 setMessage={setMessage}
-                currentReactionCost={costs[reactionLevel - 1]}
-                costsPerReactionLevel={costs}
+                currentReactionCost={currentReactionCost}
+                costsPerReactionLevel={costsPerReactionLevel}
                 onMediaOptionClick={onMediaOptionClick}
                 selectedMedia={selectedMedia}
                 cleanSelectedMedia={() => setSelectedMedia(null)}
@@ -453,8 +491,8 @@ const TweetReactionController = () => {
                 onMediaSelected={onMediaSelected} />
             <ReactionTierSelectorDialog open={openReactionLevelModal}
                 onClose={() => setOpenReactionLevelModal(false)}
-                costs={costs}
-                changeReactionLevel={(level) =>onUpgradeReaction(level, null)} />
+                costs={costsPerReactionLevel}
+                changeReactionLevel={(level) => onUpgradeReaction(level, null)} />
             <ChooseBotVoiceDialog open={openBotVoiceDialog}
                 onClose={() => setOpenBotVoiceDialog(false)}
                 currentVoice={selectedVoiceBot ? selectedVoiceBot.key : null}
@@ -471,8 +509,10 @@ const TweetReactionController = () => {
                 onClose={resetReaction} />
             <NoReactionsDialog open={openNoReactionsDialog}
                 onClose={() => setOpenNoReactionsDialog(false)}
-                price={costs[1] ? costs[1].price : 0}
-                onUpgradeReaction={() => { onUpgradeReaction(2, null); setOpenNoReactionsDialog(false); }} />
+                currentLevel={reactionLevel}
+                costs={costsPerReactionLevel}
+                numberOfReactions={numberOfReactions}
+                onUpgradeReaction={(level) => { onUpgradeReaction(level, null); setOpenNoReactionsDialog(false); }} />
             <EmptyReactionDialog open={openEmptyReactionDialog}
                 onClose={() => setOpenEmptyReactionDialog(false)} />
         </>

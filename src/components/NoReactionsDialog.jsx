@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Dialog, DialogContent, IconButton, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import ChannelPointsReaction from './../assets/Images/ChannelPointsReaction.png';
+import { ZAP } from '../constants';
 
 const CloseIconButton = styled(IconButton)({
     position: 'absolute',
@@ -56,8 +57,38 @@ const UpgradeReactionButton = styled(Button)({
     }
 });
 
-const NoReactionsDialog = ({ open, onClose, price, onUpgradeReaction }) => {
+const NoReactionsDialog = ({ open, onClose, onUpgradeReaction, currentLevel, costs, numberOfReactions }) => {
+    const [upgradeCost, setUpgradeCost] = useState(null);
+    const [levelToUpgrade, setLevelToUpgrade] = useState(null);
+    const [zapsNeededToReact, setZapsNeededToReact] = useState(null);
     const { t } = useTranslation('translation', { keyPrefix: 'dialogs.NoReactionsDialog' });
+
+    useEffect(() => {
+        if (costs[0] && costs[1] && costs[2]) {
+            getUpgradeCost();
+        }
+    }, [costs, open]);
+
+    const getUpgradeCost = () => {
+        let paidOptionFound = false;
+        if (currentLevel !== 3) {
+            paidOptionFound = costs.some(({ type, price }, index) => {
+                if ((index + 1) > currentLevel && type !== ZAP) {
+                    setUpgradeCost(price);
+                    setLevelToUpgrade(index + 1);
+                    return true;
+                }
+
+                return false;
+            });
+        } else {
+            setUpgradeCost(null);
+        }
+
+        if (!paidOptionFound) {
+            setZapsNeededToReact(costs[currentLevel - 1].price - numberOfReactions);
+        }
+    }
 
     return (
         <Dialog open={open}
@@ -65,10 +96,10 @@ const NoReactionsDialog = ({ open, onClose, price, onUpgradeReaction }) => {
             PaperProps={{
                 style: {
                     background: '#141539',
-                    borderRadius: '40px'
+                    borderRadius: '40px',
+                    maxWidth: '336px'
                 }
-            }}
-            maxWidth='xs'>
+            }}>
             <CloseIconButton onClick={onClose}>
                 <Close />
             </CloseIconButton>
@@ -79,20 +110,35 @@ const NoReactionsDialog = ({ open, onClose, price, onUpgradeReaction }) => {
                     <Title>
                         {t('noReactions')}
                     </Title>
-                    <Description>
-                        <b>
-                            {t('descriptionBold')}
-                        </b>
-                        {t('description')}
-                    </Description>
+                    {(upgradeCost && levelToUpgrade) ?
+                        <Description>
+                            <b>
+                                {t('descriptionBold')}
+                            </b>
+                            {t('description')}
+                        </Description>
+                        :
+                        <Description>
+                            <b style={{ color: '#00FFDD' }}>
+                                {t('descriptionBoldNoZaps', { numberOfReactions: zapsNeededToReact })}
+                            </b>
+                            {t('descriptionNoZaps')}
+                        </Description>
+                    }
                 </TextContainer>
-                <UpgradeReactionButton onClick={onUpgradeReaction}
-                    endIcon={<Bits style={{ height: '16px', width: '16px' }} />}>
-                    {t('upgradeFor')}
-                    <span style={{ marginLeft: '4px', color: '#00FFDD' }}>
-                        {price}
-                    </span>
-                </UpgradeReactionButton>
+                {(upgradeCost && levelToUpgrade) ?
+                    <UpgradeReactionButton onClick={() => onUpgradeReaction(levelToUpgrade)}
+                        endIcon={<Bits style={{ height: '16px', width: '16px' }} />}>
+                        {t('upgradeFor')}
+                        <span style={{ marginLeft: '4px', color: '#00FFDD' }}>
+                            {upgradeCost}
+                        </span>
+                    </UpgradeReactionButton>
+                    :
+                    <UpgradeReactionButton onClick={onClose}>
+                        {t('understood')}
+                    </UpgradeReactionButton>
+                }
             </Content>
         </Dialog>
     );

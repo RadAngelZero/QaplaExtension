@@ -31,6 +31,7 @@ const Router = () => {
                 return <TweetReactionController />;
             }
 
+            // eslint-disable-next-line
             return <CircularProgress style={{ color: '#00FFDD', position: 'absolute', top: '50%', left: '50%' }} />;;
         case 'config':
             return <Config />;

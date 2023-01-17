@@ -14,6 +14,7 @@ import { ReactComponent as TTSBot } from './../assets/Icons/TTSBot.svg';
 import { ReactComponent as Interactions } from './../assets/Icons/Interactions.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import { getRandomGifByLibrary } from '../services/database';
+import { ZAP } from '../constants';
 
 const ReactionTierSelectorContainer = styled(Box)({
     display: 'flex',
@@ -196,9 +197,13 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                                 {t('level1')}
                             </Title>
                             <PriceContainer>
-                                <Interactions />
+                                {costs[0] && costs[0].type === ZAP ?
+                                    <Interactions />
+                                    :
+                                    <Bits />
+                                }
                                 <PriceText>
-                                    1
+                                    {costs[0] && costs[0].price.toLocaleString()}
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
@@ -225,9 +230,13 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                                 {t('level2')}
                             </Title>
                             <PriceContainer>
-                                <Bits />
+                                {costs[1] && costs[1].type === ZAP ?
+                                    <Interactions />
+                                    :
+                                    <Bits />
+                                }
                                 <PriceText>
-                                    {costs[1] && costs[1].price}
+                                    {costs[1] && costs[1].price.toLocaleString()}
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
@@ -251,9 +260,13 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                                 {t('level3')}
                             </Title>
                             <PriceContainer>
-                                <Bits />
+                                {costs[2] && costs[2].type === ZAP ?
+                                    <Interactions />
+                                    :
+                                    <Bits />
+                                }
                                 <PriceText>
-                                    {costs[2] && costs[2].price}
+                                    {costs[2] && costs[2].price.toLocaleString()}
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
