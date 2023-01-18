@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+
 import { authWithTwitch, listenToAuthState } from '../services/auth';
-import { getUserProfile } from '../services/database';
+import { listenToUserProfile, unlistenUserProfile } from '../services/database';
 import { getUserData } from '../services/twitch';
 import { useTwitch } from './TwitchProvider';
 
@@ -19,13 +20,23 @@ const AuthProvider = ({ children }) => {
         }
 
         async function loadUserProfile(uid, twitchExtensionData) {
-            const user = await getUserProfile(uid);
+            listenToUserProfile(uid, (user) => {
+                if (user.exists()) {
 
-            /**
-             * twitchExtensionData is important as it contains tokens to call the Twitch API and to make requests
-             * to our own backend, so we merge all the relevant information in one object
-             */
-            setUser({ uid, ...user.val(), twitchExtensionData });
+                    /**
+                     * We get the profile, remove the listener, we use the listener because in the first time sign in
+                     * the profile can take a while to exist as it gets created after the sign in, this function is
+                     * called inmediately after sign in
+                     */
+                    unlistenUserProfile(uid);
+
+                    /**
+                     * twitchExtensionData is important as it contains tokens to call the Twitch API and to make requests
+                     * to our own backend, so we merge all the relevant information in one object
+                     */
+                    setUser({ uid, ...user.val(), twitchExtensionData, notLinked: false });
+                }
+            });
         }
 
         if (twitch) {
@@ -36,11 +47,18 @@ const AuthProvider = ({ children }) => {
                         twitchExtensionData: {
                             ...auth,
                             ...twitch.viewer
-                        }
+                        },
+                        notLinked: true
                     });
 
-                    // Request the user to link their Twitch account with the extension
-                    return twitch.actions.requestIdShare();
+                    const firstTime = localStorage.getItem('firstTime');
+
+                    if (firstTime === null) {
+                        localStorage.setItem('firstTime', 'false');
+
+                        // Request the user to link their Twitch account with the extension
+                        return twitch.actions.requestIdShare();
+                    }
                 } else {
                     // Listen to auth state from firebase
                     listenToAuthState((user) => {

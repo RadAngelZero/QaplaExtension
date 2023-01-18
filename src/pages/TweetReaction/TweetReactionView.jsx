@@ -1,7 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { Avatar, Box, Button, ClickAwayListener, IconButton, TextField, Typography } from '@mui/material';
-import Tooltip from 'react-power-tooltip'
+import { Avatar, Box, Button, CircularProgress, ClickAwayListener, IconButton, TextField, Typography } from '@mui/material';
+import Tooltip from 'react-power-tooltip';
+import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 
 import { ReactComponent as Interactions } from './../../assets/Icons/Interactions.svg';
 import { ReactComponent as Gif } from './../../assets/Icons/GIF.svg';
@@ -12,7 +14,10 @@ import { ReactComponent as Close } from './../../assets/Icons/Close.svg';
 import { ReactComponent as CheckCircle } from './../../assets/Icons/CheckCircle.svg';
 import { ReactComponent as GiphyText } from './../../assets/Icons/GiphyText.svg';
 import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
-import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES } from '../../constants';
+import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
+import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
+import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
+import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP } from '../../constants';
 
 const allMediaOptionsTypes = [
     GIPHY_GIFS,
@@ -23,37 +28,73 @@ const allMediaOptionsTypes = [
     CUSTOM_TTS_VOICE
 ];
 
-const mediaOptionsData = {
+// Create mediaOptionsData
+let mediaOptionsData = {
     [GIPHY_GIFS]: {
         Icon: Gif,
-        label: 'gif',
+        label: i18n.t('TweetReactionView.gifs'),
         level: 1
     },
     [GIPHY_STICKERS]: {
         Icon: Sticker,
-        label: 'sticker',
+        label: i18n.t('TweetReactionView.stickers'),
         level: 1
     },
     [MEMES]: {
         Icon: Meme,
-        label: 'meme',
+        label: i18n.t('TweetReactionView.memes'),
         level: 1
     },
     [EMOTE]: {
-        label: 'emote',
+        label: i18n.t('TweetReactionView.emotes'),
         level: 3
     },
     [GIPHY_TEXT]: {
         Icon: GiphyText,
-        label: '3D Text',
+        label: i18n.t('TweetReactionView.text3D'),
         level: 2
     },
     [CUSTOM_TTS_VOICE]: {
         Icon: TTSVoice,
-        label: 'TTS Voice',
+        label: i18n.t('TweetReactionView.botVoice'),
         level: 2
     }
 };
+
+// // Update mediaOptionsData if language changes
+i18n.on('languageChanged', () => {
+    mediaOptionsData = {
+        [GIPHY_GIFS]: {
+            Icon: Gif,
+            label: i18n.t('TweetReactionView.gifs'),
+            level: 1
+        },
+        [GIPHY_STICKERS]: {
+            Icon: Sticker,
+            label: i18n.t('TweetReactionView.stickers'),
+            level: 1
+        },
+        [MEMES]: {
+            Icon: Meme,
+            label: i18n.t('TweetReactionView.memes'),
+            level: 1
+        },
+        [EMOTE]: {
+            label: i18n.t('TweetReactionView.emotes'),
+            level: 3
+        },
+        [GIPHY_TEXT]: {
+            Icon: GiphyText,
+            label: i18n.t('TweetReactionView.text3D'),
+            level: 2
+        },
+        [CUSTOM_TTS_VOICE]: {
+            Icon: TTSVoice,
+            label: i18n.t('TweetReactionView.botVoice'),
+            level: 2
+        }
+    };
+});
 
 const excludingOptions = {
     [GIPHY_GIFS]: {
@@ -86,12 +127,17 @@ const ContentContainer = styled(Box)({
     paddingRight: '24px',
     display: 'flex',
     flexDirection: 'column',
-    display: 'flex',
     flex: 1
 });
 
 const TTSContainer = styled(Box)({
-    display: 'flex'
+    display: 'flex',
+    flexDirection: 'column'
+});
+
+const UserMessageContainer = styled(Box)({
+    display: 'flex',
+    alignItems: 'center'
 });
 
 const AvatarImage = styled(Avatar)({
@@ -120,12 +166,24 @@ const OptionalLabel = styled(Typography)({
     lineHeight: '19px'
 });
 
+const Custom3DTextContainer = styled(Box)({
+    display: 'flex',
+    alignItems: 'center'
+});
+
+const Edit3DTextButton = styled(IconButton)({
+});
+
+const Remove3DTextButton = styled(IconButton)({
+});
+
 const SelectedMediaContainer = styled(Box)({
     width: 'fit-content',
     paddingLeft: '72px',
     display: 'flex',
     flex: 1,
-    position: 'relative'
+    position: 'relative',
+    marginTop: '16px'
 });
 
 const SelectedMediaImage = styled(Box)((props) => ({
@@ -146,7 +204,8 @@ const CloseIconButton = styled(IconButton)({
 const ActionsContainer = styled(Box)({
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
 });
 
 const PricesButton = styled(Button)({
@@ -155,6 +214,8 @@ const PricesButton = styled(Button)({
     borderRadius: '14px',
     fontSize: '20px',
     fontWeight: '800',
+    lineHeight: '24.2px',
+    textTransform: 'none',
     color: '#FFF',
     '&:hover': {
         background: '#1C1E64',
@@ -163,12 +224,16 @@ const PricesButton = styled(Button)({
 });
 
 const SendButton = styled(Button)({
+    display: 'flex',
     background: '#00FFDD',
     padding: '12px 24px',
     borderRadius: '100px',
     boxShadow: '0px 5px 30px -12.4441px rgba(0, 255, 221, 0.2)',
     fontSize: '20px',
     fontWeight: '600',
+    lineHeight: 'normal',
+    textTransform: 'none',
+    boxSizing: 'border-box',
     color: '#0D1021',
     '&:hover': {
         background: '#00FFDD',
@@ -192,10 +257,7 @@ const MediaOptionsContainer = styled(Box)({
 
 const MediaOptionButton = styled(IconButton)({
     padding: 0,
-    position: 'relative',
-    '&:disabled': {
-        opacity: .2
-    }
+    position: 'relative'
 });
 
 const TooltipText = styled(Typography)({
@@ -222,20 +284,153 @@ const TooltipButton = styled(Button)({
     color: '#FFF',
     fontSize: '16px',
     fontWeight: '700',
-    borderRadius: '100px'
+    borderRadius: '100px',
+    textTransform: 'none'
 });
 
 const TipButton = styled(Button)({
-    background: '#3B4BF9',
+    boxSizing: 'border-box',
     borderRadius: '100px',
     padding: '12px 24px',
     fontSize: '20px',
     fontWeight: '600',
     color: '#FFF',
+    lineHeight: 'normal',
+    textTransform: 'none',
+    '&:hover': {
+        opacity: .9
+    }
+});
+
+const TipContainer = styled(Box)({
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'space-between',
+    // flexWrap: 'wrap',
+    alignItems: 'flex-end',
+});
+
+const ChooseTipButton = styled(Button)({
+    width: '24%',
+    boxSizing: 'border-box',
+    aspectRatio: '1',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    boxShadow: '0px 10px 15px rgba(13, 16, 33, 0.75)',
+    borderRadius: '25px',
+    padding: '4px',
+    background: 'linear-gradient(135deg, #3C00FF 0.31%, #AA00F8 100.31%)',
+});
+
+const ChooseTipButtonInnerContainer = styled(Box)({
+    display: 'flex',
+    flex: 1,
+    height: '100%',
+    flexGrow: 1,
+    borderRadius: '24px',
+    justifyContent: 'center',
+    alignItems: 'center',
+});
+
+const ChooseTipButtonText = styled('p')({
+    color: '#fff',
+    fontSize: '24px',
+    fontWeight: '700',
+    lineHeight: '29px',
+    letterSpacing: '0px',
+    textAlign: 'center',
+    margin: 0,
+    marginLeft: '2px',
+});
+
+const NoTipButton = styled(Button)({
+    margin: '0px auto',
+    background: '#3B4BF9',
+    borderRadius: '100px',
+    padding: '12px 24px',
+    fontSize: '20px',
+    fontWeight: '600',
+    alignItems: 'center',
+    lineHeight: 'normal',
+    textTransform: 'none',
+    color: '#FFF',
     '&:hover': {
         background: '#3B4BF9',
-        opacity: .8
+        opacity: .9
     }
+});
+
+const NoTipIcon = styled(Box)({
+    display: 'flex',
+    transform: 'rotate(45deg)',
+    marginRight: '4px',
+});
+
+const PillsList = styled(Box)({
+    display: 'flex',
+    flexDirection: 'row',
+    gap: '16px',
+    flexWrap: 'nowrap',
+    overflowX: 'auto',
+    maxWidth: '100%',
+    marginRight: '64px',
+    '&::-webkit-scrollbar': {
+        display: 'none'
+    }
+});
+
+const Pill = styled(Box)({
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: '3px',
+    flex: '0 0 auto',
+    width: 'fit-content',
+    background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%)',
+    borderRadius: '1000px',
+    marginTop: '28px',
+});
+
+const PillInnerContainer = styled(Box)({
+    display: 'flex',
+    flex: 1,
+    padding: '7.5px 13px',
+    borderRadius: '1000px',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: '#141539',
+});
+
+const PillText = styled('p')({
+    fontSize: '20px',
+    fontWeight: '700',
+    lineHeight: '24px',
+    letterSpacing: '0px',
+    textAlign: 'left',
+    margin: '0',
+
+    background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%), #FFFFFF',
+    webkitBackgroundClip: 'text',
+    webkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    textFillColor: 'transparent',
+});
+
+const RemoveButtonContainer = styled(Box)({
+    display: 'flex',
+    marginLeft: '8px',
+    maxWidth: '24px',
+    maxHeight: '24px',
+    marginTop: '-16px',
+});
+
+const PillIconContainer = styled(Box)({
+    marginTop: '-6px',
+    marginRight: '16px',
+    maxWidth: '16px',
+    maxHeight: '16px',
 });
 
 const MediaOptionSelectedIcon = () => {
@@ -248,21 +443,38 @@ const MediaOptionSelectedIcon = () => {
     );
 }
 
-const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSelected, emoteUrl = null, tooltipText, tooltipHighlightedText }) => {
+const MediaOption = ({ index, type, disabled = false, excluded = false, onClick, isSelected, emoteUrl, tooltipText, tooltipHighlightedText, tooltipButtonText, reactionCost, reactionType, onTooltipClick }) => {
     const mediaOptionData = mediaOptionsData[type];
     const [showTooltip, setShowTooltip] = useState(false);
+
+    // emoteUrl === undefined means we are trying to get the emote
+    if (type === EMOTE && emoteUrl === undefined) {
+        return (
+            <CircularProgress size={32} />
+        );
+    }
+
+    // emoteUrl === null means we could not find emotes
+    if (type === EMOTE && emoteUrl === null) {
+        return null;
+    }
 
     return (
         <ClickAwayListener onClickAway={() => setShowTooltip(false)}>
             <MediaOptionButton onClick={() => !disabled && !excluded ? onClick(type) : setShowTooltip(true)}
-                active={!disabled && !excluded}>
+                style={{
+                    opacity: (!disabled && !excluded) || showTooltip ? 1 : .2
+                }}>
                 <Tooltip show={showTooltip}
+                    hoverBackground='#3B4BF9'
+                    hoverColor='#FFF'
                     position='top center'
                     backgroundColor='#3B4BF9'
                     color='#FFF'
                     alert='rgb(0, 255, 221)'
                     padding='16px 24px 32px 16px'
-                    textBoxWidth='314px'
+                    arrowAlign={index === 0 || index === 1 || index === 2 ? 'start' : (index > 2 && 'center')}
+                    textBoxWidth='350px'
                     borderRadius='15px'>
                     <TooltipText>
                         {tooltipText}
@@ -271,8 +483,38 @@ const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSele
                         </HighlightedText>
                     </TooltipText>
                     <TooltipButtonContainer>
-                        <TooltipButton>
-                            Upgrade Reaction
+                        <TooltipButton endIcon={<Arrow style={{ marginTop: '6px' }} />}
+                            onClick={() => onTooltipClick(mediaOptionsData[type].level, type)}>
+                            {tooltipButtonText}
+                            {reactionCost ?
+                                <>
+                                <HighlightedText style={{
+                                        fontSize: '16px',
+                                        fontWeight: '800',
+                                        display: 'flex',
+                                        marginLeft: '8px',
+                                        marginRight: '4px',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        maxWidth: '32px'
+                                    }}>
+                                    {reactionCost.toLocaleString()}
+                                </HighlightedText>
+                                {reactionType === ZAP ?
+                                    <Interactions style={{
+                                        height: '16px',
+                                        width: '16px'
+                                    }} />
+                                    :
+                                    <Bits style={{
+                                        height: '16px',
+                                        width: '16px'
+                                    }} />
+                                }
+                                </>
+                                :
+                                null
+                            }
                         </TooltipButton>
                     </TooltipButtonContainer>
                 </Tooltip>
@@ -281,27 +523,64 @@ const MediaOption = ({ type, disabled = false, excluded = false, onClick, isSele
                 }
                 {type === EMOTE ?
                     emoteUrl ?
-                        <img source={emoteUrl ? { uri: emoteUrl } : null}
-                            style={{ height: 24, width: 24 }} />
+                        <img src={emoteUrl ? emoteUrl : null}
+                            style={{ height: 32, width: 32 }}
+                            alt='Selected Emote' />
                         :
                         null
                     :
-                    <mediaOptionData.Icon height={24} width={24} />
+                    <mediaOptionData.Icon height={32} width={32} />
                 }
             </MediaOptionButton>
         </ClickAwayListener>
     );
 }
 
+const ExtraTipOption = ({ label, onClick, selected }) => {
+    return (
+        <ChooseTipButton onClick={onClick}>
+            <ChooseTipButtonInnerContainer style={{
+                backgroundColor: selected ? 'transparent' : '#0D1021',
+            }}>
+                <Bits />
+                <ChooseTipButtonText>
+                    {label}
+                </ChooseTipButtonText>
+            </ChooseTipButtonInnerContainer>
+        </ChooseTipButton>
+    );
+}
+
 const TweetReactionView = ({
+    onSend,
+    sending,
+    numberOfReactions,
+    message,
+    setMessage,
+    currentReactionCost,
+    costsPerReactionLevel,
     onMediaOptionClick,
     selectedMedia,
     cleanSelectedMedia,
     mediaSelectorBarOptions,
     custom3DText,
+    onRemoveCustom3DText,
     voiceBot,
-    emoteRaid
+    emoteRaid,
+    reactionLevel,
+    tipping,
+    toggleTipping,
+    extraTip,
+    setExtraTip,
+    onChangeReactionLevel,
+    randomEmoteUrl,
+    userImage,
+    onUpgradeReaction,
+    availableTips
 }) => {
+    const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
+    const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
+
     const isMediaOptionSelected = (mediaType) => {
         switch (mediaType) {
             case GIPHY_GIFS:
@@ -319,40 +598,128 @@ const TweetReactionView = ({
         }
     }
 
+    const noTipButtonHandler = () => {
+        toggleTipping();
+        setExtraTip(null);
+    }
+
+    const setSelectedTip = (tipObject) => {
+        toggleTipping();
+        setExtraTip(tipObject);
+    }
+
+    // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
+    const sendButtonDisabled = currentReactionCost === undefined || sending;
+
+    let pills = [
+        voiceBot,
+        emoteRaid
+    ];
+
+    pills = pills.filter((item) => item).sort((a, b) => {
+        return b.timestamp - a.timestamp;
+    });
+
+    pills.forEach((item) => {
+        item.Icon = mediaOptionsData[item.type].Icon;
+    });
+
     return (
         <Container>
             <ContentContainer>
                 <TTSContainer>
-                    <AvatarImage
-                        src='https://static-cdn.jtvnw.net/jtv_user_pictures/ac4d7937-4dd8-47b8-8e15-d3226f1405b3-profile_image-300x300.png' />
-                    <MessageContainer>
-                        <MessageInput variant='standard'
-                            InputProps={{
-                                disableUnderline: true,
-                                style: {
-                                    color: '#FFF',
-                                    "&::placeholder": {
-                                       color: '#C2C2C2'
-                                    },
-                                    padding: 0
+                    <UserMessageContainer>
+                        <AvatarImage
+                            src={userImage} />
+                        <MessageContainer>
+                            {!custom3DText ?
+                                <>
+                                <MessageInput variant='standard'
+                                    InputProps={{
+                                        disableUnderline: true,
+                                        style: {
+                                            fontSize: '22px',
+                                            fontWeight: '400',
+                                            color: '#FFF',
+                                            '&::placeholder': {
+                                                color: '#C2C2C2'
+                                            },
+                                            padding: 0
+                                        }
+                                    }}
+                                    // eslint-disable-next-line
+                                    inputProps={{ maxLength: 100 }}
+                                    multiline
+                                    placeholder={t('typeToCreateTTS')}
+                                    fullWidth
+                                    autoFocus
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)} />
+                                {!message &&
+                                    <OptionalLabel>
+                                        {t('optional')}
+                                    </OptionalLabel>
                                 }
-                            }}
-                            inputProps={{ maxLength: 100 }}
-                            multiline
-                            placeholder='Type to create TTS'
-                            fullWidth
-                            autoFocus />
-                        <OptionalLabel>
-                            Optional
-                        </OptionalLabel>
-                    </MessageContainer>
+                                </>
+                                :
+                                <Custom3DTextContainer>
+                                    <img src={custom3DText.url}
+                                        style={{
+                                            width: window.innerWidth * .5,
+                                            aspectRatio: custom3DText.width / custom3DText.height
+                                        }}
+                                        alt={message} />
+                                    <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
+                                        <EditCircle />
+                                    </Edit3DTextButton>
+                                    <Remove3DTextButton onClick={onRemoveCustom3DText}>
+                                        <Close style={{
+                                                height: 24,
+                                                width: 24
+                                            }} />
+                                    </Remove3DTextButton>
+                                </Custom3DTextContainer>
+                            }
+                        </MessageContainer>
+                    </UserMessageContainer>
+                    {pills.length > 0 &&
+                            <PillsList>
+                                {pills.map((pill) => (
+                                    <Pill key={pill.type}>
+                                        <PillInnerContainer>
+                                            <PillIconContainer>
+                                                {pill.Icon ?
+                                                    <pill.Icon style={{
+                                                        height: '24px',
+                                                        width: '24px'
+                                                    }} />
+                                                    :
+                                                    <img src={pill.url}
+                                                        style={{
+                                                            height: '24px',
+                                                            width: '24px'
+                                                        }}
+                                                        alt={pill.type} />
+                                                }
+                                            </PillIconContainer>
+                                            <PillText>
+                                                {pill.title}
+                                            </PillText>
+                                            <RemoveButtonContainer onClick={pill.onRemove}>
+                                                <Close />
+                                            </RemoveButtonContainer>
+                                        </PillInnerContainer>
+                                    </Pill>
+                                ))}
+                            </PillsList>
+                        }
                 </TTSContainer>
                 <SelectedMediaContainer>
                     {selectedMedia &&
                         <>
-                        <SelectedMediaImage component='img'
-                            src={selectedMedia.url}
-                            aspectratio={selectedMedia.width / selectedMedia.height} />
+                            <SelectedMediaImage component='img'
+                                src={selectedMedia.url}
+                                aspectratio={selectedMedia.width / selectedMedia.height} />
                             <CloseIconButton onClick={cleanSelectedMedia}>
                                 <Close style={{
                                     position: 'absolute',
@@ -363,31 +730,85 @@ const TweetReactionView = ({
                         </>
                     }
                 </SelectedMediaContainer>
-                <ActionsContainer>
-                    <PricesButton startIcon={<Interactions />}>
-                        1
-                    </PricesButton>
-                    <SendButton>
-                        Send
-                    </SendButton>
-                </ActionsContainer>
+                {!tipping ?
+                    <ActionsContainer>
+                        {currentReactionCost &&
+                            <>
+                            <PricesButton startIcon={currentReactionCost.type === ZAP ? <Interactions /> : <Bits />}
+                                onClick={onChangeReactionLevel}>
+                                {currentReactionCost && currentReactionCost.price.toLocaleString()}
+                            </PricesButton>
+                            <SendButton onClick={onSend}
+                                disabled={sendButtonDisabled}>
+                                {t('send')}
+                            </SendButton>
+                            </>
+                        }
+                    </ActionsContainer>
+                    :
+                    <TipContainer>
+                        {availableTips.map((tip) => (
+                            <ExtraTipOption key={`tip-${tip.twitchSku}`}
+                                label={(tip.cost).toLocaleString()}
+                                selected={extraTip && tip.cost === extraTip.cost}
+                                onClick={() => setSelectedTip(tip)} />
+                        ))}
+                    </TipContainer>
+                }
             </ContentContainer>
             <MediaSelectionContainer>
-                <MediaOptionsContainer>
-                    {mediaSelectorBarOptions.map((mediaType) => (
-                        <MediaOption key={mediaType}
-                            onClick={(type) => onMediaOptionClick(type)}
-                            type={mediaType}
-                            isSelected={isMediaOptionSelected(mediaType)}
-                            excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
-                            onOpenTooltip={(e) => console.log(e)}
-                            tooltipText='👀 Upgrade your reaction to use'
-                            tooltipHighlightedText='Animated Avatar, TTS Bot Voice & 3D Text' />
-                    ))}
-                </MediaOptionsContainer>
-                <TipButton startIcon={<PlusCircle />}>
-                    Tip
-                </TipButton>
+                {!tipping ?
+                    <>
+                        <MediaOptionsContainer>
+                            {mediaSelectorBarOptions.map((mediaType, index) => (
+                                <MediaOption key={mediaType}
+                                    index={index}
+                                    onClick={(type) => onMediaOptionClick(type)}
+                                    type={mediaType}
+                                    isSelected={isMediaOptionSelected(mediaType)}
+                                    excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
+                                    emoteUrl={randomEmoteUrl}
+                                    tooltipText={t('youCanOnlyUseOne')}
+                                    tooltipHighlightedText={t('excluded')}
+                                    tooltipButtonText={t('use', { mediaType: t(mediaType) })}
+                                    onTooltipClick={(level, media) => onMediaOptionClick(media)} />
+                            ))}
+                            {noEnabledOptions.map((mediaType, index) => (
+                                <MediaOption key={mediaType}
+                                    index={index + mediaSelectorBarOptions.length}
+                                    type={mediaType}
+                                    onClick={(type) => onMediaOptionClick(type)}
+                                    disabled
+                                    emoteUrl={randomEmoteUrl}
+                                    tooltipText={t('upgradeToUse')}
+                                    tooltipHighlightedText={t(`contentAvailableWhenUpgradeTo${mediaOptionsData[mediaType].level}`)}
+                                    tooltipButtonText={`Upgrade Reaction `}
+                                    reactionCost={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].price : 0}
+                                    reactionType={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].type : 0}
+                                    onTooltipClick={onUpgradeReaction} />
+                            ))}
+                        </MediaOptionsContainer>
+                        <TipButton startIcon={extraTip ? <EditCircle /> : <PlusCircle />}
+                            endIcon={extraTip ? <Bits /> : null}
+                            onClick={toggleTipping}
+                            style={{
+                                background: extraTip ? 'linear-gradient(118.67deg, #A716EE -6.39%, #2D07FA 101.45%), #141539' : '#3B4BF9',
+                            }}>
+                            {extraTip ?
+                                (extraTip.cost).toLocaleString()
+                                :
+                                'Bits'
+                            }
+                        </TipButton>
+                    </>
+                    :
+                    <NoTipButton onClick={noTipButtonHandler}>
+                        <NoTipIcon>
+                            <PlusCircle />
+                        </NoTipIcon>
+                        No Bits
+                    </NoTipButton>
+                }
             </MediaSelectionContainer>
         </Container>
     );

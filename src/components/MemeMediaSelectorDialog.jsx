@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Dialog, IconButton, ImageList, ImageListItem } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Dialog, IconButton, ImageList, ImageListItem, TextField } from '@mui/material';
 import styled from '@emotion/styled';
+import { useTranslation } from 'react-i18next';
+
+import { searchMemesWithTag, searchMostViewedMemes, updateMemeLastViewed } from '../services/elastic';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
+import { ReactComponent as Search } from './../assets/Icons/Search.svg';
 import { MEMES } from '../constants';
-import { getQaplaMemesLibrary } from '../services/database';
 
 const MediaSelectorContainer = styled(Box)({
-    marginTop: '12%',
-    minHeight: '88vh',
+    marginTop: 'auto',
+    minHeight: '92vh',
     background: '#141539',
     borderTopLeftRadius: '30px',
     borderTopRightRadius: '30px',
@@ -28,29 +31,101 @@ const CloseIconButton = styled(IconButton)({
     padding: 0
 });
 
+const SearchContainer = styled(Box)({
+    zIndex: 1000,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#0D1021',
+    height: '44px',
+    padding: '0px 16px',
+    borderRadius: '50px',
+    width: '100%'
+});
+
+const SearchInput = styled(TextField)({
+    marginLeft: '8px',
+    padding: 0,
+    border: 'none',
+    width: '100%'
+});
+
 const GridContainer = styled(Box)({
     marginTop: '16px',
-    padding: '0px !important',
     padding: 16,
     backgroundColor: '#141539'
 });
 
+const MEMES_TO_FETCH = 100;
+
 const MemeMediaSelectorDialog = ({ open, onClose, onMediaSelected }) => {
-    const [memes, setMemes] = useState(null);
+    const [memes, setMemes] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const searchInput = useRef(null);
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.MemeMediaSelectorDialog' });
+    let fetchTimeout = null;
 
     useEffect(() => {
-        async function getMemes() {
-            const memes = await getQaplaMemesLibrary();
+        clearTimeout(fetchTimeout);
 
-            if (memes.exists()) {
-                setMemes(memes.val());
-            }
+        if (searchTerm === '') {
+            setMemes([]);
+            fetchMemes(0, MEMES_TO_FETCH);
+        } else {
+            fetchTimeout = setTimeout(async () => {
+                const searchResult = await searchMemesWithTag(searchTerm.trimEnd(), 0, MEMES_TO_FETCH);
+
+                const suggestions = searchResult.hits.hits;
+                const mappedResults = suggestions.map((suggestion) => ({
+                    id: suggestion._id,
+                    ...suggestion._source
+                }));
+
+                setMemes(mappedResults);
+            }, 250);
         }
 
-        if (!memes) {
-            getMemes();
+    }, [searchTerm]);
+
+    const fetchMemes = async (from, size) => {
+        if (searchTerm === '') {
+            const media = await searchMostViewedMemes(from, size);
+
+            const mappedResults = media.hits.hits.map((hit) => ({
+                    id: hit._id,
+                    ...hit._source
+                }
+            ));
+
+            setMemes(mappedResults);
+        } else {
+            fetchMemesByTag(from, MEMES_TO_FETCH);
         }
-    }, [memes]);
+    }
+
+    const fetchMemesByTag = async (from, size) => {
+        const searchResult = await searchMemesWithTag(searchTerm, from, size);
+
+        const suggestions = searchResult.hits.hits;
+        const mappedResults = suggestions.map((suggestion) => ({
+            id: suggestion._id,
+            ...suggestion._source
+        }));
+
+        setMemes(memes.concat(mappedResults));
+    }
+
+    const searchHandler = (searchTerm) => {
+        clearTimeout(fetchTimeout);
+        setSearchTerm(searchTerm);
+    }
+
+    const focusSearch = () => searchInput.current.focus();
+
+    const memeSelected = async (meme) => {
+        await updateMemeLastViewed(meme.id);
+        onMediaSelected(meme);
+    }
 
     return (
         <Dialog open={open}
@@ -67,14 +142,36 @@ const MemeMediaSelectorDialog = ({ open, onClose, onMediaSelected }) => {
                     <CloseIconButton onClick={onClose}>
                         <Close />
                     </CloseIconButton>
+                    <SearchContainer onClick={focusSearch}>
+                        <Search style={{ opacity: 0.6 }} />
+                        <SearchInput autoFocus
+                            variant='standard'
+                            InputProps={{
+                                disableUnderline: true,
+                                style: {
+                                    color: '#FFF',
+                                    "&::placeholder": {
+                                        color: '#C2C2C2'
+                                    },
+                                    padding: 0
+                                }
+                            }}
+                            value={searchTerm}
+                            onChange={(e) => searchHandler(e.target.value)}
+                            placeholder={t('searchMemes')}
+                            ref={searchInput}
+                            id='searchInput' />
+                    </SearchContainer>
                 </HeaderContainer>
                 <GridContainer>
                     {memes &&
-                        <ImageList variant='masonry' cols={2} gap={8}>
+                        <ImageList variant='masonry'
+                            cols={2}
+                            gap={8}>
                             {Object.keys(memes).map((memeKey) => (
-                                <ImageListItem key={memes[memeKey].url} style={{ cursor: 'pointer' }}>
+                                <ImageListItem key={memes[memeKey].id} style={{ cursor: 'pointer' }}>
                                     <img src={`${memes[memeKey].url}?w=248&fit=crop&auto=format`}
-                                        onClick={() => onMediaSelected({ type: MEMES, ...memes[memeKey] })}
+                                        onClick={() => memeSelected({ type: MEMES, ...memes[memeKey] })}
                                         alt='Qapla Meme'
                                         loading='lazy' />
                                 </ImageListItem>

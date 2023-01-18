@@ -1,41 +1,43 @@
 import React, { useEffect } from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { CircularProgress } from '@mui/material';
 
 import { useAuth } from './hooks/AuthProvider';
-import { useTwitch } from './hooks/TwitchProvider';
+
 import { changeLanguage } from './i18n';
-import Routes from './Routes';
+import Config from './pages/Config';
+import TweetReactionController from './pages/TweetReaction/TweetReactionController';
+import WeNeedPermissionDialog from './components/WeNeedPermissionDialog';
 
 const Router = () => {
     const user = useAuth();
-    const twitch = useTwitch();
-    const { t } = useTranslation();
 
     useEffect(() => {
         // Get and set user language from query params
         const query = new URLSearchParams(window.location.href);
-        const language = query.get('language');
+        const language = query.get('language') ? query.get('language') : 'en';
         changeLanguage(language);
     }, []);
 
-    /* if (user) {
-        if (user.twitchExtensionData && user.twitchExtensionData.isLinked) { */
-            return (
-                <RouterProvider router={Routes} />
-            );
-        /* } else {
-            return (
-                <h1>
-                    <button onClick={twitch.actions.requestIdShare}>
-                        {t('linkToContinue')}
-                    </button>
-                </h1>
-            );
-        }
-    } */
+    const query = new URLSearchParams(window.location.href);
+    const mode = query.get('mode') ? query.get('mode') : 'viewer';
 
-    return null;
+    switch (mode) {
+        case 'viewer':
+            if (user) {
+                if (user.notLinked) {
+                    return <WeNeedPermissionDialog />;
+                }
+
+                return <TweetReactionController />;
+            }
+
+            // eslint-disable-next-line
+            return <CircularProgress style={{ color: '#00FFDD', position: 'absolute', top: '50%', left: '50%' }} />;;
+        case 'config':
+            return <Config />;
+        default:
+            return null;
+    }
 }
 
 export default Router;

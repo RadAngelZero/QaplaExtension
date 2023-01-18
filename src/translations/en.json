@@ -1,0 +1,78 @@
+{
+    "translation": {
+        "Config": {
+            "welcome": "Welcome",
+            "instructions": "Please visit Qapla GG’s Dashboard to\nconfigure the extension",
+            "openDashboard": "Open Dashboard"
+        },
+        "TweetReactionView": {
+            "gifs": "Gif",
+            "stickers": "Sticker",
+            "memes": "Meme",
+            "emotes": "Emotes Animations",
+            "text3D": "3D Text",
+            "botVoice": "TTS Bot Voice",
+            "typeToCreateTTS": "Type to create TTS",
+            "optional": "Optional",
+            "send": "Send",
+            "youCanOnlyUseOne": "😯 You can only use one of",
+            "excluded": "Gif, Meme or Sticker",
+            "use": "Use {{mediaType}}",
+            "upgradeToUse": "👀 Upgrade your reaction to use ",
+            "contentAvailableWhenUpgradeTo2": "TTS Bot Voice & 3D Text",
+            "contentAvailableWhenUpgradeTo3": "Emotes Animations"
+        },
+        "dialogs": {
+            "GiphyMediaSelectorDialog": {
+                "searchGiphy": "Search Giphy"
+            },
+            "MemeMediaSelectorDialog": {
+                "searchMemes": "Search Memes"
+            },
+            "ReactionTierSelectorDialog": {
+                "reactionTiers": "Reaction Tier",
+                "level1": "Memes + TTS",
+                "level2": "+ 3D Text,\nTTS Voice",
+                "level3": "+ Emote Animation"
+            },
+            "ChooseBotVoiceDialog": {
+                "chooseAVoice": "Choose a TTS Bot Voice"
+            },
+            "Create3DTextDialog": {
+                "sample": "Sample",
+                "typeToCreate": "Type to create"
+            },
+            "EmoteRainDialog": {
+                "follower": "Follower",
+                "bits": "Bits",
+                "subTier1": "Sub Tier 1",
+                "subTier2": "Sub Tier 2",
+                "subTier3": "Sub Tier 3"
+            },
+            "ReactionSentDialog": {
+                "sent": "Boom. Sent.",
+                "alertWillShowUp": "Your alert will show up\nshortly on stream",
+                "sendMoreReactions": "Send More Reactions"
+            },
+            "NoReactionsDialog": {
+                "noReactions": "Not enough zaps!",
+                "descriptionBold": "Get a Zap Reward or upgrade\nyour reaction",
+                "description": " to send your alert\nusing Bits",
+                "descriptionBoldNoZaps": "You need {{numberOfReactions}} extra Zap Rewards",
+                "descriptionNoZaps": " to send your reaction",
+                "upgradeFor": "Upgrade for",
+                "understood": "Understood"
+            },
+            "EmptyReactionDialog": {
+                "reactionEmpty": "Your reaction is empty 🥺",
+                "instructions": "Type to create a TTS, or add a\nMeme, GIF, Sticker or any\ncontent to send a reaction",
+                "addContent": "Add TTS or Content"
+            },
+            "WeNeedPermissionDialog": {
+                "weNeedPermission": "We need permission 🙏",
+                "permissionReason": "To send reactions on screen you\nmust grant access to your Twitch ID",
+                "managePermission": "Manage Permissions"
+            }
+        }
+    }
+}

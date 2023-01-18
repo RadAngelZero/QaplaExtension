@@ -1,13 +1,12 @@
-import React, { useRef, useState } from 'react';
-import { Box, Dialog, IconButton, TextField } from '@mui/material';
+import React, { useState, useRef, useEffect } from 'react';
+import { Box, Dialog, IconButton, ImageList, ImageListItem, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Grid } from '@giphy/react-components';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Search } from './../assets/Icons/Search.svg';
-import { GIPHY_GIFS } from '../constants';
+import { GIPHY_TEXT } from '../constants';
 
 const gf = new GiphyFetch('Kb3qFoEloWmqsI3ViTJKGkQZjxICJ3bi');
 
@@ -58,16 +57,44 @@ const GridContainer = styled(Box)({
     backgroundColor: '#141539'
 });
 
-const GiphyMediaSelectorDialog = ({ open, onClose, mediaType, onMediaSelected }) => {
-    const [searchTerm, setSearchTerm] = useState('');
+const Create3DTextDialog = ({ open, onClose, defaultMessage, on3DTextSelected }) => {
+    const [text, setText] = useState('');
+    const [giphyText, setGiphyText] = useState([]);
     const searchInput = useRef(null);
-    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.GiphyMediaSelectorDialog' });
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.Create3DTextDialog' });
+    let timeout = null;
 
-    const fetchTrending = (offset) => gf.trending({ offset, type: mediaType, limit: 20, rating: 'pg-13' });
+    useEffect(() => {
+        if (open) {
+            if (!defaultMessage) {
+                loadGiphyText(t('sample'));
+            } else {
+                setText(defaultMessage);
+                loadGiphyText(defaultMessage);
+            }
+        }
+    }, [open]);
 
-    const fetchSearch = (offset) => gf.search(searchTerm, { offset, limit: 50, type: mediaType, rating: 'pg-13' });
+    const loadGiphyText = async (text) => {
+        const giphyText = await gf.animate(text, { limit: 50, type: GIPHY_TEXT });
+        setGiphyText(giphyText.data);
+    }
 
-    const focusSearch = () => searchInput.current.focus();
+    const focusSearch = () => {
+        searchInput.current.childNodes[0].focus();
+    }
+
+    const handleText = (text) => {
+        clearTimeout(timeout);
+        setText(text);
+        timeout = setTimeout(() => {
+            loadGiphyText(text);
+        }, 250);
+    }
+
+    const onGiphyTextSelected = (giphyText) => {
+        on3DTextSelected(text, giphyText)
+    }
 
     return (
         <Dialog open={open}
@@ -98,12 +125,12 @@ const GiphyMediaSelectorDialog = ({ open, onClose, mediaType, onMediaSelected })
                                     padding: 0
                                 }
                             }}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder={t('searchGiphy')}
+                            value={text}
+                            onChange={(e) => handleText(e.target.value)}
+                            placeholder={t('typeToCreate')}
                             ref={searchInput}
                             id='searchInput' />
-                        {searchTerm === '' &&
+                        {text === '' &&
                             <img src={require('./../assets/Images/PoweredByGiphy.png')}
                                 onClick={focusSearch}
                                 alt='Powered by Giphy' />
@@ -111,18 +138,25 @@ const GiphyMediaSelectorDialog = ({ open, onClose, mediaType, onMediaSelected })
                     </SearchContainer>
                 </HeaderContainer>
                 <GridContainer>
-                    <Grid width={window.innerWidth - 32}
-                        columns={mediaType === GIPHY_GIFS ? 2 : 3}
-                        gutter={8}
-                        fetchGifs={searchTerm === '' ? fetchTrending : fetchSearch}
-                        key={searchTerm}
-                        onGifClick={(media) => onMediaSelected({ ...media.images.original, type: mediaType })}
-                        hideAttribution
-                        noLink />
+                    {giphyText.length > 0 &&
+                        <ImageList cols={2} gap={8}>
+                            {giphyText.map((giphyText) => (
+                                <ImageListItem key={giphyText.id} style={{ cursor: text === '' ? 'auto' : 'pointer' }}>
+                                    <img src={`${giphyText.images.fixed_width_small.url}?w=248&fit=crop&auto=format`}
+                                        onClick={() => text === ''  ? null : onGiphyTextSelected(giphyText.images.original)}
+                                        height={giphyText.images.fixed_width_small.height}
+                                        width={giphyText.images.fixed_width_small.width}
+                                        style={{ color: 'transparent' }}
+                                        alt='Giphy text'
+                                        loading='lazy' />
+                                </ImageListItem>
+                            ))}
+                        </ImageList>
+                    }
                 </GridContainer>
             </MediaSelectorContainer>
         </Dialog>
     );
 }
 
-export default GiphyMediaSelectorDialog;
+export default Create3DTextDialog;
