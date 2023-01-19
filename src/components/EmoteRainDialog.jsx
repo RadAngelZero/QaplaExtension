@@ -107,10 +107,10 @@ const EmoteRainDialog = ({ open, onClose, emotes, onEmoteSelected }) => {
                 locked = !twitch.viewer.subscriptionStatus;
                 break;
             case 'subTier2':
-                locked = !twitch.viewer.subscriptionStatus || twitch.viewer.subscriptionStatus < 2000;
+                locked = !twitch.viewer.subscriptionStatus || twitch.viewer.subscriptionStatus.tier < 2000;
                 break;
             case 'subTier3':
-                locked = !twitch.viewer.subscriptionStatus || twitch.viewer.subscriptionStatus < 3000;
+                locked = !twitch.viewer.subscriptionStatus || twitch.viewer.subscriptionStatus.tier < 3000;
                 break;
             default:
                 break;
