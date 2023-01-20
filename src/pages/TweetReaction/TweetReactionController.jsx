@@ -16,7 +16,16 @@ import {
 } from '../../services/database';
 import { getStreamerEmotes } from '../../services/functions';
 
-import { AVATAR, CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP } from '../../constants';
+import {
+    AVATAR,
+    CUSTOM_TTS_VOICE,
+    EMOTE,
+    GIPHY_GIFS,
+    GIPHY_STICKERS,
+    GIPHY_TEXT,
+    MEMES,
+    ZAP
+} from '../../constants';
 
 import TweetReactionView from './TweetReactionView';
 import GiphyMediaSelectorDialog from '../../components/GiphyMediaSelectorDialog';
@@ -29,6 +38,7 @@ import ReactionSentDialog from '../../components/ReactionSentDialog';
 import NoReactionsDialog from '../../components/NoReactionsDialog';
 import EmptyReactionDialog from '../../components/EmptyReactionDialog';
 import CreateAvatarDialog from '../../components/CreateAvatarDialog';
+import ChooseAvatarAnimationDialog from '../../components/ChooseAvatarAnimationDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -60,6 +70,8 @@ const TweetReactionController = () => {
     const [openEmptyReactionDialog, setOpenEmptyReactionDialog] = useState(false);
     const [streamerIsPremium, setStreamerIsPremium] = useState(false);
     const [openCreateAvatarDialog, setOpenCreateAvatarDialog] = useState(false);
+    const [openAnimationAvatarDialog, setOpenAnimationAvatarDialog] = useState(false);
+    const [avatarAnimation, setAvatarAnimation] = useState(null);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -212,7 +224,7 @@ const TweetReactionController = () => {
                 break;
             case AVATAR:
                 if (user.avatarId) {
-                    // Open avatar animation dialog
+                    setOpenAnimationAvatarDialog(true);
                 } else {
                     setOpenCreateAvatarDialog(true);
                 }
@@ -257,6 +269,17 @@ const TweetReactionController = () => {
             timestamp: new Date().getTime()
         });
         setOpenEmoteRainDialog(false);
+    }
+
+    const onAvatarAnimationSelected = (animationId) => {
+        setAvatarAnimation({
+            id: animationId,
+            title: 'Avatar On',
+            type: AVATAR,
+            onRemove: () => setAvatarAnimation(null),
+            timestamp: new Date().getTime()
+        });
+        setOpenAnimationAvatarDialog(false);
     }
 
     const onUpgradeReaction = (reactionLevel, mediaUnlocked) => {
@@ -321,6 +344,7 @@ const TweetReactionController = () => {
             (new Date()).getTime(),
             user.avatarId,
             user.avatarBackground,
+            avatarAnimation ? avatarAnimation.id : '',
             channelPointsReaction
         );
 
@@ -419,6 +443,7 @@ const TweetReactionController = () => {
         setCustom3DText(null);
         setSelectedEmote(null);
         setSending(false);
+        setAvatarAnimation(null);
         reactionPaid = false;
 
         // Close modal
@@ -447,6 +472,7 @@ const TweetReactionController = () => {
         case 3:
             availableContent = [
                 EMOTE,
+                AVATAR,
                 GIPHY_TEXT,
                 CUSTOM_TTS_VOICE,
                 GIPHY_GIFS,
@@ -496,7 +522,8 @@ const TweetReactionController = () => {
                 userImage={user && user.photoUrl ? user.photoUrl : null}
                 emoteRaid={selectedEmote}
                 onUpgradeReaction={onUpgradeReaction}
-                availableTips={availableTips} />
+                availableTips={availableTips}
+                avatarAnimation={avatarAnimation} />
             <GiphyMediaSelectorDialog open={openGiphyDialog}
                 onClose={() => setOpenGiphyDialog(false)}
                 mediaType={giphyDialogMediaType}
@@ -532,6 +559,10 @@ const TweetReactionController = () => {
                 onClose={() => setOpenEmptyReactionDialog(false)} />
             <CreateAvatarDialog open={openCreateAvatarDialog}
                 onClose={() => setOpenCreateAvatarDialog(false)} />
+            <ChooseAvatarAnimationDialog open={openAnimationAvatarDialog}
+                onClose={() => setOpenAnimationAvatarDialog(false)}
+                avatarId={user.avatarId}
+                onAvatarAnimationSelected={onAvatarAnimationSelected} />
         </>
     );
 }

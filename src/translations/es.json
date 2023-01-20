@@ -2,7 +2,7 @@
     "translation": {
         "Config": {
             "welcome": "Bienvenido",
-            "instructions": "Porfavor vista el Dashboard de Qapla GG para\nconfigurar la extensión",
+            "instructions": "Por favor vista el Dashboard de Qapla GG para\nconfigurar la extensión",
             "openDashboard": "Abrir Dashboard"
         },
         "TweetReactionView": {
@@ -19,7 +19,7 @@
             "excluded": "Gif, Meme o Sticker",
             "use": "Usar {{mediaType}}",
             "upgradeToUse": "👀 Sube de nivel tu tu reacción para usar ",
-            "contentAvailableWhenUpgradeTo2": "Voz de bot para TTS & Texto 3D",
+            "contentAvailableWhenUpgradeTo2": "Voz de bot para TTS, Avatar Animado & Texto 3D",
             "contentAvailableWhenUpgradeTo3": "Animaciones de Emotes"
         },
         "dialogs": {
@@ -75,6 +75,10 @@
                 "memeIdentity": "Tu Meme Identidad",
                 "sendDankMemes": "Envía memes geniales usando tu propio avi animado",
                 "createAvatar": "Crear Avatar"
+            },
+            "ChooseAvatarAnimationDialog": {
+                "editAvatar": "Editar Avatar",
+                "confirm": "Confirmar"
             }
         }
     }

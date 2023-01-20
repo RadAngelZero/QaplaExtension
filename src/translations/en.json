@@ -19,7 +19,7 @@
             "excluded": "Gif, Meme or Sticker",
             "use": "Use {{mediaType}}",
             "upgradeToUse": "👀 Upgrade your reaction to use ",
-            "contentAvailableWhenUpgradeTo2": "TTS Bot Voice & 3D Text",
+            "contentAvailableWhenUpgradeTo2": "TTS Bot Voice, Animated Avatar & 3D Text",
             "contentAvailableWhenUpgradeTo3": "Emotes Animations"
         },
         "dialogs": {
@@ -77,6 +77,10 @@
                 "memeIdentity": "Your Meme Identity",
                 "sendDankMemes": "Send dank memes using your own animated avi",
                 "createAvatar": "Create Avatar"
+            },
+            "ChooseAvatarAnimationDialog": {
+                "editAvatar": "Edit Avatar",
+                "confirm": "Confirm"
             }
         }
     }

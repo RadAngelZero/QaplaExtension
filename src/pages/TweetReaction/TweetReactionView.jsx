@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { Avatar, Box, Button, CircularProgress, ClickAwayListener, IconButton, TextField, Typography } from '@mui/material';
+import {
+    Avatar,
+    Box,
+    Button,
+    CircularProgress,
+    ClickAwayListener,
+    IconButton,
+    TextField,
+    Typography
+} from '@mui/material';
 import Tooltip from 'react-power-tooltip';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
@@ -18,7 +27,16 @@ import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
 import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
 import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
-import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP, AVATAR } from '../../constants';
+import {
+    CUSTOM_TTS_VOICE,
+    EMOTE,
+    GIPHY_GIFS,
+    GIPHY_STICKERS,
+    GIPHY_TEXT,
+    MEMES,
+    ZAP,
+    AVATAR
+} from '../../constants';
 
 const allMediaOptionsTypes = [
     GIPHY_GIFS,
@@ -385,6 +403,8 @@ const PillsList = styled(Box)({
     gap: '16px',
     flexWrap: 'nowrap',
     overflowX: 'auto',
+    // 56px for the user image width + 16px for the margin of text input = 72px
+    paddingLeft: '72px',
     maxWidth: '100%',
     marginRight: '64px',
     '&::-webkit-scrollbar': {
@@ -584,7 +604,8 @@ const TweetReactionView = ({
     randomEmoteUrl,
     userImage,
     onUpgradeReaction,
-    availableTips
+    availableTips,
+    avatarAnimation
 }) => {
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
@@ -601,6 +622,8 @@ const TweetReactionView = ({
                 return Boolean(voiceBot).valueOf();
             case EMOTE:
                 return Boolean(emoteRaid).valueOf();
+            case AVATAR:
+                return Boolean(avatarAnimation).valueOf();
             default:
                 return false;
         }
@@ -621,7 +644,8 @@ const TweetReactionView = ({
 
     let pills = [
         voiceBot,
-        emoteRaid
+        emoteRaid,
+        avatarAnimation
     ];
 
     pills = pills.filter((item) => item).sort((a, b) => {
@@ -691,36 +715,36 @@ const TweetReactionView = ({
                         </MessageContainer>
                     </UserMessageContainer>
                     {pills.length > 0 &&
-                            <PillsList>
-                                {pills.map((pill) => (
-                                    <Pill key={pill.type}>
-                                        <PillInnerContainer>
-                                            <PillIconContainer>
-                                                {pill.Icon ?
-                                                    <pill.Icon style={{
+                        <PillsList>
+                            {pills.map((pill) => (
+                                <Pill key={pill.type}>
+                                    <PillInnerContainer>
+                                        <PillIconContainer>
+                                            {pill.Icon ?
+                                                <pill.Icon style={{
+                                                    height: '24px',
+                                                    width: '24px'
+                                                }} />
+                                                :
+                                                <img src={pill.url}
+                                                    style={{
                                                         height: '24px',
                                                         width: '24px'
-                                                    }} />
-                                                    :
-                                                    <img src={pill.url}
-                                                        style={{
-                                                            height: '24px',
-                                                            width: '24px'
-                                                        }}
-                                                        alt={pill.type} />
-                                                }
-                                            </PillIconContainer>
-                                            <PillText>
-                                                {pill.title}
-                                            </PillText>
-                                            <RemoveButtonContainer onClick={pill.onRemove}>
-                                                <Close />
-                                            </RemoveButtonContainer>
-                                        </PillInnerContainer>
-                                    </Pill>
-                                ))}
-                            </PillsList>
-                        }
+                                                    }}
+                                                    alt={pill.type} />
+                                            }
+                                        </PillIconContainer>
+                                        <PillText>
+                                            {pill.title}
+                                        </PillText>
+                                        <RemoveButtonContainer onClick={pill.onRemove}>
+                                            <Close />
+                                        </RemoveButtonContainer>
+                                    </PillInnerContainer>
+                                </Pill>
+                            ))}
+                        </PillsList>
+                    }
                 </TTSContainer>
                 <SelectedMediaContainer>
                     {selectedMedia &&

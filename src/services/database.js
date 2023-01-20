@@ -315,15 +315,17 @@ export function getAvailableExtraTips() {
  * @param {object | undefined} avatarBackground Avatar background data
  * @param {number} avatarBackground.angle Avatar gradient angle
  * @param {Array<string>} avatarBackground.colors Array of colors for gradient background
+ * @param {string | undefined} avatarAnimationId Avatar animation identifier
  * @param {boolean} pointsChannelInteractions True if reaction was sent with channel points
  */
-export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, pointsChannelInteractions, zapsToRemove) {
+export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, avatarAnimationId, pointsChannelInteractions) {
     const streamerDonations = createChild(`/StreamersDonations/${streamerUid}`);
 
     const reactionReference = await push(streamerDonations, {
         avatar: {
             avatarId: avatarId ? avatarId : null,
-            avatarBackground: avatarBackground ? avatarBackground : null
+            avatarBackground: avatarBackground ? avatarBackground : null,
+            avatarAnimationId: avatarAnimationId ? avatarAnimationId : null
         },
         /**
          * amountQoins and donationType are filled even if the reaction is sent free with reaction points, our
@@ -357,4 +359,18 @@ export async function sendReaction(bits, uid, userName, twitchUserName, userPhot
         streamerName,
         pointsChannelInteractions
     });
+}
+
+//////////////////////
+// Avatars Animations Overlay
+//////////////////////
+
+/**
+ * Get the full list of avatars animations
+ * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
+ */
+export async function getAnimationsData() {
+    const animations = child(database, `/AvatarsAnimationsOverlay`);
+
+    return get(query(animations));
 }
