@@ -9,6 +9,7 @@ import { ReactComponent as Interactions } from './../../assets/Icons/Interaction
 import { ReactComponent as Gif } from './../../assets/Icons/GIF.svg';
 import { ReactComponent as Meme } from './../../assets/Icons/Memes.svg';
 import { ReactComponent as Sticker } from './../../assets/Icons/Sticker.svg';
+import { ReactComponent as AvatarIcon } from './../../assets/Icons/Avatar.svg';
 import { ReactComponent as PlusCircle } from './../../assets/Icons/PlusCircle.svg';
 import { ReactComponent as Close } from './../../assets/Icons/Close.svg';
 import { ReactComponent as CheckCircle } from './../../assets/Icons/CheckCircle.svg';
@@ -17,7 +18,7 @@ import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
 import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
 import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
-import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP } from '../../constants';
+import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP, AVATAR } from '../../constants';
 
 const allMediaOptionsTypes = [
     GIPHY_GIFS,
@@ -25,7 +26,8 @@ const allMediaOptionsTypes = [
     MEMES,
     EMOTE,
     GIPHY_TEXT,
-    CUSTOM_TTS_VOICE
+    CUSTOM_TTS_VOICE,
+    AVATAR
 ];
 
 // Create mediaOptionsData
@@ -57,6 +59,11 @@ let mediaOptionsData = {
     [CUSTOM_TTS_VOICE]: {
         Icon: TTSVoice,
         label: i18n.t('TweetReactionView.botVoice'),
+        level: 2
+    },
+    [AVATAR]: {
+        Icon: AvatarIcon,
+        label: 'Avatar',
         level: 2
     }
 };
@@ -91,6 +98,11 @@ i18n.on('languageChanged', () => {
         [CUSTOM_TTS_VOICE]: {
             Icon: TTSVoice,
             label: i18n.t('TweetReactionView.botVoice'),
+            level: 2
+        },
+        [AVATAR]: {
+            Icon: AvatarIcon,
+            label: 'Avatar',
             level: 2
         }
     };
@@ -306,7 +318,6 @@ const TipContainer = styled(Box)({
     display: 'flex',
     gap: '8px',
     justifyContent: 'space-between',
-    // flexWrap: 'wrap',
     alignItems: 'flex-end',
 });
 
@@ -410,7 +421,6 @@ const PillText = styled('p')({
     letterSpacing: '0px',
     textAlign: 'left',
     margin: '0',
-
     background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%), #FFFFFF',
     webkitBackgroundClip: 'text',
     webkitTextFillColor: 'transparent',
@@ -554,7 +564,6 @@ const ExtraTipOption = ({ label, onClick, selected }) => {
 const TweetReactionView = ({
     onSend,
     sending,
-    numberOfReactions,
     message,
     setMessage,
     currentReactionCost,
@@ -567,7 +576,6 @@ const TweetReactionView = ({
     onRemoveCustom3DText,
     voiceBot,
     emoteRaid,
-    reactionLevel,
     tipping,
     toggleTipping,
     extraTip,

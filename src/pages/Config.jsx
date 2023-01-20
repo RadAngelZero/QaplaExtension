@@ -90,7 +90,7 @@ const Config = () => {
                     {t('instructions')}
                 </CardInstructions>
                 <CardButton fullWidth
-                    endIcon={<ExternalLink />}
+                    endIcon={<ExternalLink fill='#141833' />}
                     href={uri}
                     target='_blank'>
                     {t('openDashboard')}

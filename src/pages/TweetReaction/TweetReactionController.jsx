@@ -16,7 +16,7 @@ import {
 } from '../../services/database';
 import { getStreamerEmotes } from '../../services/functions';
 
-import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP } from '../../constants';
+import { AVATAR, CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP } from '../../constants';
 
 import TweetReactionView from './TweetReactionView';
 import GiphyMediaSelectorDialog from '../../components/GiphyMediaSelectorDialog';
@@ -28,6 +28,7 @@ import EmoteRainDialog from '../../components/EmoteRainDialog';
 import ReactionSentDialog from '../../components/ReactionSentDialog';
 import NoReactionsDialog from '../../components/NoReactionsDialog';
 import EmptyReactionDialog from '../../components/EmptyReactionDialog';
+import CreateAvatarDialog from '../../components/CreateAvatarDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -58,6 +59,7 @@ const TweetReactionController = () => {
     const [openNoReactionsDialog, setOpenNoReactionsDialog] = useState(false);
     const [openEmptyReactionDialog, setOpenEmptyReactionDialog] = useState(false);
     const [streamerIsPremium, setStreamerIsPremium] = useState(false);
+    const [openCreateAvatarDialog, setOpenCreateAvatarDialog] = useState(false);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -207,6 +209,13 @@ const TweetReactionController = () => {
                 break;
             case EMOTE:
                 setOpenEmoteRainDialog(true);
+                break;
+            case AVATAR:
+                if (user.avatarId) {
+                    // Open avatar animation dialog
+                } else {
+                    setOpenCreateAvatarDialog(true);
+                }
                 break;
             default:
                 break;
@@ -427,6 +436,7 @@ const TweetReactionController = () => {
             break;
         case 2:
             availableContent = [
+                AVATAR,
                 GIPHY_TEXT,
                 CUSTOM_TTS_VOICE,
                 GIPHY_GIFS,
@@ -520,6 +530,8 @@ const TweetReactionController = () => {
                 onUpgradeReaction={(level) => { onUpgradeReaction(level, null); setOpenNoReactionsDialog(false); }} />
             <EmptyReactionDialog open={openEmptyReactionDialog}
                 onClose={() => setOpenEmptyReactionDialog(false)} />
+            <CreateAvatarDialog open={openCreateAvatarDialog}
+                onClose={() => setOpenCreateAvatarDialog(false)} />
         </>
     );
 }

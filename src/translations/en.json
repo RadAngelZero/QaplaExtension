@@ -72,6 +72,11 @@
                 "weNeedPermission": "We need permission 🙏",
                 "permissionReason": "To send reactions on screen you\nmust grant access to your Twitch ID",
                 "managePermission": "Manage Permissions"
+            },
+            "CreateAvatarDialog": {
+                "memeIdentity": "Your Meme Identity",
+                "sendDankMemes": "Send dank memes using your own animated avi",
+                "createAvatar": "Create Avatar"
             }
         }
     }

@@ -70,6 +70,11 @@
                 "weNeedPermission": "Necesitamos permiso 🙏",
                 "permissionReason": "Para enviar reacciones en pantalla debes\npermitirmos el acceso a tu Twitch ID",
                 "managePermission": "Manejar Permisos"
+            },
+            "CreateAvatarDialog": {
+                "memeIdentity": "Tu Meme Identidad",
+                "sendDankMemes": "Envía memes geniales usando tu propio avi animado",
+                "createAvatar": "Crear Avatar"
             }
         }
     }
