@@ -561,7 +561,6 @@ const TweetReactionController = () => {
                 onClose={() => setOpenCreateAvatarDialog(false)} />
             <ChooseAvatarAnimationDialog open={openAnimationAvatarDialog}
                 onClose={() => setOpenAnimationAvatarDialog(false)}
-                avatarId={user.avatarId}
                 onAvatarAnimationSelected={onAvatarAnimationSelected} />
         </>
     );

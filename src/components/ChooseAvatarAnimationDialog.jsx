@@ -5,8 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import { getAnimationsData } from '../services/database';
 
-import AvatarAnimationPreview from './AvatarAnimationPreview';
-
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as ExternalLink } from './../assets/Icons/ExternalLink.svg';
 
@@ -23,7 +21,13 @@ const TopBarContainer = styled(Box)({
     justifyContent: 'space-between'
 });
 
-const CloseIconContainer = styled(IconButton)({
+const AvatarAnimationPreview = styled('img')({
+    backgroundColor: '#00020E',
+    width: '100vw',
+    height: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
 });
 
 const EditAvatarButton = styled(Button)({
@@ -118,10 +122,9 @@ const UseAnimationButton = styled(Button)({
     }
 });
 
-const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimationSelected }) => {
+const ChooseAvatarAnimationDialog = ({ open, onClose, onAvatarAnimationSelected }) => {
     const [animations, setAnimations] = useState({});
     const [currentAnimation, setCurrentAnimation] = useState(null);
-    const [showAnimation, setShowAnimation] = useState(false);
     const { t } = useTranslation('translation', { keyPrefix: 'dialogs.ChooseAvatarAnimationDialog' });
 
     useEffect(() => {
@@ -137,7 +140,6 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimatio
     }, []);
 
     const changeAnimation = (animation) => {
-        setShowAnimation(false);
         setCurrentAnimation(animation);
     }
 
@@ -150,18 +152,15 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimatio
             open={open}
             onClose={onClose}>
             <TopBarContainer>
-                <CloseIconContainer onClick={onClose}>
+                <IconButton onClick={onClose}>
                     <Close />
-                </CloseIconContainer>
+                </IconButton>
                 <EditAvatarButton onClick={openAvatarEditorTab}
                     startIcon={<ExternalLink fill='#FFF' />}>
                     {t('editAvatar')}
                 </EditAvatarButton>
             </TopBarContainer>
-            <AvatarAnimationPreview avatarId={avatarId}
-                animationData={currentAnimation}
-                showAnimation={showAnimation}
-                setShowAnimation={setShowAnimation} />
+                <AvatarAnimationPreview src={currentAnimation ? currentAnimation.gif : ''} />
             <AnimationsOptionsMenu>
                 <AnimationPicker>
                     {currentAnimation && Object.keys(animations).map((animationKey, index) => (
