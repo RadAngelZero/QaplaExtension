@@ -77,7 +77,7 @@
                 "createAvatar": "Crear Avatar"
             },
             "ChooseAvatarAnimationDialog": {
-                "editAvatar": "Editar Avatar",
+                "fullPreview": "Preview Completo",
                 "confirm": "Confirmar"
             }
         }

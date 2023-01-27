@@ -61,6 +61,16 @@ const AnimationsOptionsMenu = styled(Box)({
     boxSizing: 'border-box'
 });
 
+const GenericAvatarLegend = styled('p')({
+    position: 'absolute',
+    bottom: '236px',
+    width: '100%',
+    textAlign: 'center',
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#FFF'
+});
+
 const AnimationPicker = styled(Box)({
     display: 'flex',
     flexDirection: 'row',
@@ -122,7 +132,7 @@ const UseAnimationButton = styled(Button)({
     }
 });
 
-const ChooseAvatarAnimationDialog = ({ open, onClose, onAvatarAnimationSelected }) => {
+const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimationSelected }) => {
     const [animations, setAnimations] = useState({});
     const [currentAnimation, setCurrentAnimation] = useState(null);
     const { t } = useTranslation('translation', { keyPrefix: 'dialogs.ChooseAvatarAnimationDialog' });
@@ -143,8 +153,8 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, onAvatarAnimationSelected 
         setCurrentAnimation(animation);
     }
 
-    const openAvatarEditorTab = () => {
-        window.open('https://web.qapla.gg/', '_blank');
+    const openAvatarFullPreviewTab = () => {
+        window.open(`http://localhost:6969/avatar/animation/${avatarId}/${currentAnimation.id}/`, '_blank');
     }
 
     return (
@@ -155,12 +165,15 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, onAvatarAnimationSelected 
                 <IconButton onClick={onClose}>
                     <Close />
                 </IconButton>
-                <EditAvatarButton onClick={openAvatarEditorTab}
+                <EditAvatarButton onClick={openAvatarFullPreviewTab}
                     startIcon={<ExternalLink fill='#FFF' />}>
-                    {t('editAvatar')}
+                    {t('fullPreview')}
                 </EditAvatarButton>
             </TopBarContainer>
                 <AvatarAnimationPreview src={currentAnimation ? currentAnimation.gif : ''} />
+            <GenericAvatarLegend>
+                This is an mock animation. Your avi will show on stream
+            </GenericAvatarLegend>
             <AnimationsOptionsMenu>
                 <AnimationPicker>
                     {currentAnimation && Object.keys(animations).map((animationKey, index) => (

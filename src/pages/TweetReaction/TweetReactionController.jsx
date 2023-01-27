@@ -90,6 +90,17 @@ const TweetReactionController = () => {
     }, []);
 
     useEffect(() => {
+        /**
+         * If openCreateAvatarDialog is true and avatarId has a valid value, close the create avatar
+         * dialog and open the dialog to allow the user to choose an avatar animation
+         */
+        if (openCreateAvatarDialog && user && user.avatarId) {
+            setOpenCreateAvatarDialog(false);
+            setOpenAnimationAvatarDialog(true);
+        }
+    }, [openCreateAvatarDialog, user]);
+
+    useEffect(() => {
         async function getStreamerData(streamerId) {
             const streamer = await getStreamerWithTwitchId(streamerId);
             let uid = '';
@@ -558,9 +569,11 @@ const TweetReactionController = () => {
             <EmptyReactionDialog open={openEmptyReactionDialog}
                 onClose={() => setOpenEmptyReactionDialog(false)} />
             <CreateAvatarDialog open={openCreateAvatarDialog}
-                onClose={() => setOpenCreateAvatarDialog(false)} />
+                onClose={() => setOpenCreateAvatarDialog(false)}
+                userTwitchId={user.twitchId} />
             <ChooseAvatarAnimationDialog open={openAnimationAvatarDialog}
                 onClose={() => setOpenAnimationAvatarDialog(false)}
+                avatarId={user.avatarId}
                 onAvatarAnimationSelected={onAvatarAnimationSelected} />
         </>
     );
