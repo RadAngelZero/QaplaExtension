@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 import { authWithTwitch, listenToAuthState } from '../services/auth';
-import { listenToUserProfile, unlistenUserProfile } from '../services/database';
+import { listenToUserProfile } from '../services/database';
 import { getUserData } from '../services/twitch';
 import { useTwitch } from './TwitchProvider';
 
