@@ -13,8 +13,7 @@ import { ReactComponent as TTSBot } from './../assets/Icons/TTSBot.svg';
 import { ReactComponent as Interactions } from './../assets/Icons/Interactions.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import { getRandomGifByLibrary } from '../services/database';
-import AvatarGif from './../assets/Gifs/AvatarIcon.gif';
-import { ZAP } from '../constants';
+import { AVATAR_OPTION_GIF, ZAP } from '../constants';
 
 const ReactionTierSelectorContainer = styled(Box)({
     display: 'flex',
@@ -225,7 +224,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel,
                                 <TTSBot />
                             </Icon>
                             <Icon>
-                                <img src={AvatarGif}
+                                <img src={AVATAR_OPTION_GIF}
                                     height='32px'
                                     width='32px'
                                     alt='Avatar Gif' />

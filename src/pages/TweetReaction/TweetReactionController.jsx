@@ -19,6 +19,7 @@ import { getStreamerEmotes } from '../../services/functions';
 
 import {
     AVATAR,
+    AVATAR_OPTION_GIF,
     CUSTOM_TTS_VOICE,
     EMOTE,
     GIPHY_GIFS,
@@ -287,6 +288,7 @@ const TweetReactionController = () => {
 
     const onAvatarAnimationSelected = (animationId) => {
         setAvatarAnimation({
+            url: AVATAR_OPTION_GIF,
             id: animationId,
             title: 'Avatar On',
             type: AVATAR,

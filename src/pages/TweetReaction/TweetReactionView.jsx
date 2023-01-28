@@ -26,7 +26,6 @@ import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
 import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
 import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
-import AvatarGif from './../../assets/Gifs/AvatarIcon.gif';
 import {
     CUSTOM_TTS_VOICE,
     EMOTE,
@@ -35,7 +34,8 @@ import {
     GIPHY_TEXT,
     MEMES,
     ZAP,
-    AVATAR
+    AVATAR,
+    AVATAR_OPTION_GIF
 } from '../../constants';
 
 const allMediaOptionsTypes = [
@@ -80,7 +80,7 @@ let mediaOptionsData = {
         level: 2
     },
     [AVATAR]: {
-        Gif: AvatarGif,
+        Gif: AVATAR_OPTION_GIF,
         label: 'Avatar',
         level: 2
     }
@@ -119,7 +119,7 @@ i18n.on('languageChanged', () => {
             level: 2
         },
         [AVATAR]: {
-            Gif: AvatarGif,
+            Gif: AVATAR_OPTION_GIF,
             label: 'Avatar',
             level: 2
         }
@@ -406,7 +406,7 @@ const PillsList = styled(Box)({
     // 56px for the user image width + 16px for the margin of text input = 72px
     paddingLeft: '72px',
     maxWidth: '100%',
-    marginRight: '64px',
+    marginRight: '-16px',
     '&::-webkit-scrollbar': {
         display: 'none'
     }
@@ -843,7 +843,7 @@ const TweetReactionView = ({
                         <NoTipIcon>
                             <PlusCircle />
                         </NoTipIcon>
-                        No Bits
+                        No Extra Bits
                     </NoTipButton>
                 }
             </MediaSelectionContainer>

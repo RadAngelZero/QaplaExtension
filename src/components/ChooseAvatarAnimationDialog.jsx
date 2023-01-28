@@ -140,7 +140,8 @@ const UseAnimationButton = styled(Button)({
 const TooltipText = styled(Typography)({
     fontSize: '16px',
     fontWeight: '800',
-    color: '#FFF'
+    color: '#FFF',
+    marginTop: '16px'
 });
 
 const TooltipButtonContainer = styled(Box)({
