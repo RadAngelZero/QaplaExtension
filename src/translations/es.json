@@ -81,6 +81,11 @@
                 "tooltipButton": "Done",
                 "fullPreview": "Preview con tu Avatar",
                 "confirm": "Confirmar"
+            },
+            "ReactionsSnoozedDialog": {
+                "reactionsSnoozed": "Reactions deshabilitadas 😴",
+                "streamsHasReactionsDisabled": "El streamer deshabilito las reacciones por el momento ¡Pidele que las encienda!",
+                "understood": "Understood"
             }
         }
     }

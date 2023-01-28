@@ -374,3 +374,18 @@ export async function getAnimationsData() {
 
     return get(query(animations));
 }
+
+//////////////////////
+// Streamer Alerts Settings
+//////////////////////
+
+/**
+ * Gets the reactionsEnabled flag from the given streamer
+ * @param {string} streamerUid Streamer identifier
+ * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
+ */
+export async function getAreReactionsEnabledFlag(streamerUid) {
+    const reactionsEnabled = child(database, `/StreamerAlertsSettings/${streamerUid}/reactionsEnabled`);
+
+    return get(query(reactionsEnabled));
+}

@@ -83,6 +83,11 @@
                 "tooltipButton": "Done",
                 "fullPreview": "Preview with your avatar",
                 "confirm": "Confirm"
+            },
+            "ReactionsSnoozedDialog": {
+                "reactionsSnoozed": "Reactions snoozed 😴",
+                "streamsHasReactionsDisabled": "The streamer has their reactions disabled at the moment. Ask your streamer to turn them on!",
+                "understood": "Understood"
             }
         }
     }

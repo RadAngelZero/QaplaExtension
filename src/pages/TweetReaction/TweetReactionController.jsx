@@ -12,7 +12,8 @@ import {
     sendReaction,
     substractZaps,
     getStreamerReactionPriceForSubs,
-    getReactionPriceDefaultForSubs
+    getReactionPriceDefaultForSubs,
+    getAreReactionsEnabledFlag
 } from '../../services/database';
 import { getStreamerEmotes } from '../../services/functions';
 
@@ -39,6 +40,7 @@ import NoReactionsDialog from '../../components/NoReactionsDialog';
 import EmptyReactionDialog from '../../components/EmptyReactionDialog';
 import CreateAvatarDialog from '../../components/CreateAvatarDialog';
 import ChooseAvatarAnimationDialog from '../../components/ChooseAvatarAnimationDialog';
+import ReactionsSnoozedDialog from '../../components/ReactionsSnoozedDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -72,6 +74,7 @@ const TweetReactionController = () => {
     const [openCreateAvatarDialog, setOpenCreateAvatarDialog] = useState(false);
     const [openAnimationAvatarDialog, setOpenAnimationAvatarDialog] = useState(false);
     const [avatarAnimation, setAvatarAnimation] = useState(null);
+    const [openReactionsSnoozedDialog, setOpenReactionsSnoozedDialog] = useState(false);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -366,82 +369,92 @@ const TweetReactionController = () => {
         setOpenSentDialog(true);
     }
 
-    const onSendReaction = () => {
+    const onSendReaction = async () => {
         const sendButtonDisabled = (!message && !selectedMedia);
         if (sendButtonDisabled) {
             return setOpenEmptyReactionDialog(true);
         }
 
-        if (!sending) {
-            setSending(true);
-            /**
-             * If the streamer is a Qapla premium user and the user using the extension is a subscriber of the channel, show the
-             * preferential reactions costs for subs defined by the streamer
-             */
-            const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
-            if (currentReactionCost.type !== ZAP) {
-                twitch.bits.onTransactionComplete((transactionObject) => {
-                    if (transactionObject.initiator === 'current_user') {
-                        // Transaction comes from reaction payment
-                        if (!reactionPaid) {
-                            reactionPaid = true
+        const areReactionsEnabled = await getAreReactionsEnabledFlag(streamerUid);
 
-                            if (extraTip) {
-                                // Reaction paid, charge extra tip now
-                                twitch.bits.useBits(extraTip.twitchSku);
+        console.log(!areReactionsEnabled.exists() || (areReactionsEnabled.exists() && areReactionsEnabled.val()));
+        // If reactionsEnabled flag does not exist or exists and it is true, send the reaction
+        if (!areReactionsEnabled.exists() || (areReactionsEnabled.exists() && areReactionsEnabled.val())) {
+            if (!sending) {
+                setSending(true);
+                /**
+                 * If the streamer is a Qapla premium user and the user using the extension is a subscriber of the channel, show the
+                 * preferential reactions costs for subs defined by the streamer
+                 */
+                const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
+                if (currentReactionCost.type !== ZAP) {
+                    twitch.bits.onTransactionComplete((transactionObject) => {
+                        if (transactionObject.initiator === 'current_user') {
+                            // Transaction comes from reaction payment
+                            if (!reactionPaid) {
+                                reactionPaid = true
+
+                                if (extraTip) {
+                                    // Reaction paid, charge extra tip now
+                                    twitch.bits.useBits(extraTip.twitchSku);
+                                } else {
+                                    // Reaction paid and no extra tip, write reaction
+                                    writeReaction(currentReactionCost.price);
+                                }
                             } else {
-                                // Reaction paid and no extra tip, write reaction
-                                writeReaction(currentReactionCost.price);
+                                // Reaction and extra tip are paid, write reaction
+                                writeReaction(currentReactionCost.price + extraTip.cost);
                             }
-                        } else {
-                            // Reaction and extra tip are paid, write reaction
-                            writeReaction(currentReactionCost.price + extraTip.cost);
                         }
-                    }
-                });
+                    });
 
-                twitch.bits.onTransactionCancelled(() => {
-                    // If the user already paid the reaction, but he canceled the extra tip
-                    if (reactionPaid) {
-                        // Send the reaction only with the Bits he actually paid
-                        writeReaction(currentReactionCost.price);
-                    }
+                    twitch.bits.onTransactionCancelled(() => {
+                        // If the user already paid the reaction, but he canceled the extra tip
+                        if (reactionPaid) {
+                            // Send the reaction only with the Bits he actually paid
+                            writeReaction(currentReactionCost.price);
+                        }
 
-                    // In any case, unlock the sending button
-                    setSending(false);
-                });
+                        // In any case, unlock the sending button
+                        setSending(false);
+                    });
 
-                // Listeners are set, start the purchase attempt
-                twitch.bits.useBits(currentReactionCost.twitchSku);
-            } else {
-                // Check if user has enough Zaps to react
-                if (numberOfReactions >= currentReactionCost.price) {
-                    if (extraTip) {
-                        // Channel point reaction but with extra tip
-                        twitch.bits.onTransactionComplete((transactionObject) => {
-                            if (transactionObject.initiator === 'current_user') {
-                                // Extra tip paid, write reaction
-                                writeReaction(extraTip.cost, true, currentReactionCost.price);
-                            }
-                        });
-
-                        twitch.bits.onTransactionCancelled(() => {
-                            // If the user cancels the purchase unlock the sending button and show tip menu
-                            setSending(false);
-                            toggleTipping();
-                        });
-
-                        // Listeners are set, start the purchase attempt
-                        twitch.bits.useBits(extraTip.twitchSku);
-                    } else {
-                        // Channel point reaction, don't charge products and write reaction
-                        writeReaction(0, true, currentReactionCost.price);
-                    }
+                    // Listeners are set, start the purchase attempt
+                    twitch.bits.useBits(currentReactionCost.twitchSku);
                 } else {
-                    setOpenNoReactionsDialog(true);
-                    setSending(false);
+                    // Check if user has enough Zaps to react
+                    if (numberOfReactions >= currentReactionCost.price) {
+                        if (extraTip) {
+                            // Channel point reaction but with extra tip
+                            twitch.bits.onTransactionComplete((transactionObject) => {
+                                if (transactionObject.initiator === 'current_user') {
+                                    // Extra tip paid, write reaction
+                                    writeReaction(extraTip.cost, true, currentReactionCost.price);
+                                }
+                            });
+
+                            twitch.bits.onTransactionCancelled(() => {
+                                // If the user cancels the purchase unlock the sending button and show tip menu
+                                setSending(false);
+                                toggleTipping();
+                            });
+
+                            // Listeners are set, start the purchase attempt
+                            twitch.bits.useBits(extraTip.twitchSku);
+                        } else {
+                            // Channel point reaction, don't charge products and write reaction
+                            writeReaction(0, true, currentReactionCost.price);
+                        }
+                    } else {
+                        setOpenNoReactionsDialog(true);
+                        setSending(false);
+                    }
                 }
             }
+        } else {
+            console.log('Snoozed');
+            // If reactionsEnabled flag exists and it is false open ReactionsSnoozedDialog
+            setOpenReactionsSnoozedDialog(true);
         }
     }
 
@@ -466,29 +479,29 @@ const TweetReactionController = () => {
         case 1:
             availableContent = [
                 GIPHY_GIFS,
-                GIPHY_STICKERS,
-                MEMES
+                MEMES,
+                GIPHY_STICKERS
             ];
             break;
         case 2:
             availableContent = [
-                AVATAR,
+                GIPHY_GIFS,
+                MEMES,
+                GIPHY_STICKERS,
                 GIPHY_TEXT,
                 CUSTOM_TTS_VOICE,
-                GIPHY_GIFS,
-                GIPHY_STICKERS,
-                MEMES,
+                AVATAR
             ];
             break;
         case 3:
             availableContent = [
-                EMOTE,
-                AVATAR,
+                GIPHY_GIFS,
+                MEMES,
+                GIPHY_STICKERS,
                 GIPHY_TEXT,
                 CUSTOM_TTS_VOICE,
-                GIPHY_GIFS,
-                GIPHY_STICKERS,
-                MEMES,
+                AVATAR,
+                EMOTE
             ];
             break;
         default:
@@ -559,14 +572,6 @@ const TweetReactionController = () => {
                 onClose={() => setOpenEmoteRainDialog(false)}
                 emotes={emotes}
                 onEmoteSelected={onEmoteSelected} />
-            <ReactionSentDialog open={openSentDialog}
-                onClose={resetReaction} />
-            <NoReactionsDialog open={openNoReactionsDialog}
-                onClose={() => setOpenNoReactionsDialog(false)}
-                currentLevel={reactionLevel}
-                costs={costsPerReactionLevel}
-                numberOfReactions={numberOfReactions}
-                onUpgradeReaction={(level) => { onUpgradeReaction(level, null); setOpenNoReactionsDialog(false); }} />
             <EmptyReactionDialog open={openEmptyReactionDialog}
                 onClose={() => setOpenEmptyReactionDialog(false)} />
             <CreateAvatarDialog open={openCreateAvatarDialog}
@@ -576,6 +581,16 @@ const TweetReactionController = () => {
                 onClose={() => setOpenAnimationAvatarDialog(false)}
                 avatarId={user.avatarId}
                 onAvatarAnimationSelected={onAvatarAnimationSelected} />
+            <ReactionSentDialog open={openSentDialog}
+                onClose={resetReaction} />
+            <NoReactionsDialog open={openNoReactionsDialog}
+                onClose={() => setOpenNoReactionsDialog(false)}
+                currentLevel={reactionLevel}
+                costs={costsPerReactionLevel}
+                numberOfReactions={numberOfReactions}
+                onUpgradeReaction={(level) => { onUpgradeReaction(level, null); setOpenNoReactionsDialog(false); }} />
+            <ReactionsSnoozedDialog open={openReactionsSnoozedDialog}
+                onClose={() => setOpenReactionsSnoozedDialog(false)} />
         </>
     );
 }
