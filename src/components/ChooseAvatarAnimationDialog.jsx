@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Dialog, IconButton } from '@mui/material';
+import { Box, Button, Dialog, IconButton, Typography } from '@mui/material';
+import Tooltip from 'react-power-tooltip';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 
@@ -136,9 +137,34 @@ const UseAnimationButton = styled(Button)({
     }
 });
 
+const TooltipText = styled(Typography)({
+    fontSize: '16px',
+    fontWeight: '800',
+    color: '#FFF'
+});
+
+const TooltipButtonContainer = styled(Box)({
+    display: 'flex',
+    justifyContent: 'flex-end',
+    paddingTop: '0 !important',
+    paddingBottom: '24px !important'
+});
+
+const TooltipButton = styled(Button)({
+    alignSelf: 'flex-end',
+    backgroundColor: '#141735 !important',
+    padding: '12px 24px !important',
+    color: '#FFF',
+    fontSize: '16px',
+    fontWeight: '700',
+    borderRadius: '100px',
+    textTransform: 'none'
+});
+
 const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimationSelected }) => {
     const [animations, setAnimations] = useState({});
     const [currentAnimation, setCurrentAnimation] = useState(null);
+    const [showTooltip, setShowTooltip] = useState(false);
     const { t } = useTranslation('translation', { keyPrefix: 'dialogs.ChooseAvatarAnimationDialog' });
 
     useEffect(() => {
@@ -161,6 +187,8 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimatio
         window.open(`http://localhost:6969/avatar/animation/${avatarId}/${currentAnimation.id}/`, '_blank');
     }
 
+    console.log(showTooltip);
+
     return (
         <Dialog fullScreen
             open={open}
@@ -170,8 +198,28 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimatio
                     <IconButton onClick={onClose}>
                         <Close />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={() => !showTooltip ? setShowTooltip(true) : null}>
                         <QuestionMark />
+                        <Tooltip show={showTooltip}
+                            hoverBackground='#3B4BF9'
+                            hoverColor='#FFF'
+                            position='bottom left'
+                            backgroundColor='#3B4BF9'
+                            color='#FFF'
+                            padding='16px 24px 32px 16px'
+                            arrowAlign='start'
+                            textBoxWidth='350px'
+                            borderRadius='15px'
+                            moveRight='16px'>
+                            <TooltipText>
+                                This is an animation sample preview. Your custom avi will show on stream instead.
+                            </TooltipText>
+                            <TooltipButtonContainer>
+                                <TooltipButton onClick={() => setShowTooltip(false)}>
+                                    Done
+                                </TooltipButton>
+                            </TooltipButtonContainer>
+                        </Tooltip>
                     </IconButton>
                 </IconsContainer>
             </TopBarContainer>
