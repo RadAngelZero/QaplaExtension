@@ -77,6 +77,8 @@
                 "createAvatar": "Crear Avatar"
             },
             "ChooseAvatarAnimationDialog": {
+                "tooltipTitle": "Esta es una vista previa de muestra de la animación. Tu avatar personalizado sera mostrado en stream.",
+                "tooltipButton": "Done",
                 "fullPreview": "Preview con tu Avatar",
                 "confirm": "Confirmar"
             }

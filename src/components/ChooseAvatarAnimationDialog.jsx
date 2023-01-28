@@ -187,8 +187,6 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimatio
         window.open(`http://localhost:6969/avatar/animation/${avatarId}/${currentAnimation.id}/`, '_blank');
     }
 
-    console.log(showTooltip);
-
     return (
         <Dialog fullScreen
             open={open}
@@ -212,11 +210,11 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimatio
                             borderRadius='15px'
                             moveRight='16px'>
                             <TooltipText>
-                                This is an animation sample preview. Your custom avi will show on stream instead.
+                                {t('tooltipTitle')}
                             </TooltipText>
                             <TooltipButtonContainer>
                                 <TooltipButton onClick={() => setShowTooltip(false)}>
-                                    Done
+                                    {t('tooltipButton')}
                                 </TooltipButton>
                             </TooltipButtonContainer>
                         </Tooltip>

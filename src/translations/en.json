@@ -79,6 +79,8 @@
                 "createAvatar": "Create Avatar"
             },
             "ChooseAvatarAnimationDialog": {
+                "tooltipTitle": "This is an animation sample preview. Your custom avi will show on stream instead.",
+                "tooltipButton": "Done",
                 "fullPreview": "Preview with your avatar",
                 "confirm": "Confirm"
             }
