@@ -60,7 +60,7 @@ const CreateAvatarDialog = ({ open, onClose, userTwitchId }) => {
     const { t } = useTranslation('translation', { keyPrefix: 'dialogs.CreateAvatarDialog' });
 
     const openAvatarCreatorTab = () => {
-        window.open(`http://localhost:6969/hub/avatar?id=${userTwitchId}`, '_blank');
+        window.open(`https://web.qapla.gg/hub/avatar?id=${userTwitchId}`, '_blank');
     }
 
     return (

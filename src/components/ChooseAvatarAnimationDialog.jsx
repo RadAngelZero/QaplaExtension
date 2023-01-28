@@ -184,7 +184,7 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimatio
     }
 
     const openAvatarFullPreviewTab = () => {
-        window.open(`http://localhost:6969/avatar/animation/${avatarId}/${currentAnimation.id}/`, '_blank');
+        window.open(`https://web.qapla.gg/avatar/animation/${avatarId}/${currentAnimation.id}/`, '_blank');
     }
 
     return (
