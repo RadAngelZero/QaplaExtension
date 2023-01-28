@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Dialog, IconButton } from '@mui/material';
+import { Box, CircularProgress, Dialog, IconButton } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 
@@ -8,12 +8,12 @@ import { ReactComponent as UpgradeArrow } from './../assets/Icons/UpgradeArrow.s
 import { ReactComponent as GIF } from './../assets/Icons/GIF.svg';
 import { ReactComponent as Memes } from './../assets/Icons/Memes.svg';
 import { ReactComponent as Sticker } from './../assets/Icons/Sticker.svg';
-import { ReactComponent as Avatar } from './../assets/Icons/Avatar.svg';
 import { ReactComponent as GiphyText } from './../assets/Icons/GiphyText.svg';
 import { ReactComponent as TTSBot } from './../assets/Icons/TTSBot.svg';
 import { ReactComponent as Interactions } from './../assets/Icons/Interactions.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import { getRandomGifByLibrary } from '../services/database';
+import AvatarGif from './../assets/Gifs/AvatarIcon.gif';
 import { ZAP } from '../constants';
 
 const ReactionTierSelectorContainer = styled(Box)({
@@ -129,7 +129,7 @@ const PriceText = styled('p')({
     marginLeft: '8px',
 });
 
-const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel }) => {
+const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel, randomEmoteUrl }) => {
     const [level1Gif, setLevel1Gif] = useState(null);
     const [level2Gif, setLevel2Gif] = useState(null);
     const [level3Gif, setLevel3Gif] = useState(null);
@@ -224,6 +224,12 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                             <Icon>
                                 <TTSBot />
                             </Icon>
+                            <Icon>
+                                <img src={AvatarGif}
+                                    height='32px'
+                                    width='32px'
+                                    alt='Avatar Gif' />
+                            </Icon>
                         </IconsContainer>
                         <BottomContainer>
                             <Title>
@@ -252,7 +258,14 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel 
                                 <UpgradeArrow />
                             </Icon>
                             <Icon>
-                                <Avatar />
+                                {randomEmoteUrl ?
+                                    <img src={randomEmoteUrl}
+                                        height='32px'
+                                        width='32px'
+                                        alt='Emote' />
+                                    :
+                                    <CircularProgress size={32} />
+                                }
                             </Icon>
                         </IconsContainer>
                         <BottomContainer>

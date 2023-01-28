@@ -545,7 +545,8 @@ const TweetReactionController = () => {
             <ReactionTierSelectorDialog open={openReactionLevelModal}
                 onClose={() => setOpenReactionLevelModal(false)}
                 costs={costsPerReactionLevel}
-                changeReactionLevel={(level) => onUpgradeReaction(level, null)} />
+                changeReactionLevel={(level) => onUpgradeReaction(level, null)}
+                randomEmoteUrl={randomEmoteUrl} />
             <ChooseBotVoiceDialog open={openBotVoiceDialog}
                 onClose={() => setOpenBotVoiceDialog(false)}
                 currentVoice={selectedVoiceBot ? selectedVoiceBot.key : null}

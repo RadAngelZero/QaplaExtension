@@ -18,7 +18,6 @@ import { ReactComponent as Interactions } from './../../assets/Icons/Interaction
 import { ReactComponent as Gif } from './../../assets/Icons/GIF.svg';
 import { ReactComponent as Meme } from './../../assets/Icons/Memes.svg';
 import { ReactComponent as Sticker } from './../../assets/Icons/Sticker.svg';
-import { ReactComponent as AvatarIcon } from './../../assets/Icons/Avatar.svg';
 import { ReactComponent as PlusCircle } from './../../assets/Icons/PlusCircle.svg';
 import { ReactComponent as Close } from './../../assets/Icons/Close.svg';
 import { ReactComponent as CheckCircle } from './../../assets/Icons/CheckCircle.svg';
@@ -27,6 +26,7 @@ import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
 import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
 import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
+import AvatarGif from './../../assets/Gifs/AvatarIcon.gif';
 import {
     CUSTOM_TTS_VOICE,
     EMOTE,
@@ -80,7 +80,7 @@ let mediaOptionsData = {
         level: 2
     },
     [AVATAR]: {
-        Icon: AvatarIcon,
+        Gif: AvatarGif,
         label: 'Avatar',
         level: 2
     }
@@ -119,7 +119,7 @@ i18n.on('languageChanged', () => {
             level: 2
         },
         [AVATAR]: {
-            Icon: AvatarIcon,
+            Gif: AvatarGif,
             label: 'Avatar',
             level: 2
         }
@@ -559,7 +559,12 @@ const MediaOption = ({ index, type, disabled = false, excluded = false, onClick,
                         :
                         null
                     :
-                    <mediaOptionData.Icon height={32} width={32} />
+                    type !== AVATAR ?
+                        <mediaOptionData.Icon height={32} width={32} />
+                        :
+                        <img src={mediaOptionData.Gif}
+                            style={{ height: 32, width: 32 }}
+                            alt='Avatar' />
                 }
             </MediaOptionButton>
         </ClickAwayListener>

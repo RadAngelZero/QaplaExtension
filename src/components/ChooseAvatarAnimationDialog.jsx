@@ -7,6 +7,7 @@ import { getAnimationsData } from '../services/database';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as ExternalLink } from './../assets/Icons/ExternalLink.svg';
+import { ReactComponent as QuestionMark } from './../assets/Icons/QuestionMark.svg';
 
 const TopBarContainer = styled(Box)({
     width: '100vw',
@@ -21,6 +22,9 @@ const TopBarContainer = styled(Box)({
     justifyContent: 'space-between'
 });
 
+const IconsContainer = styled(Box)({
+});
+
 const AvatarAnimationPreview = styled('img')({
     backgroundColor: '#00020E',
     width: '100vw',
@@ -30,7 +34,17 @@ const AvatarAnimationPreview = styled('img')({
     alignItems: 'center'
 });
 
-const EditAvatarButton = styled(Button)({
+const AvatarPreviewButtonContainer = styled(Box)({
+    position: 'absolute',
+    bottom: '236px',
+    right: 0,
+    left: 0,
+    display: 'flex',
+    justifyContent: 'center'
+});
+
+const AvatarPreviewButton = styled(Button)({
+    maxWidth: '260px',
     backgroundColor: '#3B4BF9',
     borderRadius: '100px',
     padding: '8px 16px',
@@ -39,7 +53,7 @@ const EditAvatarButton = styled(Button)({
     color: '#FFF',
     textTransform: 'none',
     '&:hover': {
-        opacity: .9,
+        opacity: .95,
         background: '#3B4BF9'
     }
 });
@@ -59,16 +73,6 @@ const AnimationsOptionsMenu = styled(Box)({
     webkitBoxSizing: 'border-box',
     mozBoxSizing: 'border-box',
     boxSizing: 'border-box'
-});
-
-const GenericAvatarLegend = styled('p')({
-    position: 'absolute',
-    bottom: '236px',
-    width: '100%',
-    textAlign: 'center',
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#FFF'
 });
 
 const AnimationPicker = styled(Box)({
@@ -162,18 +166,22 @@ const ChooseAvatarAnimationDialog = ({ open, onClose, avatarId, onAvatarAnimatio
             open={open}
             onClose={onClose}>
             <TopBarContainer>
-                <IconButton onClick={onClose}>
-                    <Close />
-                </IconButton>
-                <EditAvatarButton onClick={openAvatarFullPreviewTab}
-                    startIcon={<ExternalLink fill='#FFF' />}>
-                    {t('fullPreview')}
-                </EditAvatarButton>
+                <IconsContainer>
+                    <IconButton onClick={onClose}>
+                        <Close />
+                    </IconButton>
+                    <IconButton>
+                        <QuestionMark />
+                    </IconButton>
+                </IconsContainer>
             </TopBarContainer>
-                <AvatarAnimationPreview src={currentAnimation ? currentAnimation.gif : ''} />
-            <GenericAvatarLegend>
-                This is an mock animation. Your avi will show on stream
-            </GenericAvatarLegend>
+            <AvatarAnimationPreview src={currentAnimation ? currentAnimation.gif : ''} />
+            <AvatarPreviewButtonContainer>
+                <AvatarPreviewButton onClick={openAvatarFullPreviewTab}
+                    endIcon={<ExternalLink fill='#FFF' />}>
+                    {t('fullPreview')}
+                </AvatarPreviewButton>
+            </AvatarPreviewButtonContainer>
             <AnimationsOptionsMenu>
                 <AnimationPicker>
                     {currentAnimation && Object.keys(animations).map((animationKey, index) => (
