@@ -40,12 +40,12 @@ import {
 
 const allMediaOptionsTypes = [
     GIPHY_GIFS,
-    GIPHY_STICKERS,
     MEMES,
-    EMOTE,
+    GIPHY_STICKERS,
     GIPHY_TEXT,
     CUSTOM_TTS_VOICE,
-    AVATAR
+    AVATAR,
+    EMOTE
 ];
 
 // Create mediaOptionsData

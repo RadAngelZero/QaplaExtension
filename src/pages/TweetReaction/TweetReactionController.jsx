@@ -308,6 +308,7 @@ const TweetReactionController = () => {
                 setSelectedVoiceBot(null);
                 setCustom3DText(null);
                 setSelectedEmote(null);
+                setAvatarAnimation(null);
                 break;
             case 2:
                 setSelectedEmote(null);
@@ -454,7 +455,6 @@ const TweetReactionController = () => {
                 }
             }
         } else {
-            console.log('Snoozed');
             // If reactionsEnabled flag exists and it is false open ReactionsSnoozedDialog
             setOpenReactionsSnoozedDialog(true);
         }
