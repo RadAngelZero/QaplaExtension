@@ -170,9 +170,16 @@ const UserMessageContainer = styled(Box)({
     alignItems: 'center'
 });
 
-const AvatarImage = styled(Avatar)({
+const AvatarImage = styled('img')({
     height: '56px',
-    width: '56px'
+    width: '56px',
+    borderRadius: '100px'
+});
+
+const UserImage = styled(Avatar)({
+    height: '56px',
+    width: '56px',
+    borderRadius: '100px'
 });
 
 const MessageContainer = styled(Box)({
@@ -610,7 +617,9 @@ const TweetReactionView = ({
     userImage,
     onUpgradeReaction,
     availableTips,
-    avatarAnimation
+    avatarAnimation,
+    avatarId,
+    avatarBackground
 }) => {
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
@@ -644,6 +653,15 @@ const TweetReactionView = ({
         setExtraTip(tipObject);
     }
 
+    const getLinearGradientBackground = (angle, colors) => {
+        let colorsString = '';
+        colors.forEach((color, index) => {
+            colorsString += color + (index === colors.length - 1 ? '' : ', ');
+        });
+
+        return `linear-gradient(${angle}deg, ${colorsString})`;
+    }
+
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
     const sendButtonDisabled = currentReactionCost === undefined || sending;
 
@@ -666,8 +684,19 @@ const TweetReactionView = ({
             <ContentContainer>
                 <TTSContainer>
                     <UserMessageContainer>
-                        <AvatarImage
-                            src={userImage} />
+                        {avatarId ?
+                            <AvatarImage src={`https://api.readyplayer.me/v1/avatars/${avatarId}.png?scene=fullbody-portrait-v1-transparent`}
+                                alt='User avatar image'
+                                style={{
+                                    background: avatarBackground ?
+                                        getLinearGradientBackground(avatarBackground.angle, avatarBackground.colors)
+                                        :
+                                        'linear-gradient(95.31deg, #FF669D 1.88%, #9746FF 95.17%)'
+                                }} />
+                            :
+                            <UserImage
+                                src={userImage} />
+                        }
                         <MessageContainer>
                             {!custom3DText ?
                                 <>
