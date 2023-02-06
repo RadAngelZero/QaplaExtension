@@ -990,7 +990,7 @@ const TweetReactionView = ({
                                         <MenuOptionText>Extension Walkthrough</MenuOptionText>
                                     </MenuOption>
                                     <MenuOption onClick={() => {
-                                        // window.open('', '_blank');
+                                        window.open('https://web.qapla.gg/hub/how', '_blank');
                                     }}>
                                         <MenuOptionEmoji>
                                             🎥
@@ -999,7 +999,7 @@ const TweetReactionView = ({
                                         <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
                                     </MenuOption>
                                     <MenuOption onClick={() => {
-                                        // window.open('', '_blank');
+                                        window.open('https://web.qapla.gg/hub/avatar', '_blank');
                                     }}>
                                         <MenuOptionEmoji>
                                             👽
@@ -1009,7 +1009,7 @@ const TweetReactionView = ({
 
                                     </MenuOption>
                                     <MenuOption onClick={() => {
-                                        // window.open('', '_blank');
+                                        window.open('https://www.discord.gg/6GBHn78', '_blank');
                                     }}>
                                         <MenuOptionEmoji>
                                             💬
