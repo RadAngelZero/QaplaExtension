@@ -19,7 +19,7 @@
             "excluded": "Gif, Meme or Sticker",
             "use": "Use {{mediaType}}",
             "upgradeToUse": "👀 Upgrade your reaction to use ",
-            "contentAvailableWhenUpgradeTo2": "TTS Bot Voice & 3D Text",
+            "contentAvailableWhenUpgradeTo2": "TTS Bot Voice, Animated Avatar & 3D Text",
             "contentAvailableWhenUpgradeTo3": "Emotes Animations"
         },
         "dialogs": {
@@ -72,6 +72,22 @@
                 "weNeedPermission": "We need permission 🙏",
                 "permissionReason": "To send reactions on screen you\nmust grant access to your Twitch ID",
                 "managePermission": "Manage Permissions"
+            },
+            "CreateAvatarDialog": {
+                "memeIdentity": "Your Meme Identity",
+                "sendDankMemes": "Send dank memes using your own animated avi",
+                "createAvatar": "Create Avatar"
+            },
+            "ChooseAvatarAnimationDialog": {
+                "tooltipTitle": "This is an animation sample preview. Your custom avi will show on stream instead.",
+                "tooltipButton": "Done",
+                "fullPreview": "Preview with your avatar",
+                "confirm": "Confirm"
+            },
+            "ReactionsSnoozedDialog": {
+                "reactionsSnoozed": "Reactions snoozed 😴",
+                "streamsHasReactionsDisabled": "The streamer has their reactions disabled at the moment. Ask your streamer to turn them on!",
+                "understood": "Understood"
             }
         }
     }

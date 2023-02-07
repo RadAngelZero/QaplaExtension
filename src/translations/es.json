@@ -2,7 +2,7 @@
     "translation": {
         "Config": {
             "welcome": "Bienvenido",
-            "instructions": "Porfavor vista el Dashboard de Qapla GG para\nconfigurar la extensión",
+            "instructions": "Por favor vista el Dashboard de Qapla GG para\nconfigurar la extensión",
             "openDashboard": "Abrir Dashboard"
         },
         "TweetReactionView": {
@@ -19,7 +19,7 @@
             "excluded": "Gif, Meme o Sticker",
             "use": "Usar {{mediaType}}",
             "upgradeToUse": "👀 Sube de nivel tu tu reacción para usar ",
-            "contentAvailableWhenUpgradeTo2": "Voz de bot para TTS & Texto 3D",
+            "contentAvailableWhenUpgradeTo2": "Voz de bot para TTS, Avatar Animado & Texto 3D",
             "contentAvailableWhenUpgradeTo3": "Animaciones de Emotes"
         },
         "dialogs": {
@@ -70,6 +70,22 @@
                 "weNeedPermission": "Necesitamos permiso 🙏",
                 "permissionReason": "Para enviar reacciones en pantalla debes\npermitirmos el acceso a tu Twitch ID",
                 "managePermission": "Manejar Permisos"
+            },
+            "CreateAvatarDialog": {
+                "memeIdentity": "Tu Meme Identidad",
+                "sendDankMemes": "Envía memes geniales usando tu propio avi animado",
+                "createAvatar": "Crear Avatar"
+            },
+            "ChooseAvatarAnimationDialog": {
+                "tooltipTitle": "Esta es una vista previa de muestra de la animación. Tu avatar personalizado sera mostrado en stream.",
+                "tooltipButton": "Done",
+                "fullPreview": "Preview con tu Avatar",
+                "confirm": "Confirmar"
+            },
+            "ReactionsSnoozedDialog": {
+                "reactionsSnoozed": "Reactions deshabilitadas 😴",
+                "streamsHasReactionsDisabled": "El streamer deshabilito las reacciones por el momento ¡Pidele que las encienda!",
+                "understood": "Entendido"
             }
         }
     }
