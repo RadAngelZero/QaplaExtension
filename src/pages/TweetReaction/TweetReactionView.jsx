@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { Avatar, Box, Button, CircularProgress, ClickAwayListener, IconButton, TextField, Typography, TooltipClasses, tooltipClasses } from '@mui/material';
-import { Tooltip as MuiTooltip } from '@mui/material';
+import {
+    Avatar,
+    Box,
+    Button,
+    CircularProgress,
+    ClickAwayListener,
+    IconButton,
+    TextField,
+    Typography,
+    TooltipClasses,
+    tooltipClasses,
+    Tooltip as MuiTooltip
+} from '@mui/material';
 import Tooltip from 'react-power-tooltip';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
@@ -23,14 +34,26 @@ import { ReactComponent as Wallet } from './../../assets/Icons/Wallet.svg';
 import { ReactComponent as Menu } from './../../assets/Icons/Menu.svg';
 import { ReactComponent as CloseMenu } from './../../assets/Icons/CloseMenu.svg';
 import { ReactComponent as ExternalLinkWhite } from './../../assets/Icons/ExternalLinkWhite.svg';
-import { CUSTOM_TTS_VOICE, EMOTE, GIPHY_GIFS, GIPHY_STICKERS, GIPHY_TEXT, MEMES, ZAP } from '../../constants';
-const allMediaOptionsTypes = [
+import {
+    CUSTOM_TTS_VOICE,
+    EMOTE,
     GIPHY_GIFS,
     GIPHY_STICKERS,
-    MEMES,
-    EMOTE,
     GIPHY_TEXT,
-    CUSTOM_TTS_VOICE
+    MEMES,
+    ZAP,
+    AVATAR,
+    AVATAR_OPTION_GIF
+} from '../../constants';
+
+const allMediaOptionsTypes = [
+    GIPHY_GIFS,
+    MEMES,
+    GIPHY_STICKERS,
+    GIPHY_TEXT,
+    CUSTOM_TTS_VOICE,
+    AVATAR,
+    EMOTE
 ];
 
 // Create mediaOptionsData
@@ -62,6 +85,11 @@ let mediaOptionsData = {
     [CUSTOM_TTS_VOICE]: {
         Icon: TTSVoice,
         label: i18n.t('TweetReactionView.botVoice'),
+        level: 2
+    },
+    [AVATAR]: {
+        Gif: AVATAR_OPTION_GIF,
+        label: 'Avatar',
         level: 2
     }
 };
@@ -96,6 +124,11 @@ i18n.on('languageChanged', () => {
         [CUSTOM_TTS_VOICE]: {
             Icon: TTSVoice,
             label: i18n.t('TweetReactionView.botVoice'),
+            level: 2
+        },
+        [AVATAR]: {
+            Gif: AVATAR_OPTION_GIF,
+            label: 'Avatar',
             level: 2
         }
     };
@@ -145,9 +178,16 @@ const UserMessageContainer = styled(Box)({
     alignItems: 'center'
 });
 
-const AvatarImage = styled(Avatar)({
+const AvatarImage = styled('img')({
     height: '56px',
-    width: '56px'
+    width: '56px',
+    borderRadius: '100px'
+});
+
+const UserImage = styled(Avatar)({
+    height: '56px',
+    width: '56px',
+    borderRadius: '100px'
 });
 
 const MessageContainer = styled(Box)({
@@ -311,7 +351,6 @@ const TipContainer = styled(Box)({
     display: 'flex',
     gap: '8px',
     justifyContent: 'space-between',
-    // flexWrap: 'wrap',
     alignItems: 'flex-end',
 });
 
@@ -379,8 +418,10 @@ const PillsList = styled(Box)({
     gap: '16px',
     flexWrap: 'nowrap',
     overflowX: 'auto',
+    // 56px for the user image width + 16px for the margin of text input = 72px
+    paddingLeft: '72px',
     maxWidth: '100%',
-    marginRight: '64px',
+    marginRight: '-16px',
     '&::-webkit-scrollbar': {
         display: 'none'
     }
@@ -415,7 +456,6 @@ const PillText = styled('p')({
     letterSpacing: '0px',
     textAlign: 'left',
     margin: '0',
-
     background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%), #FFFFFF',
     webkitBackgroundClip: 'text',
     webkitTextFillColor: 'transparent',
@@ -807,7 +847,12 @@ const MediaOption = ({ index, type, disabled = false, excluded = false, onClick,
                         :
                         null
                     :
-                    <mediaOptionData.Icon height={32} width={32} />
+                    type !== AVATAR ?
+                        <mediaOptionData.Icon height={32} width={32} />
+                        :
+                        <img src={mediaOptionData.Gif}
+                            style={{ height: 32, width: 32 }}
+                            alt='Avatar' />
                 }
             </MediaOptionButton>
         </ClickAwayListener>
@@ -832,7 +877,6 @@ const ExtraTipOption = ({ label, onClick, selected }) => {
 const TweetReactionView = ({
     onSend,
     sending,
-    numberOfReactions,
     message,
     setMessage,
     currentReactionCost,
@@ -845,7 +889,6 @@ const TweetReactionView = ({
     onRemoveCustom3DText,
     voiceBot,
     emoteRaid,
-    reactionLevel,
     tipping,
     toggleTipping,
     extraTip,
@@ -854,7 +897,10 @@ const TweetReactionView = ({
     randomEmoteUrl,
     userImage,
     onUpgradeReaction,
-    availableTips
+    availableTips,
+    avatarAnimation,
+    avatarId,
+    avatarBackground
 }) => {
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
     const [toolTipStep, setTooltipStep] = useState(null);
@@ -875,6 +921,8 @@ const TweetReactionView = ({
                 return Boolean(voiceBot).valueOf();
             case EMOTE:
                 return Boolean(emoteRaid).valueOf();
+            case AVATAR:
+                return Boolean(avatarAnimation).valueOf();
             default:
                 return false;
         }
@@ -890,12 +938,22 @@ const TweetReactionView = ({
         setExtraTip(tipObject);
     }
 
+    const getLinearGradientBackground = (angle, colors) => {
+        let colorsString = '';
+        colors.forEach((color, index) => {
+            colorsString += color + (index === colors.length - 1 ? '' : ', ');
+        });
+
+        return `linear-gradient(${angle}deg, ${colorsString})`;
+    }
+
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
     const sendButtonDisabled = currentReactionCost === undefined || sending;
 
     let pills = [
         voiceBot,
-        emoteRaid
+        emoteRaid,
+        avatarAnimation
     ];
 
     pills = pills.filter((item) => item).sort((a, b) => {
@@ -911,8 +969,19 @@ const TweetReactionView = ({
             <ContentContainer>
                 <TTSContainer>
                     <UserMessageContainer>
-                        <AvatarImage
-                            src={userImage} />
+                        {avatarId ?
+                            <AvatarImage src={`https://api.readyplayer.me/v1/avatars/${avatarId}.png?scene=fullbody-portrait-v1-transparent`}
+                                alt='User avatar image'
+                                style={{
+                                    background: avatarBackground ?
+                                        getLinearGradientBackground(avatarBackground.angle, avatarBackground.colors)
+                                        :
+                                        'linear-gradient(95.31deg, #FF669D 1.88%, #9746FF 95.17%)'
+                                }} />
+                            :
+                            <UserImage
+                                src={userImage} />
+                        }
                         <MessageContainer>
                             {!custom3DText ?
                                 <>
@@ -1249,7 +1318,7 @@ const TweetReactionView = ({
                             <NoTipIcon>
                                 <PlusCircle />
                             </NoTipIcon>
-                            No Bits
+                            No Extra Bits
                         </NoTipButton>
                     }
                 </MediaSelectionContainer>
