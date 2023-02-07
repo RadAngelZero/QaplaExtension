@@ -8,12 +8,12 @@ import {
     getReactionPriceDefault,
     getStreamerWithTwitchId,
     listenToUserReactionsCount,
-    getStreamerReactionPrice,
     sendReaction,
     substractZaps,
-    getStreamerReactionPriceForSubs,
     getReactionPriceDefaultForSubs,
-    getAreReactionsEnabledFlag
+    getAreReactionsEnabledFlag,
+    listenForStreamerReactionPrice,
+    listenForStreamerReactionPriceForSubs
 } from '../../services/database';
 import { getStreamerEmotes } from '../../services/functions';
 
@@ -76,6 +76,7 @@ const TweetReactionController = () => {
     const [openAnimationAvatarDialog, setOpenAnimationAvatarDialog] = useState(false);
     const [avatarAnimation, setAvatarAnimation] = useState(null);
     const [openReactionsSnoozedDialog, setOpenReactionsSnoozedDialog] = useState(false);
+    const [costsUpdates, setCostsUpdates] = useState(null);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -121,45 +122,61 @@ const TweetReactionController = () => {
         }
 
         async function loadPrices() {
-            const costs = [];
+            const costsArray = [];
 
             for (let i = 1; i <= 3; i++) {
-                const costSnapshot = await getStreamerReactionPrice(streamerUid, `level${i}`);
-                let costObject = null;
-                if (costSnapshot.exists()) {
-                    costObject = costSnapshot.val();
-                } else {
-                    const defaultCost = await getReactionPriceDefault(`level${i}`);
-                    costObject = defaultCost.val();
-                }
-
-                // Overwrite price value if price is for bits reaction
-                costObject.price = costObject.type === ZAP ? costObject.price : costObject.bitsPrice;
-
-                costs.push(costObject);
-            }
-
-            setCosts(costs);
-
-            if (streamerIsPremium) {
-                const subscribersCosts = [];
-                for (let i = 1; i <= 3; i++) {
-                    const subscribersCostsSnap = await getStreamerReactionPriceForSubs(streamerUid, `level${i}`);
+                listenForStreamerReactionPrice(streamerUid, `level${i}`, async (reactionPrice) => {
                     let costObject = null;
-                    if (subscribersCostsSnap.exists()) {
-                        costObject = subscribersCostsSnap.val();
+                    if (reactionPrice.exists()) {
+                        costObject = reactionPrice.val();
                     } else {
-                        const defaultCost = await getReactionPriceDefaultForSubs(`level${i}`);
+                        const defaultCost = await getReactionPriceDefault(`level${i}`);
                         costObject = defaultCost.val();
                     }
 
                     // Overwrite price value if price is for bits reaction
                     costObject.price = costObject.type === ZAP ? costObject.price : costObject.bitsPrice;
 
-                    subscribersCosts.push(costObject);
-                }
+                    if (!costsArray[i - 1]) {
+                        costsArray.push(costObject);
+                    } else {
+                        costsArray[i - 1] = costObject;
+                    }
 
-                setSubscribersCosts(subscribersCosts);
+                    if (costsArray.length === 3) {
+                        setCostsUpdates(costsArray[i - 1]);
+                        setCosts(costsArray);
+                    }
+                });
+            }
+
+            if (streamerIsPremium) {
+                const subscribersCosts = [];
+                for (let i = 1; i <= 3; i++) {
+                    listenForStreamerReactionPriceForSubs(streamerUid, `level${i}`, async (reactionPrice) => {
+                        let costObject = null;
+                        if (reactionPrice.exists()) {
+                            costObject = reactionPrice.val();
+                        } else {
+                            const defaultCost = await getReactionPriceDefaultForSubs(`level${i}`);
+                            costObject = defaultCost.val();
+                        }
+
+                        // Overwrite price value if price is for bits reaction
+                        costObject.price = costObject.type === ZAP ? costObject.price : costObject.bitsPrice;
+
+                        if (!subscribersCosts[i - 1]) {
+                            subscribersCosts.push(costObject);
+                        } else {
+                            subscribersCosts[i - 1] = costObject;
+                        }
+
+                        if (subscribersCosts.length === 3) {
+                            setCostsUpdates(subscribersCosts[i - 1]);
+                            setSubscribersCosts(subscribersCosts);
+                        }
+                    });
+                }
             }
         }
 
@@ -208,6 +225,17 @@ const TweetReactionController = () => {
             });
         }
     }, [user, streamerUid]);
+
+    /**
+     * For some reason, updating arrays don't trigger re renders with hooks, so we use this variable only to update the prices
+     * in the UI for the user, we write something in it and then we set it to null here so every time we write something we are sure
+     * react is going to render again (two times, but at least we know it will always render)
+     */
+    useEffect(() => {
+        if (costsUpdates) {
+            setCostsUpdates(null);
+        }
+    }, [costsUpdates]);
 
     const toggleTipping = () => {
         setTipping(!tipping);
@@ -380,7 +408,6 @@ const TweetReactionController = () => {
 
         const areReactionsEnabled = await getAreReactionsEnabledFlag(streamerUid);
 
-        console.log(!areReactionsEnabled.exists() || (areReactionsEnabled.exists() && areReactionsEnabled.val()));
         // If reactionsEnabled flag does not exist or exists and it is true, send the reaction
         if (!areReactionsEnabled.exists() || (areReactionsEnabled.exists() && areReactionsEnabled.val())) {
             if (!sending) {
@@ -405,6 +432,7 @@ const TweetReactionController = () => {
                                     writeReaction(currentReactionCost.price);
                                 }
                             } else {
+                                console.log(currentReactionCost.price, extraTip.cost);
                                 // Reaction and extra tip are paid, write reaction
                                 writeReaction(currentReactionCost.price + extraTip.cost);
                             }

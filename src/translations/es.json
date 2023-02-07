@@ -85,7 +85,7 @@
             "ReactionsSnoozedDialog": {
                 "reactionsSnoozed": "Reactions deshabilitadas 😴",
                 "streamsHasReactionsDisabled": "El streamer deshabilito las reacciones por el momento ¡Pidele que las encienda!",
-                "understood": "Understood"
+                "understood": "Entendido"
             }
         }
     }

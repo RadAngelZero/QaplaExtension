@@ -167,16 +167,16 @@ export async function getRandomGifByLibrary(libraryName) {
 //////////////////////
 
 /**
- * Gets the price of the given reaction level and their Sku on the Twitch catalog (if it applies) (this price
+ * Listen for the price of the given reaction level and their Sku on the Twitch catalog (if it applies) (this price
  * is the one the streamer selected in their configuration)
  * @param {string} streamerUid Streamer identifier
  * @param {string} reactionLevel Reaction level name (e.g: level1)
  * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
  */
-export async function getStreamerReactionPrice(streamerUid, reactionLevel) {
+export function listenForStreamerReactionPrice(streamerUid, reactionLevel, callback) {
     const channelPrices = createChild(`/ReactionsPricesLevels/${streamerUid}/${reactionLevel}`);
 
-    return await get(query(channelPrices));
+    return onValue(query(channelPrices), callback);
 }
 
 //////////////////////
@@ -201,15 +201,15 @@ export async function getReactionPriceDefault(reactionLevel) {
 //////////////////////
 
 /**
- * Gets the price of the given reaction level for subs
+ * Listen for the price of the given reaction level for subs
  * @param {string} streamerUid Streamer identifier
  * @param {string} reactionLevel Name of reaction level
  * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
  */
-export async function getStreamerReactionPriceForSubs(streamerUid, reactionLevel) {
-    const reactionPriceLevelForSub = createChild(`/ReactionsPricesLevelsSubs/${streamerUid}/${reactionLevel}`);
+export function listenForStreamerReactionPriceForSubs(streamerUid, reactionLevel, callback) {
+    const channelPrices = createChild(`/ReactionsPricesLevelsSubs/${streamerUid}/${reactionLevel}`);
 
-    return await get(query(reactionPriceLevelForSub));
+    return onValue(query(channelPrices), callback);
 }
 
 //////////////////////
@@ -357,7 +357,8 @@ export async function sendReaction(bits, uid, userName, twitchUserName, userPhot
         twitchUserName,
         userName,
         streamerName,
-        pointsChannelInteractions
+        pointsChannelInteractions,
+        donationType: BITS
     });
 }
 
