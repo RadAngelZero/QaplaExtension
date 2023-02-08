@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import {
     Avatar,
@@ -9,7 +9,6 @@ import {
     IconButton,
     TextField,
     Typography,
-    TooltipClasses,
     tooltipClasses,
     Tooltip as MuiTooltip
 } from '@mui/material';
@@ -168,10 +167,10 @@ const ContentContainer = styled(Box)({
     flex: 1
 });
 
-const TTSContainer = styled(Box)({
+const TTSContainer = styled(Box)((props) => ({
     display: 'flex',
     flexDirection: 'column'
-});
+}));
 
 const UserMessageContainer = styled(Box)({
     display: 'flex',
@@ -246,12 +245,13 @@ const CloseIconButton = styled(IconButton)({
     padding: 0
 });
 
-const ActionsContainer = styled(Box)({
+const ActionsContainer = styled(Box)((props) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-});
+    pointerEvents: props.enabled ? 'auto' : 'none'
+}));
 
 const PricesButton = styled(Button)({
     background: '#1C1E64',
@@ -286,19 +286,21 @@ const SendButton = styled(Button)({
     }
 });
 
-const MediaSelectionContainer = styled(Box)({
+const MediaSelectionContainer = styled(Box)((props) => ({
     marginTop: '16px',
     background: '#141539',
     padding: '24px',
     display: 'flex',
-    justifyContent: 'space-between'
-});
+    justifyContent: 'space-between',
+    pointerEvents: props.enabled ? 'auto' : 'none'
+}));
 
-const MediaOptionsContainer = styled(Box)({
+const MediaOptionsContainer = styled(Box)((props) => ({
     display: 'flex',
     gap: '16px',
-    padding: '8px 0px'
-});
+    padding: '8px 0px',
+    pointerEvents: props.enabled ? 'auto' : 'none'
+}));
 
 const MediaOptionButton = styled(IconButton)({
     padding: 0,
@@ -877,6 +879,7 @@ const ExtraTipOption = ({ label, onClick, selected }) => {
 const TweetReactionView = ({
     onSend,
     sending,
+    numberOfReactions,
     message,
     setMessage,
     currentReactionCost,
@@ -907,7 +910,17 @@ const TweetReactionView = ({
     const [hoverWallet, setHoverWallet] = useState(false);
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
+    const ttsRef = useRef();
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
+
+    useEffect(() => {
+        const userTutorialsDone = localStorage.getItem('userTutorialsDone');
+        // if (!userTutorialsDone) {
+            setTooltipStep(0);
+            setOpenMenu(false);
+            localStorage.setItem('userTutorialsDone', '1');
+        // }
+    }, []);
 
     const isMediaOptionSelected = (mediaType) => {
         switch (mediaType) {
@@ -947,6 +960,14 @@ const TweetReactionView = ({
         return `linear-gradient(${angle}deg, ${colorsString})`;
     }
 
+    const onWalktroughStart = () => {
+        setTooltipStep(0);
+        setOpenMenu(false);
+        if (tipping) {
+            toggleTipping();
+        }
+    }
+
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
     const sendButtonDisabled = currentReactionCost === undefined || sending;
 
@@ -965,7 +986,7 @@ const TweetReactionView = ({
     });
 
     return (
-        <Container>
+        <Container enabled={toolTipStep === null}>
             <ContentContainer>
                 <TTSContainer>
                     <UserMessageContainer>
@@ -982,79 +1003,87 @@ const TweetReactionView = ({
                             <UserImage
                                 src={userImage} />
                         }
-                        <MessageContainer>
-                            {!custom3DText ?
-                                <>
-                                    <MessageInput variant='standard'
-                                        InputProps={{
-                                            disableUnderline: true,
-                                            style: {
-                                                fontSize: '22px',
-                                                fontWeight: '400',
-                                                color: '#FFF',
-                                                '&::placeholder': {
-                                                    color: '#C2C2C2'
-                                                },
-                                                padding: 0
-                                            }
-                                        }}
-                                        // eslint-disable-next-line
-                                        inputProps={{ maxLength: 100 }}
-                                        multiline
-                                        placeholder={t('typeToCreateTTS')}
-                                        fullWidth
-                                        autoFocus
-                                        value={message}
-                                        onChange={(e) => setMessage(e.target.value)} />
-                                    {!message &&
-                                        <QaplaTooltipZero open={toolTipStep === 0} placement="bottom-start" arrow title={
-                                            <React.Fragment>
-                                                <QaplaTooltipText>Start typing to send a <QaplaToooltipTextHighlight>Text-to-Speech</QaplaToooltipTextHighlight> using your custom avi</QaplaTooltipText>
-                                                <Next style={{
-                                                    position: 'absolute',
-                                                    right: '12px',
-                                                    bottom: '12px',
-                                                    cursor: 'pointer',
-                                                }} onClick={() => {
-                                                    setTooltipStep(toolTipStep + 1);
-                                                }} />
-                                            </React.Fragment>
-                                        } >
-                                            <OptionalLabel>
-                                                {t('optional')}
-                                            </OptionalLabel>
-                                        </QaplaTooltipZero>
-                                    }
-                                </>
-                                :
-                                <Custom3DTextContainer>
-                                    <img src={custom3DText.url}
-                                        style={{
-                                            width: window.innerWidth * .5,
-                                            aspectRatio: custom3DText.width / custom3DText.height
-                                        }}
-                                        alt={message} />
-                                    <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
-                                        <EditCircle />
-                                    </Edit3DTextButton>
-                                    <Remove3DTextButton onClick={onRemoveCustom3DText}>
-                                        <Close style={{
-                                            height: 24,
-                                            width: 24
-                                        }} />
-                                    </Remove3DTextButton>
-                                </Custom3DTextContainer>
-                            }
-                        </MessageContainer>
+
+                        <QaplaTooltipZero open={toolTipStep === 0} placement="bottom-start" arrow title={
+                            <React.Fragment>
+                                <QaplaTooltipText>
+                                    Start typing to send a
+                                    <QaplaToooltipTextHighlight>
+                                        Text-to-Speech
+                                    </QaplaToooltipTextHighlight>
+                                    using your custom avi
+                                </QaplaTooltipText>
+                                <Next style={{
+                                    position: 'absolute',
+                                    right: '12px',
+                                    bottom: '12px',
+                                    cursor: 'pointer',
+                                }} onClick={() => {
+                                    setTooltipStep(toolTipStep + 1);
+                                }} />
+                            </React.Fragment>
+                        }>
+                            <MessageContainer>
+                                {!custom3DText ?
+                                    <>
+                                        <MessageInput variant='standard'
+                                            InputProps={{
+                                                disableUnderline: true,
+                                                style: {
+                                                    fontSize: '22px',
+                                                    fontWeight: '400',
+                                                    color: '#FFF',
+                                                    caretColor: toolTipStep === null ? '#FFF' : 'transparent',
+                                                    '&::placeholder': {
+                                                        color: '#C2C2C2'
+                                                    },
+                                                    padding: 0
+                                                }
+                                            }}
+                                            // eslint-disable-next-line
+                                            inputProps={{ maxLength: 100 }}
+                                            multiline
+                                            placeholder={t('typeToCreateTTS')}
+                                            fullWidth
+                                            autoFocus
+                                            value={message}
+                                            inputRef={ttsRef}
+                                            onChange={(e) => toolTipStep === null ? setMessage(e.target.value) : null} />
+                                        {!message &&
+                                                <OptionalLabel>
+                                                    {t('optional')}
+                                                </OptionalLabel>
+                                        }
+                                    </>
+                                    :
+                                    <Custom3DTextContainer>
+                                        <img src={custom3DText.url}
+                                            style={{
+                                                width: window.innerWidth * .5,
+                                                aspectRatio: custom3DText.width / custom3DText.height
+                                            }}
+                                            alt={message} />
+                                        <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
+                                            <EditCircle />
+                                        </Edit3DTextButton>
+                                        <Remove3DTextButton onClick={onRemoveCustom3DText}>
+                                            <Close style={{
+                                                height: 24,
+                                                width: 24
+                                            }} />
+                                        </Remove3DTextButton>
+                                    </Custom3DTextContainer>
+                                }
+                            </MessageContainer>
+                        </QaplaTooltipZero>
                         <MenuPopUp open={openMenu} placement="bottom-end" title={
                             <React.Fragment>
                                 <MenuOptionsContainer>
-                                    <MenuOption onClick={() => {
-                                        setTooltipStep(0);
-                                        setOpenMenu(false);
-                                    }}>
+                                    <MenuOption onClick={onWalktroughStart}>
                                         <MenuOptionEmoji>
-                                            🦮
+                                            <span role='img' aria-label='Walkthrough'>
+                                                🦮
+                                            </span>
                                         </MenuOptionEmoji>
                                         <MenuOptionText>Extension Walkthrough</MenuOptionText>
                                     </MenuOption>
@@ -1062,7 +1091,9 @@ const TweetReactionView = ({
                                         window.open('https://web.qapla.gg/hub/how', '_blank');
                                     }}>
                                         <MenuOptionEmoji>
-                                            🎥
+                                            <span role='img' aria-label='Tutorials'>
+                                                🎥
+                                            </span>
                                         </MenuOptionEmoji>
                                         <MenuOptionText>Tutorials</MenuOptionText>
                                         <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
@@ -1071,7 +1102,9 @@ const TweetReactionView = ({
                                         window.open('https://web.qapla.gg/hub/avatar', '_blank');
                                     }}>
                                         <MenuOptionEmoji>
-                                            👽
+                                            <span role='img' aria-label='Avatar'>
+                                                👽
+                                            </span>
                                         </MenuOptionEmoji>
                                         <MenuOptionText>Edit Avatar</MenuOptionText>
                                         <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
@@ -1081,7 +1114,9 @@ const TweetReactionView = ({
                                         window.open('https://www.discord.gg/6GBHn78', '_blank');
                                     }}>
                                         <MenuOptionEmoji>
-                                            💬
+                                            <span role='img' aria-label='Support'>
+                                                💬
+                                            </span>
                                         </MenuOptionEmoji>
                                         <MenuOptionText>Support</MenuOptionText>
                                         <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
@@ -1099,7 +1134,10 @@ const TweetReactionView = ({
                                     <React.Fragment>
                                         <QaplaTooltipText>{`You can always re-do this walkthrough.\n\nOr watch our wiki videos on YT`}</QaplaTooltipText>
                                         <QaplaTooltipDoneButton onClick={() => {
-                                            setTooltipStep(toolTipStep + 1);
+                                            // Last step so we set the step to null
+                                            setTooltipStep(null);
+                                            // Set the focus on TTS text input
+                                            ttsRef.current.focus();
                                         }} >
                                             {`Done`}
                                         </QaplaTooltipDoneButton>
@@ -1170,7 +1208,7 @@ const TweetReactionView = ({
                     }
                 </SelectedMediaContainer>
                 {!tipping ?
-                    <ActionsContainer>
+                    <ActionsContainer enabled={toolTipStep === null}>
                         {currentReactionCost &&
                             <>
                                 <QaplaTooltipTwo open={toolTipStep === 2} placement="top-start" arrow title={
@@ -1203,7 +1241,7 @@ const TweetReactionView = ({
                                             setTooltipStep(toolTipStep + 1);
                                         }} />
                                     </React.Fragment>
-                                } >
+                                }>
                                     <WalletContainer onMouseEnter={() => { setHoverWallet(true); }} onMouseLeave={() => { setHoverWallet(false); }}>
                                         <Wallet style={{ opacity: hoverWallet || toolTipStep === 3 ? 0.6 : 0.4 }} />
                                         <WalletText style={{
@@ -1219,11 +1257,11 @@ const TweetReactionView = ({
                                             marginLeft: '4px',
                                             opacity: hoverWallet || toolTipStep === 3 ? 1 : 0,
                                         }}>
-                                            0
+                                            {numberOfReactions}
                                         </WalletText>
                                     </WalletContainer>
                                 </QaplaTooltipThree>
-                                <SendButton onClick={onSend}
+                                <SendButton onClick={() => { onSend(); ttsRef.current.focus() }}
                                     disabled={sendButtonDisabled}>
                                     {t('send')}
                                 </SendButton>
@@ -1254,10 +1292,10 @@ const TweetReactionView = ({
                     }} />
                 </React.Fragment>
             } >
-                <MediaSelectionContainer>
+                <MediaSelectionContainer enabled={toolTipStep === null}>
                     {!tipping ?
                         <>
-                            <MediaOptionsContainer>
+                            <MediaOptionsContainer enabled={toolTipStep === null}>
                                 {mediaSelectorBarOptions.map((mediaType, index) => (
                                     <MediaOption key={mediaType}
                                         index={index}
@@ -1323,7 +1361,7 @@ const TweetReactionView = ({
                     }
                 </MediaSelectionContainer>
             </QaplaTooltipOne>
-        </Container >
+        </Container>
     );
 }
 
