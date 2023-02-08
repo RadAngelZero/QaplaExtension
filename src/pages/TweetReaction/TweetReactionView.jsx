@@ -29,6 +29,7 @@ import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
 import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
 import { ReactComponent as Next } from './../../assets/Icons/Next.svg';
+import { ReactComponent as Ok } from './../../assets/Icons/Ok.svg';
 import { ReactComponent as Wallet } from './../../assets/Icons/Wallet.svg';
 import { ReactComponent as Menu } from './../../assets/Icons/Menu.svg';
 import { ReactComponent as CloseMenu } from './../../assets/Icons/CloseMenu.svg';
@@ -731,7 +732,7 @@ const AvatartTipOnMenu = styled(({ className, ...props }) => (
     [`& .${tooltipClasses.tooltip}`]: {
         backgroundColor: '#3B4BF9',
         maxWidth: '200px',
-        // height: '196px',
+        height: '154px',
         padding: '15px',
         paddingRight: '30px',
         borderRadius: '20px',
@@ -943,11 +944,17 @@ const TweetReactionView = ({
 
     useEffect(() => {
         const userTutorialsDone = localStorage.getItem('userTutorialsDone');
-        // if (!userTutorialsDone) {
+        if (!userTutorialsDone) {
             setTooltipStep(0);
             setOpenMenu(false);
             localStorage.setItem('userTutorialsDone', '1');
-        // }
+        } else if (userTutorialsDone === '1') {
+            setOpenMenu(true);
+            setTimeout(() => {
+                setOpenAvatarTip(true);
+            }, 250);
+            localStorage.setItem('userTutorialsDone', '2');
+        }
     }, []);
 
     const isMediaOptionSelected = (mediaType) => {
@@ -996,6 +1003,12 @@ const TweetReactionView = ({
         }
     }
 
+    const onAvatarTooltipClose = () => {
+        setOpenAvatarTip(false);
+        setOpenMenu(false);
+        ttsRef.current.focus();
+    }
+
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
     const sendButtonDisabled = currentReactionCost === undefined || sending;
 
@@ -1013,8 +1026,11 @@ const TweetReactionView = ({
         item.Icon = mediaOptionsData[item.type].Icon;
     });
 
+    // Enable UI only if no tooltips tutorials are open
+    const enableUI = toolTipStep === null && !openAvatarTip;
+
     return (
-        <Container enabled={toolTipStep === null}>
+        <Container enabled={enableUI}>
             <ContentContainer>
                 <TTSContainer>
                     <UserMessageContainer>
@@ -1032,7 +1048,7 @@ const TweetReactionView = ({
                                 src={userImage} />
                         }
 
-                        <QaplaTooltipZero open={toolTipStep === 0} placement="bottom-start" arrow title={
+                        <QaplaTooltipZero open={toolTipStep === 0} placement='bottom-start' arrow title={
                             <React.Fragment>
                                 <QaplaTooltipText>
                                     Start typing to send a
@@ -1061,7 +1077,7 @@ const TweetReactionView = ({
                                                     fontSize: '22px',
                                                     fontWeight: '400',
                                                     color: '#FFF',
-                                                    caretColor: toolTipStep === null ? '#FFF' : 'transparent',
+                                                    caretColor: enableUI ? '#FFF' : 'transparent',
                                                     '&::placeholder': {
                                                         color: '#C2C2C2'
                                                     },
@@ -1076,7 +1092,7 @@ const TweetReactionView = ({
                                             autoFocus
                                             value={message}
                                             inputRef={ttsRef}
-                                            onChange={(e) => toolTipStep === null ? setMessage(e.target.value) : null} />
+                                            onChange={(e) => enableUI ? setMessage(e.target.value) : null} />
                                         {!message &&
                                                 <OptionalLabel>
                                                     {t('optional')}
@@ -1104,7 +1120,7 @@ const TweetReactionView = ({
                                 }
                             </MessageContainer>
                         </QaplaTooltipZero>
-                        <MenuPopUp open={openMenu} placement="bottom-end" title={
+                        <MenuPopUp open={openMenu} placement='bottom-end' title={
                             <React.Fragment>
                                 <MenuOptionsContainer>
                                     <MenuOption onClick={onWalktroughStart}
@@ -1127,13 +1143,26 @@ const TweetReactionView = ({
                                         <MenuOptionText>Tutorials</MenuOptionText>
                                         <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
                                     </MenuOption>
-                                    <AvatartTipOnMenu open={openAvatarTip} placement="left" arrow title={
+                                    <AvatartTipOnMenu open={openAvatarTip} placement='left' arrow title={
                                         <React.Fragment>
-                                            <QaplaTooltipText>{`Create your avatar and`} <QaplaToooltipTextHighlight>{`show off your virtual identity`}</QaplaToooltipTextHighlight> {`in all your reactions`}</QaplaTooltipText>
+                                            <QaplaTooltipText>
+                                                {`Create your avatar and`}
+                                                <QaplaToooltipTextHighlight>
+                                                    {`show off your virtual identity`}
+                                                </QaplaToooltipTextHighlight>
+                                                {`in all your reactions`}
+                                            </QaplaTooltipText>
+                                            <Ok style={{
+                                                position: 'absolute',
+                                                right: '12px',
+                                                bottom: '12px',
+                                                cursor: 'pointer',
+                                            }} onClick={onAvatarTooltipClose} />
                                         </React.Fragment>
-                                    } >
+                                    }>
                                         <MenuOption onClick={() => {
                                             window.open('https://web.qapla.gg/hub/avatar', '_blank');
+                                            onAvatarTooltipClose();
                                         }}>
                                             <MenuOptionEmoji>
                                                 👽
@@ -1162,7 +1191,7 @@ const TweetReactionView = ({
                                 }}>
                                     Menu
                                 </MenuHintText>
-                                <QaplaTooltipFive open={toolTipStep === 5} placement="bottom-start" arrow title={
+                                <QaplaTooltipFive open={toolTipStep === 5} placement='bottom-start' arrow title={
                                     <React.Fragment>
                                         <QaplaTooltipText>{`You can always re-do this walkthrough.\n\nOr watch our wiki videos on YT`}</QaplaTooltipText>
                                         <QaplaTooltipDoneButton onClick={() => {
@@ -1178,7 +1207,7 @@ const TweetReactionView = ({
                                     <div
                                         onMouseEnter={() => { setHoverMenu(true); }}
                                         onMouseLeave={() => { setHoverMenu(false); }}
-                                        onClick={() => { if (toolTipStep === null || toolTipStep > 5) setOpenMenu(!openMenu) }}
+                                        onClick={() => { if (enableUI) setOpenMenu(!openMenu) }}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         {openMenu ?
@@ -1240,10 +1269,10 @@ const TweetReactionView = ({
                     }
                 </SelectedMediaContainer>
                 {!tipping ?
-                    <ActionsContainer enabled={toolTipStep === null}>
+                    <ActionsContainer enabled={enableUI}>
                         {currentReactionCost &&
                             <>
-                                <QaplaTooltipTwo open={toolTipStep === 2} placement="top-start" arrow title={
+                                <QaplaTooltipTwo open={toolTipStep === 2} placement='top-start' arrow title={
                                     <React.Fragment>
                                         <QaplaTooltipTextTwo>{`Here you can see the Reaction Tier `}<QaplaToooltipTextHighlight>{`price in Bits or Zaps`}</QaplaToooltipTextHighlight>{`\n\nClick to expand to upgrade or downgrade your reaction`}</QaplaTooltipTextTwo>
                                         <Next style={{
@@ -1261,7 +1290,7 @@ const TweetReactionView = ({
                                         {currentReactionCost && currentReactionCost.price.toLocaleString()}
                                     </PricesButton>
                                 </QaplaTooltipTwo>
-                                <QaplaTooltipThree open={toolTipStep === 3} placement="top-start" arrow title={
+                                <QaplaTooltipThree open={toolTipStep === 3} placement='top-start' arrow title={
                                     <React.Fragment>
                                         <QaplaTooltipTextTwo>{`Use your channel points to get Zap channel rewards\n\nHover over the wallet icon to see how many `}<QaplaToooltipTextHighlight>{`Zaps you have`}</QaplaToooltipTextHighlight>{``}</QaplaTooltipTextTwo>
                                         <Next style={{
@@ -1311,7 +1340,7 @@ const TweetReactionView = ({
                     </TipContainer>
                 }
             </ContentContainer>
-            <QaplaTooltipOne open={toolTipStep === 1} placement="top-start" arrow title={
+            <QaplaTooltipOne open={toolTipStep === 1} placement='top-start' arrow title={
                 <React.Fragment>
                     <QaplaTooltipText>Customize your reaction using the <QaplaToooltipTextHighlight>Add-ons</QaplaToooltipTextHighlight> Bar</QaplaTooltipText>
                     <Next style={{
@@ -1324,10 +1353,10 @@ const TweetReactionView = ({
                     }} />
                 </React.Fragment>
             } >
-                <MediaSelectionContainer enabled={toolTipStep === null}>
+                <MediaSelectionContainer enabled={enableUI}>
                     {!tipping ?
                         <>
-                            <MediaOptionsContainer enabled={toolTipStep === null}>
+                            <MediaOptionsContainer enabled={enableUI}>
                                 {mediaSelectorBarOptions.map((mediaType, index) => (
                                     <MediaOption key={mediaType}
                                         index={index}
@@ -1356,7 +1385,7 @@ const TweetReactionView = ({
                                         onTooltipClick={onUpgradeReaction} />
                                 ))}
                             </MediaOptionsContainer>
-                            <QaplaTooltipFour open={toolTipStep === 4} placement="top-end" arrow title={
+                            <QaplaTooltipFour open={toolTipStep === 4} placement='top-end' arrow title={
                                 <React.Fragment>
                                     <QaplaTooltipText><QaplaToooltipTextHighlight>{`Send Cheers`}</QaplaToooltipTextHighlight>{` to your streamer adding extra Bits to your Reaction`}</QaplaTooltipText>
                                     <Next style={{
