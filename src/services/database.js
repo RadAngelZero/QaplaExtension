@@ -167,16 +167,16 @@ export async function getRandomGifByLibrary(libraryName) {
 //////////////////////
 
 /**
- * Gets the price of the given reaction level and their Sku on the Twitch catalog (if it applies) (this price
+ * Listen for the price of the given reaction level and their Sku on the Twitch catalog (if it applies) (this price
  * is the one the streamer selected in their configuration)
  * @param {string} streamerUid Streamer identifier
  * @param {string} reactionLevel Reaction level name (e.g: level1)
  * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
  */
-export async function getStreamerReactionPrice(streamerUid, reactionLevel) {
+export function listenForStreamerReactionPrice(streamerUid, reactionLevel, callback) {
     const channelPrices = createChild(`/ReactionsPricesLevels/${streamerUid}/${reactionLevel}`);
 
-    return await get(query(channelPrices));
+    return onValue(query(channelPrices), callback);
 }
 
 //////////////////////
@@ -201,15 +201,15 @@ export async function getReactionPriceDefault(reactionLevel) {
 //////////////////////
 
 /**
- * Gets the price of the given reaction level for subs
+ * Listen for the price of the given reaction level for subs
  * @param {string} streamerUid Streamer identifier
  * @param {string} reactionLevel Name of reaction level
  * @returns {Promise<DataSnapshot>} Resulting DataSnapshot of the query
  */
-export async function getStreamerReactionPriceForSubs(streamerUid, reactionLevel) {
-    const reactionPriceLevelForSub = createChild(`/ReactionsPricesLevelsSubs/${streamerUid}/${reactionLevel}`);
+export function listenForStreamerReactionPriceForSubs(streamerUid, reactionLevel, callback) {
+    const channelPrices = createChild(`/ReactionsPricesLevelsSubs/${streamerUid}/${reactionLevel}`);
 
-    return await get(query(reactionPriceLevelForSub));
+    return onValue(query(channelPrices), callback);
 }
 
 //////////////////////
@@ -315,15 +315,17 @@ export function getAvailableExtraTips() {
  * @param {object | undefined} avatarBackground Avatar background data
  * @param {number} avatarBackground.angle Avatar gradient angle
  * @param {Array<string>} avatarBackground.colors Array of colors for gradient background
+ * @param {string | undefined} avatarAnimationId Avatar animation identifier
  * @param {boolean} pointsChannelInteractions True if reaction was sent with channel points
  */
-export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, pointsChannelInteractions, zapsToRemove) {
+export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, avatarAnimationId, pointsChannelInteractions) {
     const streamerDonations = createChild(`/StreamersDonations/${streamerUid}`);
 
     const reactionReference = await push(streamerDonations, {
         avatar: {
             avatarId: avatarId ? avatarId : null,
-            avatarBackground: avatarBackground ? avatarBackground : null
+            avatarBackground: avatarBackground ? avatarBackground : null,
+            avatarAnimationId: avatarAnimationId ? avatarAnimationId : null
         },
         /**
          * amountQoins and donationType are filled even if the reaction is sent free with reaction points, our
@@ -355,6 +357,36 @@ export async function sendReaction(bits, uid, userName, twitchUserName, userPhot
         twitchUserName,
         userName,
         streamerName,
-        pointsChannelInteractions
+        pointsChannelInteractions,
+        donationType: BITS
     });
+}
+
+//////////////////////
+// Avatars Animations Overlay
+//////////////////////
+
+/**
+ * Get the full list of avatars animations
+ * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
+ */
+export async function getAnimationsData() {
+    const animations = child(database, `/AvatarsAnimationsOverlay`);
+
+    return get(query(animations));
+}
+
+//////////////////////
+// Streamer Alerts Settings
+//////////////////////
+
+/**
+ * Gets the reactionsEnabled flag from the given streamer
+ * @param {string} streamerUid Streamer identifier
+ * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
+ */
+export async function getAreReactionsEnabledFlag(streamerUid) {
+    const reactionsEnabled = child(database, `/StreamerAlertsSettings/${streamerUid}/reactionsEnabled`);
+
+    return get(query(reactionsEnabled));
 }
