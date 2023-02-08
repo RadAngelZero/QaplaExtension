@@ -1130,7 +1130,9 @@ const TweetReactionView = ({
                                                 🦮
                                             </span>
                                         </MenuOptionEmoji>
-                                        <MenuOptionText>Extension Walkthrough</MenuOptionText>
+                                        <MenuOptionText>
+                                            {t('menu.walkthrough')}
+                                        </MenuOptionText>
                                     </MenuOption>
                                     <MenuOption onClick={() => {
                                         window.open('https://web.qapla.gg/hub/how', '_blank');
@@ -1140,18 +1142,30 @@ const TweetReactionView = ({
                                                 🎥
                                             </span>
                                         </MenuOptionEmoji>
-                                        <MenuOptionText>Tutorials</MenuOptionText>
+                                        <MenuOptionText>
+                                            {t('menu.tutorials')}
+                                        </MenuOptionText>
                                         <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
                                     </MenuOption>
                                     <AvatartTipOnMenu open={openAvatarTip} placement='left' arrow title={
                                         <React.Fragment>
-                                            <QaplaTooltipText>
-                                                {t('createAvatarTooltip.textP1')}
-                                                <QaplaToooltipTextHighlight>
-                                                    {t('createAvatarTooltip.textP2')}
-                                                </QaplaToooltipTextHighlight>
-                                                {t('createAvatarTooltip.textP3')}
-                                            </QaplaTooltipText>
+                                            {avatarId ?
+                                                <QaplaTooltipText>
+                                                    {t('createAvatarTooltip.editAvatarTextP1')}
+                                                    <QaplaToooltipTextHighlight>
+                                                        {t('createAvatarTooltip.editAvatarTextP2')}
+                                                    </QaplaToooltipTextHighlight>
+                                                    {t('createAvatarTooltip.editAvatarTextP3')}
+                                                </QaplaTooltipText>
+                                                :
+                                                <QaplaTooltipText>
+                                                    {t('createAvatarTooltip.createAvatarTextP1')}
+                                                    <QaplaToooltipTextHighlight>
+                                                        {t('createAvatarTooltip.createAvatarTextP2')}
+                                                    </QaplaToooltipTextHighlight>
+                                                    {t('createAvatarTooltip.createAvatarTextP3')}
+                                                </QaplaTooltipText>
+                                            }
                                             <Ok style={{
                                                 position: 'absolute',
                                                 right: '12px',
@@ -1165,9 +1179,17 @@ const TweetReactionView = ({
                                             onAvatarTooltipClose();
                                         }}>
                                             <MenuOptionEmoji>
-                                                👽
+                                                <span role='img' aria-label='Avatar'>
+                                                    👽
+                                                </span>
                                             </MenuOptionEmoji>
-                                            <MenuOptionText>Edit Avatar</MenuOptionText>
+                                            <MenuOptionText>
+                                                {avatarId ?
+                                                    t('menu.editAvatar')
+                                                    :
+                                                    t('menu.createAvatar')
+                                                }
+                                            </MenuOptionText>
                                             <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
                                         </MenuOption>
                                     </AvatartTipOnMenu>
@@ -1179,7 +1201,9 @@ const TweetReactionView = ({
                                                 💬
                                             </span>
                                         </MenuOptionEmoji>
-                                        <MenuOptionText>Support</MenuOptionText>
+                                        <MenuOptionText>
+                                            {t('menu.support')}
+                                        </MenuOptionText>
                                         <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
                                     </MenuOption>
                                 </MenuOptionsContainer>

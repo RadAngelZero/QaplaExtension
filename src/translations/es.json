@@ -21,6 +21,13 @@
             "upgradeToUse": "👀 Sube de nivel tu tu reacción para usar ",
             "contentAvailableWhenUpgradeTo2": "Voz de bot para TTS, Avatar Animado & Texto 3D",
             "contentAvailableWhenUpgradeTo3": "Animaciones de Emotes",
+            "menu": {
+                "walkthrough": "Tutorial de la Extensión",
+                "tutorials": "+ Tutoriales",
+                "createAvatar": "Crear Avatar",
+                "editAvatar": "Editar Avatar",
+                "support": "Soporte"
+            },
             "QaplaTooltipZero": {
                 "textP1": "Comienza a escribir para enviar un",
                 "textP2": " Text-to-Speech ",
@@ -50,9 +57,12 @@
                 "done": "Listo"
             },
             "createAvatarTooltip": {
-                "textP1": "Crea tu avatar y",
-                "textP2": " muestra tu identidad virtual ",
-                "textP3": "en todas tus reacciones"
+                "createAvatarTextP1": "Crea tu avatar y",
+                "createAvatarTextP2": " muestra tu identidad virtual ",
+                "createAvatarTextP3": "en todas tus reacciones",
+                "editAvatarTextP1": "Siempre puedes",
+                "editAvatarTextP2": " editar tu avatar ",
+                "editAvatarTextP3": "desde este menu"
             }
         },
         "dialogs": {
