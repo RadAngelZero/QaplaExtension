@@ -20,7 +20,40 @@
             "use": "Use {{mediaType}}",
             "upgradeToUse": "👀 Upgrade your reaction to use ",
             "contentAvailableWhenUpgradeTo2": "TTS Bot Voice, Animated Avatar & 3D Text",
-            "contentAvailableWhenUpgradeTo3": "Emotes Animations"
+            "contentAvailableWhenUpgradeTo3": "Emotes Animations",
+            "QaplaTooltipZero": {
+                "textP1": "Start typing to send a",
+                "textP2": " Text-to-Speech ",
+                "textP3": "using your custom avi"
+            },
+            "QaplaTooltipOne": {
+                "textP1": "Customize your reaction using the",
+                "textP2": " Add-ons ",
+                "textP3": "Bar"
+            },
+            "QaplaTooltipTwo": {
+                "textP1": "Here you can see the Reaction Tier",
+                "textP2": " price in Bits or Zaps",
+                "textP3": "",
+                "textP4": "\n\nClick to expand to upgrade or downgrade your reaction"
+            },
+            "QaplaTooltipThree": {
+                "textP1": "Use your channel points to get Zap channel rewards\n\nHover over the wallet icon to see how many ",
+                "textP2": "Zaps you have"
+            },
+            "QaplaTooltipFour": {
+                "textP1": "Send Extra Bits",
+                "textP2": " to your streamer with your Reaction"
+            },
+            "QaplaTooltipFive": {
+                "textP1": "You can always re-do this walkthrough.\n\nOr watch our wiki videos on YT",
+                "done": "Done"
+            },
+            "createAvatarTooltip": {
+                "textP1": "Create your avatar and",
+                "textP2": " show off your virtual identity ",
+                "textP3": "in all your reactions"
+            }
         },
         "dialogs": {
             "GiphyMediaSelectorDialog": {

@@ -1012,6 +1012,9 @@ const TweetReactionView = ({
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
     const sendButtonDisabled = currentReactionCost === undefined || sending;
 
+    // Enable UI only if no tooltips tutorials are open
+    const enableUI = toolTipStep === null && !openAvatarTip;
+
     let pills = [
         voiceBot,
         emoteRaid,
@@ -1025,9 +1028,6 @@ const TweetReactionView = ({
     pills.forEach((item) => {
         item.Icon = mediaOptionsData[item.type].Icon;
     });
-
-    // Enable UI only if no tooltips tutorials are open
-    const enableUI = toolTipStep === null && !openAvatarTip;
 
     return (
         <Container enabled={enableUI}>
@@ -1051,11 +1051,11 @@ const TweetReactionView = ({
                         <QaplaTooltipZero open={toolTipStep === 0} placement='bottom-start' arrow title={
                             <React.Fragment>
                                 <QaplaTooltipText>
-                                    Start typing to send a
+                                    {t('QaplaTooltipZero.textP1')}
                                     <QaplaToooltipTextHighlight>
-                                        Text-to-Speech
+                                        {t('QaplaTooltipZero.textP2')}
                                     </QaplaToooltipTextHighlight>
-                                    using your custom avi
+                                    {t('QaplaTooltipZero.textP3')}
                                 </QaplaTooltipText>
                                 <Next style={{
                                     position: 'absolute',
@@ -1146,11 +1146,11 @@ const TweetReactionView = ({
                                     <AvatartTipOnMenu open={openAvatarTip} placement='left' arrow title={
                                         <React.Fragment>
                                             <QaplaTooltipText>
-                                                {`Create your avatar and`}
+                                                {t('createAvatarTooltip.textP1')}
                                                 <QaplaToooltipTextHighlight>
-                                                    {`show off your virtual identity`}
+                                                    {t('createAvatarTooltip.textP2')}
                                                 </QaplaToooltipTextHighlight>
-                                                {`in all your reactions`}
+                                                {t('createAvatarTooltip.textP3')}
                                             </QaplaTooltipText>
                                             <Ok style={{
                                                 position: 'absolute',
@@ -1193,14 +1193,16 @@ const TweetReactionView = ({
                                 </MenuHintText>
                                 <QaplaTooltipFive open={toolTipStep === 5} placement='bottom-start' arrow title={
                                     <React.Fragment>
-                                        <QaplaTooltipText>{`You can always re-do this walkthrough.\n\nOr watch our wiki videos on YT`}</QaplaTooltipText>
+                                        <QaplaTooltipText>
+                                            {t('QaplaTooltipFive.textP1')}
+                                        </QaplaTooltipText>
                                         <QaplaTooltipDoneButton onClick={() => {
                                             // Last step so we set the step to null
                                             setTooltipStep(null);
                                             // Set the focus on TTS text input
                                             ttsRef.current.focus();
                                         }} >
-                                            {`Done`}
+                                            {t('QaplaTooltipFive.done')}
                                         </QaplaTooltipDoneButton>
                                     </React.Fragment>
                                 } >
@@ -1274,7 +1276,14 @@ const TweetReactionView = ({
                             <>
                                 <QaplaTooltipTwo open={toolTipStep === 2} placement='top-start' arrow title={
                                     <React.Fragment>
-                                        <QaplaTooltipTextTwo>{`Here you can see the Reaction Tier `}<QaplaToooltipTextHighlight>{`price in Bits or Zaps`}</QaplaToooltipTextHighlight>{`\n\nClick to expand to upgrade or downgrade your reaction`}</QaplaTooltipTextTwo>
+                                        <QaplaTooltipTextTwo>
+                                            {t('QaplaTooltipTwo.textP1')}
+                                            <QaplaToooltipTextHighlight>
+                                                {t('QaplaTooltipTwo.textP2')}
+                                            </QaplaToooltipTextHighlight>
+                                            {t('QaplaTooltipTwo.textP3')}
+                                            {t('QaplaTooltipTwo.textP4')}
+                                        </QaplaTooltipTextTwo>
                                         <Next style={{
                                             position: 'absolute',
                                             right: '12px',
@@ -1284,7 +1293,7 @@ const TweetReactionView = ({
                                             setTooltipStep(toolTipStep + 1);
                                         }} />
                                     </React.Fragment>
-                                } >
+                                }>
                                     <PricesButton startIcon={currentReactionCost.type === ZAP ? <Interactions /> : <Bits />}
                                         onClick={onChangeReactionLevel}>
                                         {currentReactionCost && currentReactionCost.price.toLocaleString()}
@@ -1292,7 +1301,12 @@ const TweetReactionView = ({
                                 </QaplaTooltipTwo>
                                 <QaplaTooltipThree open={toolTipStep === 3} placement='top-start' arrow title={
                                     <React.Fragment>
-                                        <QaplaTooltipTextTwo>{`Use your channel points to get Zap channel rewards\n\nHover over the wallet icon to see how many `}<QaplaToooltipTextHighlight>{`Zaps you have`}</QaplaToooltipTextHighlight>{``}</QaplaTooltipTextTwo>
+                                        <QaplaTooltipTextTwo>
+                                            {t('QaplaTooltipThree.textP1')}
+                                            <QaplaToooltipTextHighlight>
+                                                {t('QaplaTooltipThree.textP2')}
+                                            </QaplaToooltipTextHighlight>
+                                        </QaplaTooltipTextTwo>
                                         <Next style={{
                                             position: 'absolute',
                                             right: '12px',
@@ -1342,7 +1356,13 @@ const TweetReactionView = ({
             </ContentContainer>
             <QaplaTooltipOne open={toolTipStep === 1} placement='top-start' arrow title={
                 <React.Fragment>
-                    <QaplaTooltipText>Customize your reaction using the <QaplaToooltipTextHighlight>Add-ons</QaplaToooltipTextHighlight> Bar</QaplaTooltipText>
+                    <QaplaTooltipText>
+                        {t('QaplaTooltipOne.textP1')}
+                        <QaplaToooltipTextHighlight>
+                            {t('QaplaTooltipOne.textP2')}
+                        </QaplaToooltipTextHighlight>
+                        {t('QaplaTooltipOne.textP3')}
+                    </QaplaTooltipText>
                     <Next style={{
                         position: 'absolute',
                         right: '12px',
@@ -1387,7 +1407,12 @@ const TweetReactionView = ({
                             </MediaOptionsContainer>
                             <QaplaTooltipFour open={toolTipStep === 4} placement='top-end' arrow title={
                                 <React.Fragment>
-                                    <QaplaTooltipText><QaplaToooltipTextHighlight>{`Send Cheers`}</QaplaToooltipTextHighlight>{` to your streamer adding extra Bits to your Reaction`}</QaplaTooltipText>
+                                    <QaplaTooltipText>
+                                        <QaplaToooltipTextHighlight>
+                                            {t('QaplaTooltipFour.textP1')}
+                                        </QaplaToooltipTextHighlight>
+                                        {t('QaplaTooltipFour.textP2')}
+                                    </QaplaTooltipText>
                                     <Next style={{
                                         position: 'absolute',
                                         right: '12px',
