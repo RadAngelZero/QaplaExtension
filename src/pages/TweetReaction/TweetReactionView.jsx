@@ -725,6 +725,33 @@ const MenuPopUp = styled(({ className, ...props }) => (
     },
 }));
 
+const AvatartTipOnMenu = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#3B4BF9',
+        maxWidth: '200px',
+        // height: '196px',
+        padding: '15px',
+        paddingRight: '30px',
+        borderRadius: '20px',
+        display: 'flex',
+        right: '25px',
+        boxSizing: 'border-box',
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: '#3B4BF9',
+        right: '-6px !important',
+        width: '15px !important',
+        height: '25px !important',
+        // top: '-20px !important',
+        '&::before': {
+            color: '#3B4BF9',
+            borderRadius: '5px',
+        },
+    },
+}));
+
 const MenuOptionsContainer = styled(Box)({
     display: 'flex',
     flexDirection: 'column',
@@ -910,6 +937,7 @@ const TweetReactionView = ({
     const [hoverWallet, setHoverWallet] = useState(false);
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
+    const [openAvatarTip, setOpenAvatarTip] = useState(false);
     const ttsRef = useRef();
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
 
@@ -1079,7 +1107,8 @@ const TweetReactionView = ({
                         <MenuPopUp open={openMenu} placement="bottom-end" title={
                             <React.Fragment>
                                 <MenuOptionsContainer>
-                                    <MenuOption onClick={onWalktroughStart}>
+                                    <MenuOption onClick={onWalktroughStart}
+                                        style={{ opacity: openAvatarTip ? 0.6 : 1 }}>
                                         <MenuOptionEmoji>
                                             <span role='img' aria-label='Walkthrough'>
                                                 🦮
@@ -1089,7 +1118,7 @@ const TweetReactionView = ({
                                     </MenuOption>
                                     <MenuOption onClick={() => {
                                         window.open('https://web.qapla.gg/hub/how', '_blank');
-                                    }}>
+                                    }} style={{ opacity: openAvatarTip ? 0.6 : 1 }}>
                                         <MenuOptionEmoji>
                                             <span role='img' aria-label='Tutorials'>
                                                 🎥
@@ -1098,21 +1127,24 @@ const TweetReactionView = ({
                                         <MenuOptionText>Tutorials</MenuOptionText>
                                         <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
                                     </MenuOption>
-                                    <MenuOption onClick={() => {
-                                        window.open('https://web.qapla.gg/hub/avatar', '_blank');
-                                    }}>
-                                        <MenuOptionEmoji>
-                                            <span role='img' aria-label='Avatar'>
+                                    <AvatartTipOnMenu open={openAvatarTip} placement="left" arrow title={
+                                        <React.Fragment>
+                                            <QaplaTooltipText>{`Create your avatar and`} <QaplaToooltipTextHighlight>{`show off your virtual identity`}</QaplaToooltipTextHighlight> {`in all your reactions`}</QaplaTooltipText>
+                                        </React.Fragment>
+                                    } >
+                                        <MenuOption onClick={() => {
+                                            window.open('https://web.qapla.gg/hub/avatar', '_blank');
+                                        }}>
+                                            <MenuOptionEmoji>
                                                 👽
-                                            </span>
-                                        </MenuOptionEmoji>
-                                        <MenuOptionText>Edit Avatar</MenuOptionText>
-                                        <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
-
-                                    </MenuOption>
+                                            </MenuOptionEmoji>
+                                            <MenuOptionText>Edit Avatar</MenuOptionText>
+                                            <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
+                                        </MenuOption>
+                                    </AvatartTipOnMenu>
                                     <MenuOption onClick={() => {
                                         window.open('https://www.discord.gg/6GBHn78', '_blank');
-                                    }}>
+                                    }} style={{ opacity: openAvatarTip ? 0.6 : 1 }}>
                                         <MenuOptionEmoji>
                                             <span role='img' aria-label='Support'>
                                                 💬
