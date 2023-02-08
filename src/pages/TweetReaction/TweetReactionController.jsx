@@ -137,11 +137,7 @@ const TweetReactionController = () => {
                     // Overwrite price value if price is for bits reaction
                     costObject.price = costObject.type === ZAP ? costObject.price : costObject.bitsPrice;
 
-                    if (!costsArray[i - 1]) {
-                        costsArray.push(costObject);
-                    } else {
-                        costsArray[i - 1] = costObject;
-                    }
+                    costsArray[i - 1] = costObject;
 
                     if (costsArray.length === 3) {
                         setCostsUpdates(costsArray[i - 1]);
@@ -432,7 +428,6 @@ const TweetReactionController = () => {
                                     writeReaction(currentReactionCost.price);
                                 }
                             } else {
-                                console.log(currentReactionCost.price, extraTip.cost);
                                 // Reaction and extra tip are paid, write reaction
                                 writeReaction(currentReactionCost.price + extraTip.cost);
                             }
