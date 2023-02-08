@@ -20,7 +20,50 @@
             "use": "Usar {{mediaType}}",
             "upgradeToUse": "👀 Sube de nivel tu tu reacción para usar ",
             "contentAvailableWhenUpgradeTo2": "Voz de bot para TTS, Avatar Animado & Texto 3D",
-            "contentAvailableWhenUpgradeTo3": "Animaciones de Emotes"
+            "contentAvailableWhenUpgradeTo3": "Animaciones de Emotes",
+            "menu": {
+                "walkthrough": "Tutorial de Extensión",
+                "tutorials": "+ Tutoriales",
+                "createAvatar": "Crear Avatar",
+                "editAvatar": "Editar Avatar",
+                "support": "Soporte"
+            },
+            "QaplaTooltipZero": {
+                "textP1": "Comienza a escribir para enviar un",
+                "textP2": " Text-to-Speech ",
+                "textP3": "usando tu avatar"
+            },
+            "QaplaTooltipOne": {
+                "textP1": "Personaliza tu reacción usando la barra de",
+                "textP2": " Add-ons",
+                "textP3": ""
+            },
+            "QaplaTooltipTwo": {
+                "textP1": "Aquí puedes ver el",
+                "textP2": " precio en Bits o Zaps ",
+                "textP3": "del Reaction Tier",
+                "textP4": "\n\nHaz click para subir o bajar el tier de tu reacción"
+            },
+            "QaplaTooltipThree": {
+                "textP1": "Usa tus puntos de canal para canjear la recompensa Zap\n\nPasa el cursor sobre el icono de la cartera para ver cuantos ",
+                "textP2": "Zaps tienes"
+            },
+            "QaplaTooltipFour": {
+                "textP1": "Envia Bits Extra",
+                "textP2": " a tu streamer con tu Reacción"
+            },
+            "QaplaTooltipFive": {
+                "textP1": "Siempre puedes ver este tutorial de nuevo.\n\nO mirar nuestros videos en YT",
+                "done": "Listo"
+            },
+            "createAvatarTooltip": {
+                "createAvatarTextP1": "Crea tu avatar y",
+                "createAvatarTextP2": " muestra tu identidad virtual ",
+                "createAvatarTextP3": "en todas tus reacciones",
+                "editAvatarTextP1": "Siempre puedes",
+                "editAvatarTextP2": " editar tu avatar ",
+                "editAvatarTextP3": "desde este menu"
+            }
         },
         "dialogs": {
             "GiphyMediaSelectorDialog": {

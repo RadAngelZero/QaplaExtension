@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import {
     Avatar,
@@ -8,7 +8,9 @@ import {
     ClickAwayListener,
     IconButton,
     TextField,
-    Typography
+    Typography,
+    tooltipClasses,
+    Tooltip as MuiTooltip
 } from '@mui/material';
 import Tooltip from 'react-power-tooltip';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +28,12 @@ import { ReactComponent as TTSVoice } from './../../assets/Icons/VolumeUp.svg';
 import { ReactComponent as Bits } from './../../assets/Icons/Bits.svg';
 import { ReactComponent as Arrow } from './../../assets/Icons/Arrow.svg';
 import { ReactComponent as EditCircle } from './../../assets/Icons/EditCircle.svg';
+import { ReactComponent as Next } from './../../assets/Icons/Next.svg';
+import { ReactComponent as Ok } from './../../assets/Icons/Ok.svg';
+import { ReactComponent as Wallet } from './../../assets/Icons/Wallet.svg';
+import { ReactComponent as Menu } from './../../assets/Icons/Menu.svg';
+import { ReactComponent as CloseMenu } from './../../assets/Icons/CloseMenu.svg';
+import { ReactComponent as ExternalLinkWhite } from './../../assets/Icons/ExternalLinkWhite.svg';
 import {
     CUSTOM_TTS_VOICE,
     EMOTE,
@@ -160,10 +168,10 @@ const ContentContainer = styled(Box)({
     flex: 1
 });
 
-const TTSContainer = styled(Box)({
+const TTSContainer = styled(Box)((props) => ({
     display: 'flex',
     flexDirection: 'column'
-});
+}));
 
 const UserMessageContainer = styled(Box)({
     display: 'flex',
@@ -238,12 +246,13 @@ const CloseIconButton = styled(IconButton)({
     padding: 0
 });
 
-const ActionsContainer = styled(Box)({
+const ActionsContainer = styled(Box)((props) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-});
+    pointerEvents: props.enabled ? 'auto' : 'none'
+}));
 
 const PricesButton = styled(Button)({
     background: '#1C1E64',
@@ -278,19 +287,21 @@ const SendButton = styled(Button)({
     }
 });
 
-const MediaSelectionContainer = styled(Box)({
+const MediaSelectionContainer = styled(Box)((props) => ({
     marginTop: '16px',
     background: '#141539',
     padding: '24px',
     display: 'flex',
-    justifyContent: 'space-between'
-});
+    justifyContent: 'space-between',
+    pointerEvents: props.enabled ? 'auto' : 'none'
+}));
 
-const MediaOptionsContainer = styled(Box)({
+const MediaOptionsContainer = styled(Box)((props) => ({
     display: 'flex',
     gap: '16px',
-    padding: '8px 0px'
-});
+    padding: '8px 0px',
+    pointerEvents: props.enabled ? 'auto' : 'none'
+}));
 
 const MediaOptionButton = styled(IconButton)({
     padding: 0,
@@ -470,6 +481,306 @@ const PillIconContainer = styled(Box)({
     maxHeight: '16px',
 });
 
+const QaplaTooltipZero = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#3B4BF9',
+        width: '215px',
+        height: '90px',
+        padding: '22px 16px',
+        borderRadius: '15px',
+        display: 'flex',
+        top: '4px',
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: '#3B4BF9',
+        left: '-140px !important',
+        top: '-6px !important',
+        width: '25px',
+        height: '15px',
+        // top: '-20px !important',
+        '&::before': {
+            color: '#3B4BF9',
+            borderRadius: '4px',
+        },
+    },
+}));
+
+const QaplaTooltipOne = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#3B4BF9',
+        width: '215px',
+        height: '90px',
+        padding: '22px 16px',
+        borderRadius: '15px',
+        display: 'flex',
+        bottom: '-16px',
+        left: '24px',
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: '#3B4BF9',
+        left: '-170px !important',
+        bottom: '-6px !important',
+        width: '25px',
+        height: '15px',
+        // top: '-20px !important',
+        '&::before': {
+            color: '#3B4BF9',
+            borderRadius: '4px',
+        },
+    },
+}));
+
+const QaplaTooltipTwo = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#3B4BF9',
+        width: '315px',
+        height: '130px',
+        padding: '22px 16px',
+        borderRadius: '15px',
+        display: 'flex',
+        bottom: '12px',
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: '#3B4BF9',
+        left: '0px !important',
+        bottom: '-8px !important',
+        width: '25px',
+        height: '18px',
+        // top: '-20px !important',
+        '&::before': {
+            color: '#3B4BF9',
+            borderRadius: '4px',
+        },
+    },
+}));
+
+const QaplaTooltipThree = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#3B4BF9',
+        width: '295px',
+        height: '130px',
+        padding: '22px 16px',
+        borderRadius: '15px',
+        display: 'flex',
+        bottom: '24px',
+        left: '-40px',
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: '#3B4BF9',
+        left: '-30px !important',
+        bottom: '-8px !important',
+        width: '25px',
+        height: '18px',
+        // top: '-20px !important',
+        '&::before': {
+            color: '#3B4BF9',
+            borderRadius: '4px',
+        },
+    },
+}));
+
+const QaplaTooltipFour = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#3B4BF9',
+        width: '215px',
+        height: '90px',
+        padding: '22px 16px',
+        borderRadius: '15px',
+        display: 'flex',
+        bottom: '10px',
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: '#3B4BF9',
+        left: '8px !important',
+        bottom: '-6px !important',
+        width: '25px',
+        height: '15px',
+        // top: '-20px !important',
+        '&::before': {
+            color: '#3B4BF9',
+            borderRadius: '4px',
+        },
+    },
+}));
+
+const QaplaTooltipFive = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#3B4BF9',
+        width: '215px',
+        height: '130px',
+        padding: '22px 16px',
+        borderRadius: '15px',
+        display: 'flex',
+        top: '10px',
+        right: '-16px',
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: '#3B4BF9',
+        left: '-8px !important',
+        top: '-6px !important',
+        width: '25px',
+        height: '15px',
+        // top: '-20px !important',
+        '&::before': {
+            color: '#3B4BF9',
+            borderRadius: '4px',
+        },
+    },
+}));
+
+const QaplaTooltipDoneButton = styled(Button)({
+    backgroundColor: '#141735',
+    position: 'absolute',
+    right: '12px',
+    bottom: '12px',
+    textTransform: 'none',
+    borderRadius: '50px',
+    color: '#fff',
+    fontSize: '17px',
+    fontWeight: '700',
+    lineHeight: '20px',
+    padding: '8px 20px',
+    '&:hover': {
+        backgroundColor: '#141735',
+        opacity: '1',
+    },
+});
+
+const QaplaTooltipText = styled(Typography)({
+    color: '#fff',
+    fontSize: '17px',
+    fontWeight: '600',
+    lineHeight: '22px',
+    maxWidth: '196px',
+    whiteSpace: 'pre-wrap',
+});
+
+const QaplaTooltipTextTwo = styled(Typography)({
+    color: '#fff',
+    fontSize: '17px',
+    fontWeight: '600',
+    lineHeight: '22px',
+    maxWidth: '246px',
+    whiteSpace: 'pre-wrap',
+});
+
+const QaplaToooltipTextHighlight = styled('span')({
+    color: '#00FFDD',
+});
+
+const WalletContainer = styled(Box)({
+    display: 'flex',
+    marginRight: 'auto',
+    marginLeft: '16px',
+    alignSelf: 'center',
+});
+
+const WalletText = styled('p')({
+    margin: '0px',
+    marginLeft: '8px',
+    color: '#fff',
+    fontSize: '20px',
+    fontWeight: '600',
+    lineHeight: '20px',
+});
+
+const MenuButtonContainer = styled(Box)({
+    display: 'flex',
+    alignSelf: 'flex-start',
+    height: '24px',
+});
+
+const MenuHintText = styled('p')({
+    color: '#fff',
+    fontSize: '16px',
+    fontWeight: '500',
+    lineHeight: '19px',
+    margin: '0px',
+    marginRight: '8px',
+    marginLeft: '-5ch',
+});
+
+const MenuPopUp = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#141539',
+        // width: '250px',
+        // height: '196px',
+        padding: '24px',
+        borderRadius: '20px',
+        display: 'flex',
+        top: '0px',
+    },
+}));
+
+const AvatartTipOnMenu = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#3B4BF9',
+        maxWidth: '200px',
+        height: '154px',
+        padding: '15px',
+        paddingRight: '30px',
+        borderRadius: '20px',
+        display: 'flex',
+        right: '25px',
+        boxSizing: 'border-box',
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+        color: '#3B4BF9',
+        right: '-6px !important',
+        width: '15px !important',
+        height: '25px !important',
+        // top: '-20px !important',
+        '&::before': {
+            color: '#3B4BF9',
+            borderRadius: '5px',
+        },
+    },
+}));
+
+const MenuOptionsContainer = styled(Box)({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+});
+
+const MenuOption = styled(Box)({
+    display: 'flex',
+    cursor: 'pointer',
+});
+
+const MenuOptionEmoji = styled('p')({
+    color: '#fff',
+    fontSize: '16px',
+    fontWeight: '500',
+    lineHeight: '19px',
+    margin: '0px',
+    marginRight: '8px',
+});
+
+const MenuOptionText = styled('p')({
+    color: '#fff',
+    fontSize: '16px',
+    fontWeight: '500',
+    lineHeight: '19px',
+    margin: '0px',
+});
+
 const MediaOptionSelectedIcon = () => {
     return (
         <CheckCircle style={{
@@ -525,7 +836,7 @@ const MediaOption = ({ index, type, disabled = false, excluded = false, onClick,
                             {tooltipButtonText}
                             {reactionCost ?
                                 <>
-                                <HighlightedText style={{
+                                    <HighlightedText style={{
                                         fontSize: '16px',
                                         fontWeight: '800',
                                         display: 'flex',
@@ -535,19 +846,19 @@ const MediaOption = ({ index, type, disabled = false, excluded = false, onClick,
                                         textOverflow: 'ellipsis',
                                         maxWidth: '32px'
                                     }}>
-                                    {reactionCost.toLocaleString()}
-                                </HighlightedText>
-                                {reactionType === ZAP ?
-                                    <Interactions style={{
-                                        height: '16px',
-                                        width: '16px'
-                                    }} />
-                                    :
-                                    <Bits style={{
-                                        height: '16px',
-                                        width: '16px'
-                                    }} />
-                                }
+                                        {reactionCost.toLocaleString()}
+                                    </HighlightedText>
+                                    {reactionType === ZAP ?
+                                        <Interactions style={{
+                                            height: '16px',
+                                            width: '16px'
+                                        }} />
+                                        :
+                                        <Bits style={{
+                                            height: '16px',
+                                            width: '16px'
+                                        }} />
+                                    }
                                 </>
                                 :
                                 null
@@ -596,6 +907,7 @@ const ExtraTipOption = ({ label, onClick, selected }) => {
 const TweetReactionView = ({
     onSend,
     sending,
+    numberOfReactions,
     message,
     setMessage,
     currentReactionCost,
@@ -622,7 +934,28 @@ const TweetReactionView = ({
     avatarBackground
 }) => {
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
+    const [toolTipStep, setTooltipStep] = useState(null);
+    const [hoverWallet, setHoverWallet] = useState(false);
+    const [hoverMenu, setHoverMenu] = useState(false);
+    const [openMenu, setOpenMenu] = useState(false);
+    const [openAvatarTip, setOpenAvatarTip] = useState(false);
+    const ttsRef = useRef();
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
+
+    useEffect(() => {
+        const userTutorialsDone = localStorage.getItem('userTutorialsDone');
+        if (!userTutorialsDone) {
+            setTooltipStep(0);
+            setOpenMenu(false);
+            localStorage.setItem('userTutorialsDone', '1');
+        } else if (userTutorialsDone === '1') {
+            setOpenMenu(true);
+            setTimeout(() => {
+                setOpenAvatarTip(true);
+            }, 250);
+            localStorage.setItem('userTutorialsDone', '2');
+        }
+    }, []);
 
     const isMediaOptionSelected = (mediaType) => {
         switch (mediaType) {
@@ -662,8 +995,25 @@ const TweetReactionView = ({
         return `linear-gradient(${angle}deg, ${colorsString})`;
     }
 
+    const onWalktroughStart = () => {
+        setTooltipStep(0);
+        setOpenMenu(false);
+        if (tipping) {
+            toggleTipping();
+        }
+    }
+
+    const onAvatarTooltipClose = () => {
+        setOpenAvatarTip(false);
+        setOpenMenu(false);
+        ttsRef.current.focus();
+    }
+
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
     const sendButtonDisabled = currentReactionCost === undefined || sending;
+
+    // Enable UI only if no tooltips tutorials are open
+    const enableUI = toolTipStep === null && !openAvatarTip;
 
     let pills = [
         voiceBot,
@@ -680,7 +1030,7 @@ const TweetReactionView = ({
     });
 
     return (
-        <Container>
+        <Container enabled={enableUI}>
             <ContentContainer>
                 <TTSContainer>
                     <UserMessageContainer>
@@ -697,56 +1047,204 @@ const TweetReactionView = ({
                             <UserImage
                                 src={userImage} />
                         }
-                        <MessageContainer>
-                            {!custom3DText ?
-                                <>
-                                <MessageInput variant='standard'
-                                    InputProps={{
-                                        disableUnderline: true,
-                                        style: {
-                                            fontSize: '22px',
-                                            fontWeight: '400',
-                                            color: '#FFF',
-                                            '&::placeholder': {
-                                                color: '#C2C2C2'
-                                            },
-                                            padding: 0
+
+                        <QaplaTooltipZero open={toolTipStep === 0} placement='bottom-start' arrow title={
+                            <React.Fragment>
+                                <QaplaTooltipText>
+                                    {t('QaplaTooltipZero.textP1')}
+                                    <QaplaToooltipTextHighlight>
+                                        {t('QaplaTooltipZero.textP2')}
+                                    </QaplaToooltipTextHighlight>
+                                    {t('QaplaTooltipZero.textP3')}
+                                </QaplaTooltipText>
+                                <Next style={{
+                                    position: 'absolute',
+                                    right: '12px',
+                                    bottom: '12px',
+                                    cursor: 'pointer',
+                                }} onClick={() => {
+                                    setTooltipStep(toolTipStep + 1);
+                                }} />
+                            </React.Fragment>
+                        }>
+                            <MessageContainer>
+                                {!custom3DText ?
+                                    <>
+                                        <MessageInput variant='standard'
+                                            InputProps={{
+                                                disableUnderline: true,
+                                                style: {
+                                                    fontSize: '22px',
+                                                    fontWeight: '400',
+                                                    color: '#FFF',
+                                                    caretColor: enableUI ? '#FFF' : 'transparent',
+                                                    '&::placeholder': {
+                                                        color: '#C2C2C2'
+                                                    },
+                                                    padding: 0
+                                                }
+                                            }}
+                                            // eslint-disable-next-line
+                                            inputProps={{ maxLength: 100 }}
+                                            multiline
+                                            placeholder={t('typeToCreateTTS')}
+                                            fullWidth
+                                            autoFocus
+                                            value={message}
+                                            inputRef={ttsRef}
+                                            onChange={(e) => enableUI ? setMessage(e.target.value) : null} />
+                                        {!message &&
+                                                <OptionalLabel>
+                                                    {t('optional')}
+                                                </OptionalLabel>
                                         }
-                                    }}
-                                    // eslint-disable-next-line
-                                    inputProps={{ maxLength: 100 }}
-                                    multiline
-                                    placeholder={t('typeToCreateTTS')}
-                                    fullWidth
-                                    autoFocus
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)} />
-                                {!message &&
-                                    <OptionalLabel>
-                                        {t('optional')}
-                                    </OptionalLabel>
-                                }
-                                </>
-                                :
-                                <Custom3DTextContainer>
-                                    <img src={custom3DText.url}
-                                        style={{
-                                            width: window.innerWidth * .5,
-                                            aspectRatio: custom3DText.width / custom3DText.height
-                                        }}
-                                        alt={message} />
-                                    <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
-                                        <EditCircle />
-                                    </Edit3DTextButton>
-                                    <Remove3DTextButton onClick={onRemoveCustom3DText}>
-                                        <Close style={{
+                                    </>
+                                    :
+                                    <Custom3DTextContainer>
+                                        <img src={custom3DText.url}
+                                            style={{
+                                                width: window.innerWidth * .5,
+                                                aspectRatio: custom3DText.width / custom3DText.height
+                                            }}
+                                            alt={message} />
+                                        <Edit3DTextButton onClick={() => onMediaOptionClick(GIPHY_TEXT)}>
+                                            <EditCircle />
+                                        </Edit3DTextButton>
+                                        <Remove3DTextButton onClick={onRemoveCustom3DText}>
+                                            <Close style={{
                                                 height: 24,
                                                 width: 24
                                             }} />
-                                    </Remove3DTextButton>
-                                </Custom3DTextContainer>
-                            }
-                        </MessageContainer>
+                                        </Remove3DTextButton>
+                                    </Custom3DTextContainer>
+                                }
+                            </MessageContainer>
+                        </QaplaTooltipZero>
+                        <MenuPopUp open={openMenu} placement='bottom-end' title={
+                            <React.Fragment>
+                                <MenuOptionsContainer>
+                                    <MenuOption onClick={onWalktroughStart}
+                                        style={{ opacity: openAvatarTip ? 0.6 : 1 }}>
+                                        <MenuOptionEmoji>
+                                            <span role='img' aria-label='Walkthrough'>
+                                                🦮
+                                            </span>
+                                        </MenuOptionEmoji>
+                                        <MenuOptionText>
+                                            {t('menu.walkthrough')}
+                                        </MenuOptionText>
+                                    </MenuOption>
+                                    <MenuOption onClick={() => {
+                                        window.open('https://web.qapla.gg/hub/how', '_blank');
+                                    }} style={{ opacity: openAvatarTip ? 0.6 : 1 }}>
+                                        <MenuOptionEmoji>
+                                            <span role='img' aria-label='Tutorials'>
+                                                🎥
+                                            </span>
+                                        </MenuOptionEmoji>
+                                        <MenuOptionText>
+                                            {t('menu.tutorials')}
+                                        </MenuOptionText>
+                                        <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
+                                    </MenuOption>
+                                    <AvatartTipOnMenu open={openAvatarTip} placement='left' arrow title={
+                                        <React.Fragment>
+                                            {avatarId ?
+                                                <QaplaTooltipText>
+                                                    {t('createAvatarTooltip.editAvatarTextP1')}
+                                                    <QaplaToooltipTextHighlight>
+                                                        {t('createAvatarTooltip.editAvatarTextP2')}
+                                                    </QaplaToooltipTextHighlight>
+                                                    {t('createAvatarTooltip.editAvatarTextP3')}
+                                                </QaplaTooltipText>
+                                                :
+                                                <QaplaTooltipText>
+                                                    {t('createAvatarTooltip.createAvatarTextP1')}
+                                                    <QaplaToooltipTextHighlight>
+                                                        {t('createAvatarTooltip.createAvatarTextP2')}
+                                                    </QaplaToooltipTextHighlight>
+                                                    {t('createAvatarTooltip.createAvatarTextP3')}
+                                                </QaplaTooltipText>
+                                            }
+                                            <Ok style={{
+                                                position: 'absolute',
+                                                right: '12px',
+                                                bottom: '12px',
+                                                cursor: 'pointer',
+                                            }} onClick={onAvatarTooltipClose} />
+                                        </React.Fragment>
+                                    }>
+                                        <MenuOption onClick={() => {
+                                            window.open('https://web.qapla.gg/hub/avatar', '_blank');
+                                            onAvatarTooltipClose();
+                                        }}>
+                                            <MenuOptionEmoji>
+                                                <span role='img' aria-label='Avatar'>
+                                                    👽
+                                                </span>
+                                            </MenuOptionEmoji>
+                                            <MenuOptionText>
+                                                {avatarId ?
+                                                    t('menu.editAvatar')
+                                                    :
+                                                    t('menu.createAvatar')
+                                                }
+                                            </MenuOptionText>
+                                            <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
+                                        </MenuOption>
+                                    </AvatartTipOnMenu>
+                                    <MenuOption onClick={() => {
+                                        window.open('https://www.discord.gg/6GBHn78', '_blank');
+                                    }} style={{ opacity: openAvatarTip ? 0.6 : 1 }}>
+                                        <MenuOptionEmoji>
+                                            <span role='img' aria-label='Support'>
+                                                💬
+                                            </span>
+                                        </MenuOptionEmoji>
+                                        <MenuOptionText>
+                                            {t('menu.support')}
+                                        </MenuOptionText>
+                                        <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
+                                    </MenuOption>
+                                </MenuOptionsContainer>
+                            </React.Fragment>
+                        } >
+                            <MenuButtonContainer>
+                                <MenuHintText style={{
+                                    opacity: (hoverMenu || toolTipStep === 5) && !message ? '0.6' : '0.0',
+                                }}>
+                                    Menu
+                                </MenuHintText>
+                                <QaplaTooltipFive open={toolTipStep === 5} placement='bottom-start' arrow title={
+                                    <React.Fragment>
+                                        <QaplaTooltipText>
+                                            {t('QaplaTooltipFive.textP1')}
+                                        </QaplaTooltipText>
+                                        <QaplaTooltipDoneButton onClick={() => {
+                                            // Last step so we set the step to null
+                                            setTooltipStep(null);
+                                            // Set the focus on TTS text input
+                                            ttsRef.current.focus();
+                                        }} >
+                                            {t('QaplaTooltipFive.done')}
+                                        </QaplaTooltipDoneButton>
+                                    </React.Fragment>
+                                } >
+                                    <div
+                                        onMouseEnter={() => { setHoverMenu(true); }}
+                                        onMouseLeave={() => { setHoverMenu(false); }}
+                                        onClick={() => { if (enableUI) setOpenMenu(!openMenu) }}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        {openMenu ?
+                                            <CloseMenu />
+                                            :
+                                            <Menu />
+                                        }
+                                    </div>
+                                </QaplaTooltipFive>
+                            </MenuButtonContainer>
+                        </MenuPopUp>
                     </UserMessageContainer>
                     {pills.length > 0 &&
                         <PillsList>
@@ -797,17 +1295,75 @@ const TweetReactionView = ({
                     }
                 </SelectedMediaContainer>
                 {!tipping ?
-                    <ActionsContainer>
+                    <ActionsContainer enabled={enableUI}>
                         {currentReactionCost &&
                             <>
-                            <PricesButton startIcon={currentReactionCost.type === ZAP ? <Interactions /> : <Bits />}
-                                onClick={onChangeReactionLevel}>
-                                {currentReactionCost && currentReactionCost.price.toLocaleString()}
-                            </PricesButton>
-                            <SendButton onClick={onSend}
-                                disabled={sendButtonDisabled}>
-                                {t('send')}
-                            </SendButton>
+                                <QaplaTooltipTwo open={toolTipStep === 2} placement='top-start' arrow title={
+                                    <React.Fragment>
+                                        <QaplaTooltipTextTwo>
+                                            {t('QaplaTooltipTwo.textP1')}
+                                            <QaplaToooltipTextHighlight>
+                                                {t('QaplaTooltipTwo.textP2')}
+                                            </QaplaToooltipTextHighlight>
+                                            {t('QaplaTooltipTwo.textP3')}
+                                            {t('QaplaTooltipTwo.textP4')}
+                                        </QaplaTooltipTextTwo>
+                                        <Next style={{
+                                            position: 'absolute',
+                                            right: '12px',
+                                            bottom: '12px',
+                                            cursor: 'pointer',
+                                        }} onClick={() => {
+                                            setTooltipStep(toolTipStep + 1);
+                                        }} />
+                                    </React.Fragment>
+                                }>
+                                    <PricesButton startIcon={currentReactionCost.type === ZAP ? <Interactions /> : <Bits />}
+                                        onClick={onChangeReactionLevel}>
+                                        {currentReactionCost && currentReactionCost.price.toLocaleString()}
+                                    </PricesButton>
+                                </QaplaTooltipTwo>
+                                <QaplaTooltipThree open={toolTipStep === 3} placement='top-start' arrow title={
+                                    <React.Fragment>
+                                        <QaplaTooltipTextTwo>
+                                            {t('QaplaTooltipThree.textP1')}
+                                            <QaplaToooltipTextHighlight>
+                                                {t('QaplaTooltipThree.textP2')}
+                                            </QaplaToooltipTextHighlight>
+                                        </QaplaTooltipTextTwo>
+                                        <Next style={{
+                                            position: 'absolute',
+                                            right: '12px',
+                                            bottom: '12px',
+                                            cursor: 'pointer',
+                                        }} onClick={() => {
+                                            setTooltipStep(toolTipStep + 1);
+                                        }} />
+                                    </React.Fragment>
+                                }>
+                                    <WalletContainer onMouseEnter={() => { setHoverWallet(true); }} onMouseLeave={() => { setHoverWallet(false); }}>
+                                        <Wallet style={{ opacity: hoverWallet || toolTipStep === 3 ? 0.6 : 0.4 }} />
+                                        <WalletText style={{
+                                            opacity: hoverWallet || toolTipStep === 3 ? 0.6 : 0,
+                                        }}>
+                                            You have:
+                                        </WalletText>
+                                        <Interactions style={{
+                                            marginLeft: '4px',
+                                            opacity: hoverWallet || toolTipStep === 3 ? 1 : 0,
+                                        }} />
+                                        <WalletText style={{
+                                            marginLeft: '4px',
+                                            opacity: hoverWallet || toolTipStep === 3 ? 1 : 0,
+                                        }}>
+                                            {numberOfReactions}
+                                        </WalletText>
+                                    </WalletContainer>
+                                </QaplaTooltipThree>
+                                <SendButton onClick={() => { onSend(); ttsRef.current.focus() }}
+                                    disabled={sendButtonDisabled}>
+                                    {t('send')}
+                                </SendButton>
                             </>
                         }
                     </ActionsContainer>
@@ -822,60 +1378,99 @@ const TweetReactionView = ({
                     </TipContainer>
                 }
             </ContentContainer>
-            <MediaSelectionContainer>
-                {!tipping ?
-                    <>
-                        <MediaOptionsContainer>
-                            {mediaSelectorBarOptions.map((mediaType, index) => (
-                                <MediaOption key={mediaType}
-                                    index={index}
-                                    onClick={(type) => onMediaOptionClick(type)}
-                                    type={mediaType}
-                                    isSelected={isMediaOptionSelected(mediaType)}
-                                    excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
-                                    emoteUrl={randomEmoteUrl}
-                                    tooltipText={t('youCanOnlyUseOne')}
-                                    tooltipHighlightedText={t('excluded')}
-                                    tooltipButtonText={t('use', { mediaType: t(mediaType) })}
-                                    onTooltipClick={(level, media) => onMediaOptionClick(media)} />
-                            ))}
-                            {noEnabledOptions.map((mediaType, index) => (
-                                <MediaOption key={mediaType}
-                                    index={index + mediaSelectorBarOptions.length}
-                                    type={mediaType}
-                                    onClick={(type) => onMediaOptionClick(type)}
-                                    disabled
-                                    emoteUrl={randomEmoteUrl}
-                                    tooltipText={t('upgradeToUse')}
-                                    tooltipHighlightedText={t(`contentAvailableWhenUpgradeTo${mediaOptionsData[mediaType].level}`)}
-                                    tooltipButtonText={`Upgrade Reaction `}
-                                    reactionCost={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].price : 0}
-                                    reactionType={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].type : 0}
-                                    onTooltipClick={onUpgradeReaction} />
-                            ))}
-                        </MediaOptionsContainer>
-                        <TipButton startIcon={extraTip ? <EditCircle /> : <PlusCircle />}
-                            endIcon={extraTip ? <Bits /> : null}
-                            onClick={toggleTipping}
-                            style={{
-                                background: extraTip ? 'linear-gradient(118.67deg, #A716EE -6.39%, #2D07FA 101.45%), #141539' : '#3B4BF9',
-                            }}>
-                            {extraTip ?
-                                (extraTip.cost).toLocaleString()
-                                :
-                                'Bits'
-                            }
-                        </TipButton>
-                    </>
-                    :
-                    <NoTipButton onClick={noTipButtonHandler}>
-                        <NoTipIcon>
-                            <PlusCircle />
-                        </NoTipIcon>
-                        No Extra Bits
-                    </NoTipButton>
-                }
-            </MediaSelectionContainer>
+            <QaplaTooltipOne open={toolTipStep === 1} placement='top-start' arrow title={
+                <React.Fragment>
+                    <QaplaTooltipText>
+                        {t('QaplaTooltipOne.textP1')}
+                        <QaplaToooltipTextHighlight>
+                            {t('QaplaTooltipOne.textP2')}
+                        </QaplaToooltipTextHighlight>
+                        {t('QaplaTooltipOne.textP3')}
+                    </QaplaTooltipText>
+                    <Next style={{
+                        position: 'absolute',
+                        right: '12px',
+                        bottom: '12px',
+                        cursor: 'pointer',
+                    }} onClick={() => {
+                        setTooltipStep(toolTipStep + 1);
+                    }} />
+                </React.Fragment>
+            } >
+                <MediaSelectionContainer enabled={enableUI}>
+                    {!tipping ?
+                        <>
+                            <MediaOptionsContainer enabled={enableUI}>
+                                {mediaSelectorBarOptions.map((mediaType, index) => (
+                                    <MediaOption key={mediaType}
+                                        index={index}
+                                        onClick={(type) => onMediaOptionClick(type)}
+                                        type={mediaType}
+                                        isSelected={isMediaOptionSelected(mediaType)}
+                                        excluded={selectedMedia && excludingOptions[selectedMedia.type] && excludingOptions[selectedMedia.type][mediaType]}
+                                        emoteUrl={randomEmoteUrl}
+                                        tooltipText={t('youCanOnlyUseOne')}
+                                        tooltipHighlightedText={t('excluded')}
+                                        tooltipButtonText={t('use', { mediaType: t(mediaType) })}
+                                        onTooltipClick={(level, media) => onMediaOptionClick(media)} />
+                                ))}
+                                {noEnabledOptions.map((mediaType, index) => (
+                                    <MediaOption key={mediaType}
+                                        index={index + mediaSelectorBarOptions.length}
+                                        type={mediaType}
+                                        onClick={(type) => onMediaOptionClick(type)}
+                                        disabled
+                                        emoteUrl={randomEmoteUrl}
+                                        tooltipText={t('upgradeToUse')}
+                                        tooltipHighlightedText={t(`contentAvailableWhenUpgradeTo${mediaOptionsData[mediaType].level}`)}
+                                        tooltipButtonText={`Upgrade Reaction `}
+                                        reactionCost={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].price : 0}
+                                        reactionType={costsPerReactionLevel[mediaOptionsData[mediaType].level - 1] ? costsPerReactionLevel[mediaOptionsData[mediaType].level - 1].type : 0}
+                                        onTooltipClick={onUpgradeReaction} />
+                                ))}
+                            </MediaOptionsContainer>
+                            <QaplaTooltipFour open={toolTipStep === 4} placement='top-end' arrow title={
+                                <React.Fragment>
+                                    <QaplaTooltipText>
+                                        <QaplaToooltipTextHighlight>
+                                            {t('QaplaTooltipFour.textP1')}
+                                        </QaplaToooltipTextHighlight>
+                                        {t('QaplaTooltipFour.textP2')}
+                                    </QaplaTooltipText>
+                                    <Next style={{
+                                        position: 'absolute',
+                                        right: '12px',
+                                        bottom: '12px',
+                                        cursor: 'pointer',
+                                    }} onClick={() => {
+                                        setTooltipStep(toolTipStep + 1);
+                                    }} />
+                                </React.Fragment>
+                            } >
+                                <TipButton startIcon={extraTip ? <EditCircle /> : <PlusCircle />}
+                                    endIcon={extraTip ? <Bits /> : null}
+                                    onClick={toggleTipping}
+                                    style={{
+                                        background: extraTip ? 'linear-gradient(118.67deg, #A716EE -6.39%, #2D07FA 101.45%), #141539' : '#3B4BF9',
+                                    }}>
+                                    {extraTip ?
+                                        (extraTip.cost).toLocaleString()
+                                        :
+                                        'Bits'
+                                    }
+                                </TipButton>
+                            </QaplaTooltipFour>
+                        </>
+                        :
+                        <NoTipButton onClick={noTipButtonHandler}>
+                            <NoTipIcon>
+                                <PlusCircle />
+                            </NoTipIcon>
+                            No Extra Bits
+                        </NoTipButton>
+                    }
+                </MediaSelectionContainer>
+            </QaplaTooltipOne>
         </Container>
     );
 }
