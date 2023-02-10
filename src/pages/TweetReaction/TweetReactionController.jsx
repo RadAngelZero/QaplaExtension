@@ -574,7 +574,8 @@ const TweetReactionController = () => {
                 availableTips={availableTips}
                 avatarAnimation={avatarAnimation}
                 avatarId={user.avatarId}
-                avatarBackground={user.avatarBackground} />
+                avatarBackground={user.avatarBackground}
+                userTwitchId={user.twitchId} />
             <GiphyMediaSelectorDialog open={openGiphyDialog}
                 onClose={() => setOpenGiphyDialog(false)}
                 mediaType={giphyDialogMediaType}
