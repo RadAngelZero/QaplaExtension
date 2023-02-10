@@ -1007,7 +1007,7 @@ const TweetReactionView = ({
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
     const [openAvatarTip, setOpenAvatarTip] = useState(false);
-    const [vibeMenuOpen, setVibeMenuOpen] = useState(false);
+    const [openVibeMenu, setOpenVibeMenu] = useState(false);
     const [vibe, setVibe] = useState(0);
     const ttsRef = useRef();
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
@@ -1105,26 +1105,26 @@ const TweetReactionView = ({
             <ContentContainer>
                 <TTSContainer>
                     <UserMessageContainer>
-                        <VibeMenu open={vibeMenuOpen} onClose={() => setVibeMenuOpen(false)} placement='bottom' title={
+                        <VibeMenu open={openVibeMenu} onClose={() => setOpenVibeMenu(false)} placement='bottom' title={
                             <React.Fragment>
                                 <VibesContainer>
                                     <VibeContainer onClick={() => {
                                         setVibe(0);
-                                        setVibeMenuOpen(false);
+                                        setOpenVibeMenu(false);
                                     }}>
                                         <VibeImage src={happyVibe} />
                                         <VibeText>Happy</VibeText>
                                     </VibeContainer>
                                     <VibeContainer onClick={() => {
                                         setVibe(1);
-                                        setVibeMenuOpen(false);
+                                        setOpenVibeMenu(false);
                                     }}>
                                         <VibeImage src={angryVibe} />
                                         <VibeText>Angry</VibeText>
                                     </VibeContainer>
                                     <VibeContainer onClick={() => {
                                         setVibe(2);
-                                        setVibeMenuOpen(false);
+                                        setOpenVibeMenu(false);
                                     }}>
                                         <VibeImage src={sadVibe} />
                                         <VibeText>Sad</VibeText>
@@ -1133,7 +1133,7 @@ const TweetReactionView = ({
                             </React.Fragment>
                         }>
                             <ImageDisplayContainer onClick={() => {
-                                setVibeMenuOpen(true);
+                                setOpenAvatarTip(true);
                             }}>
                                 {avatarId ?
                                     <AvatarImage src={`https://api.readyplayer.me/v1/avatars/${avatarId}.png?scene=fullbody-portrait-v1-transparent`}
