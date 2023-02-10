@@ -34,6 +34,11 @@ import { ReactComponent as Wallet } from './../../assets/Icons/Wallet.svg';
 import { ReactComponent as Menu } from './../../assets/Icons/Menu.svg';
 import { ReactComponent as CloseMenu } from './../../assets/Icons/CloseMenu.svg';
 import { ReactComponent as ExternalLinkWhite } from './../../assets/Icons/ExternalLinkWhite.svg';
+
+import happyVibe from '../../assets/Images/Vibes/Happy.png';
+import angryVibe from '../../assets/Images/Vibes/Angry.png';
+import sadVibe from '../../assets/Images/Vibes/Sad.png';
+
 import {
     CUSTOM_TTS_VOICE,
     EMOTE,
@@ -178,20 +183,27 @@ const UserMessageContainer = styled(Box)({
     alignItems: 'center'
 });
 
+const ImageDisplayContainer = styled(Box)({
+    display: 'flex',
+    '&:hover': {
+        cursor: 'pointer',
+    }
+});
+
 const AvatarImage = styled('img')({
     height: '56px',
     width: '56px',
-    borderRadius: '100px'
+    borderRadius: '23px'
 });
 
 const UserImage = styled(Avatar)({
     height: '56px',
     width: '56px',
-    borderRadius: '100px'
+    borderRadius: '23px'
 });
 
 const MessageContainer = styled(Box)({
-    marginLeft: '16px',
+    marginLeft: '8px',
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
@@ -781,6 +793,62 @@ const MenuOptionText = styled('p')({
     margin: '0px',
 });
 
+const VibeOnProfileIcon = styled('img')({
+    // backgroundColor: '#f0f',
+    // position: 'absolute',
+    width: '24px',
+    height: '24px',
+    marginLeft: '-20px',
+    marginTop: 'auto',
+    marginBottom: '-4px',
+    zIndex: 1000,
+});
+
+const VibeMenu = styled(({ className, ...props }) => (
+    <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#141539',
+        // width: '250px',
+        // height: '196px',
+        padding: '18px 10px',
+        borderRadius: '20px',
+        display: 'flex',
+        top: '0px',
+    },
+}));
+
+const VibesContainer = styled(Box)({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+});
+const VibeContainer = styled(Box)({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    alignItems: 'center',
+    borderRadius: '12px',
+    padding: '6px',
+    '&:hover': {
+        backgroundColor: '#0004',
+        cursor: 'pointer',
+    },
+});
+
+const VibeImage = styled('img')({
+    width: '50px',
+    height: '50px',
+});
+
+const VibeText = styled('p')({
+    margin: '0',
+    color: '#fff',
+    fontSize: '12px',
+    fontWeight: '500',
+    lineHeight: '15px',
+})
+
 const MediaOptionSelectedIcon = () => {
     return (
         <CheckCircle style={{
@@ -939,8 +1007,11 @@ const TweetReactionView = ({
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
     const [openAvatarTip, setOpenAvatarTip] = useState(false);
+    const [vibeMenuOpen, setVibeMenuOpen] = useState(false);
+    const [vibe, setVibe] = useState(0);
     const ttsRef = useRef();
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
+    const VibesArr = [happyVibe, angryVibe, sadVibe];
 
     useEffect(() => {
         const userTutorialsDone = localStorage.getItem('userTutorialsDone');
@@ -1034,20 +1105,52 @@ const TweetReactionView = ({
             <ContentContainer>
                 <TTSContainer>
                     <UserMessageContainer>
-                        {avatarId ?
-                            <AvatarImage src={`https://api.readyplayer.me/v1/avatars/${avatarId}.png?scene=fullbody-portrait-v1-transparent`}
-                                alt='User avatar image'
-                                style={{
-                                    background: avatarBackground ?
-                                        getLinearGradientBackground(avatarBackground.angle, avatarBackground.colors)
-                                        :
-                                        'linear-gradient(95.31deg, #FF669D 1.88%, #9746FF 95.17%)'
-                                }} />
-                            :
-                            <UserImage
-                                src={userImage} />
-                        }
-
+                        <VibeMenu open={vibeMenuOpen} onClose={() => setVibeMenuOpen(false)} placement='bottom' title={
+                            <React.Fragment>
+                                <VibesContainer>
+                                    <VibeContainer onClick={() => {
+                                        setVibe(0);
+                                        setVibeMenuOpen(false);
+                                    }}>
+                                        <VibeImage src={happyVibe} />
+                                        <VibeText>Happy</VibeText>
+                                    </VibeContainer>
+                                    <VibeContainer onClick={() => {
+                                        setVibe(1);
+                                        setVibeMenuOpen(false);
+                                    }}>
+                                        <VibeImage src={angryVibe} />
+                                        <VibeText>Angry</VibeText>
+                                    </VibeContainer>
+                                    <VibeContainer onClick={() => {
+                                        setVibe(2);
+                                        setVibeMenuOpen(false);
+                                    }}>
+                                        <VibeImage src={sadVibe} />
+                                        <VibeText>Sad</VibeText>
+                                    </VibeContainer>
+                                </VibesContainer>
+                            </React.Fragment>
+                        }>
+                            <ImageDisplayContainer onClick={() => {
+                                setVibeMenuOpen(true);
+                            }}>
+                                {avatarId ?
+                                    <AvatarImage src={`https://api.readyplayer.me/v1/avatars/${avatarId}.png?scene=fullbody-portrait-v1-transparent`}
+                                        alt='User avatar image'
+                                        style={{
+                                            background: avatarBackground ?
+                                                getLinearGradientBackground(avatarBackground.angle, avatarBackground.colors)
+                                                :
+                                                'linear-gradient(95.31deg, #FF669D 1.88%, #9746FF 95.17%)'
+                                        }} ></AvatarImage>
+                                    :
+                                    <UserImage
+                                        src={userImage} />
+                                }
+                                <VibeOnProfileIcon src={VibesArr[vibe]} />
+                            </ImageDisplayContainer>
+                        </VibeMenu>
                         <QaplaTooltipZero open={toolTipStep === 0} placement='bottom-start' arrow title={
                             <React.Fragment>
                                 <QaplaTooltipText>
@@ -1094,9 +1197,9 @@ const TweetReactionView = ({
                                             inputRef={ttsRef}
                                             onChange={(e) => enableUI ? setMessage(e.target.value) : null} />
                                         {!message &&
-                                                <OptionalLabel>
-                                                    {t('optional')}
-                                                </OptionalLabel>
+                                            <OptionalLabel>
+                                                {t('optional')}
+                                            </OptionalLabel>
                                         }
                                     </>
                                     :
