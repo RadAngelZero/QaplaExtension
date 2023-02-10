@@ -25,6 +25,7 @@ import {
     GIPHY_GIFS,
     GIPHY_STICKERS,
     GIPHY_TEXT,
+    HAPPY_VIBE,
     MEMES,
     ZAP
 } from '../../constants';
@@ -77,6 +78,7 @@ const TweetReactionController = () => {
     const [avatarAnimation, setAvatarAnimation] = useState(null);
     const [openReactionsSnoozedDialog, setOpenReactionsSnoozedDialog] = useState(false);
     const [costsUpdates, setCostsUpdates] = useState(null);
+    const [selectedVibe, setSelectedVibe] = useState(HAPPY_VIBE);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -386,6 +388,7 @@ const TweetReactionController = () => {
             user.avatarId,
             user.avatarBackground,
             avatarAnimation ? avatarAnimation.id : '',
+            selectedVibe,
             channelPointsReaction
         );
 
@@ -574,7 +577,9 @@ const TweetReactionController = () => {
                 availableTips={availableTips}
                 avatarAnimation={avatarAnimation}
                 avatarId={user.avatarId}
-                avatarBackground={user.avatarBackground} />
+                avatarBackground={user.avatarBackground}
+                selectedVibe={selectedVibe}
+                onChangeSelectedVibe={setSelectedVibe} />
             <GiphyMediaSelectorDialog open={openGiphyDialog}
                 onClose={() => setOpenGiphyDialog(false)}
                 mediaType={giphyDialogMediaType}

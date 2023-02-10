@@ -48,7 +48,10 @@ import {
     MEMES,
     ZAP,
     AVATAR,
-    AVATAR_OPTION_GIF
+    AVATAR_OPTION_GIF,
+    HAPPY_VIBE,
+    ANGRY_VIBE,
+    SAD_VIBE
 } from '../../constants';
 
 const allMediaOptionsTypes = [
@@ -999,7 +1002,9 @@ const TweetReactionView = ({
     availableTips,
     avatarAnimation,
     avatarId,
-    avatarBackground
+    avatarBackground,
+    selectedVibe,
+    onChangeSelectedVibe
 }) => {
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
     const [toolTipStep, setTooltipStep] = useState(null);
@@ -1008,10 +1013,19 @@ const TweetReactionView = ({
     const [openMenu, setOpenMenu] = useState(false);
     const [openAvatarTip, setOpenAvatarTip] = useState(false);
     const [openVibeMenu, setOpenVibeMenu] = useState(false);
-    const [vibe, setVibe] = useState(0);
     const ttsRef = useRef();
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
-    const VibesArr = [happyVibe, angryVibe, sadVibe];
+    const VibesObject = {
+        [HAPPY_VIBE]: {
+            Icon: happyVibe
+        },
+        [ANGRY_VIBE]: {
+            Icon: angryVibe
+        },
+        [SAD_VIBE]: {
+            Icon: sadVibe
+        }
+    };
 
     useEffect(() => {
         const userTutorialsDone = localStorage.getItem('userTutorialsDone');
@@ -1080,6 +1094,11 @@ const TweetReactionView = ({
         ttsRef.current.focus();
     }
 
+    const onVibeChanged = (selectedVibe) => {
+        onChangeSelectedVibe(selectedVibe);
+        setOpenVibeMenu(false);
+    }
+
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
     const sendButtonDisabled = currentReactionCost === undefined || sending;
 
@@ -1108,33 +1127,22 @@ const TweetReactionView = ({
                         <VibeMenu open={openVibeMenu} onClose={() => setOpenVibeMenu(false)} placement='bottom' title={
                             <React.Fragment>
                                 <VibesContainer>
-                                    <VibeContainer onClick={() => {
-                                        setVibe(0);
-                                        setOpenVibeMenu(false);
-                                    }}>
+                                    <VibeContainer onClick={() => onVibeChanged(HAPPY_VIBE)}>
                                         <VibeImage src={happyVibe} />
                                         <VibeText>Happy</VibeText>
                                     </VibeContainer>
-                                    <VibeContainer onClick={() => {
-                                        setVibe(1);
-                                        setOpenVibeMenu(false);
-                                    }}>
+                                    <VibeContainer onClick={() => onVibeChanged(ANGRY_VIBE)}>
                                         <VibeImage src={angryVibe} />
                                         <VibeText>Angry</VibeText>
                                     </VibeContainer>
-                                    <VibeContainer onClick={() => {
-                                        setVibe(2);
-                                        setOpenVibeMenu(false);
-                                    }}>
+                                    <VibeContainer onClick={() => onVibeChanged(SAD_VIBE)}>
                                         <VibeImage src={sadVibe} />
                                         <VibeText>Sad</VibeText>
                                     </VibeContainer>
                                 </VibesContainer>
                             </React.Fragment>
                         }>
-                            <ImageDisplayContainer onClick={() => {
-                                setOpenAvatarTip(true);
-                            }}>
+                            <ImageDisplayContainer onClick={() => setOpenVibeMenu(true)}>
                                 {avatarId ?
                                     <AvatarImage src={`https://api.readyplayer.me/v1/avatars/${avatarId}.png?scene=fullbody-portrait-v1-transparent`}
                                         alt='User avatar image'
@@ -1148,7 +1156,7 @@ const TweetReactionView = ({
                                     <UserImage
                                         src={userImage} />
                                 }
-                                <VibeOnProfileIcon src={VibesArr[vibe]} />
+                                <VibeOnProfileIcon src={VibesObject[selectedVibe] ? VibesObject[selectedVibe].Icon : null} />
                             </ImageDisplayContainer>
                         </VibeMenu>
                         <QaplaTooltipZero open={toolTipStep === 0} placement='bottom-start' arrow title={
