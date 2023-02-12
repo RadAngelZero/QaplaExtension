@@ -1321,7 +1321,7 @@ const TweetReactionView = ({
                                 }>
                                     <PricesButton startIcon={currentReactionCost.type === ZAP ? <Interactions /> : <Bits />}
                                         onClick={onChangeReactionLevel}>
-                                        {currentReactionCost && currentReactionCost.price.toLocaleString()}
+                                        {currentReactionCost !== undefined && (currentReactionCost.price !== 0 ? currentReactionCost.price.toLocaleString() : t('free'))}
                                     </PricesButton>
                                 </QaplaTooltipTwo>
                                 <QaplaTooltipThree open={toolTipStep === 3} placement='top-start' arrow title={
