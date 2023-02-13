@@ -42,6 +42,7 @@ import EmptyReactionDialog from '../../components/EmptyReactionDialog';
 import CreateAvatarDialog from '../../components/CreateAvatarDialog';
 import ChooseAvatarAnimationDialog from '../../components/ChooseAvatarAnimationDialog';
 import ReactionsSnoozedDialog from '../../components/ReactionsSnoozedDialog';
+import FullScreenEmoteAnimationDialog from '../../components/FullScreenEmoteAnimationDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -618,6 +619,9 @@ const TweetReactionController = () => {
                 onUpgradeReaction={(level) => { onUpgradeReaction(level, null); setOpenNoReactionsDialog(false); }} />
             <ReactionsSnoozedDialog open={openReactionsSnoozedDialog}
                 onClose={() => setOpenReactionsSnoozedDialog(false)} />
+            <FullScreenEmoteAnimationDialog open={true}
+                onClose={() => console.log('close')}
+            />
         </>
     );
 }
