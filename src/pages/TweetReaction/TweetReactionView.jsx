@@ -1007,7 +1007,9 @@ const TweetReactionView = ({
     const onAvatarTooltipClose = () => {
         setOpenAvatarTip(false);
         setOpenMenu(false);
-        ttsRef.current.focus();
+        if (ttsRef && ttsRef.current) {
+            ttsRef.current.focus();
+        }
     }
 
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
@@ -1225,7 +1227,9 @@ const TweetReactionView = ({
                                             // Last step so we set the step to null
                                             setTooltipStep(null);
                                             // Set the focus on TTS text input
-                                            ttsRef.current.focus();
+                                            if (ttsRef && ttsRef.current) {
+                                                ttsRef.current.focus();
+                                            }
                                         }} >
                                             {t('QaplaTooltipFive.done')}
                                         </QaplaTooltipDoneButton>
@@ -1361,7 +1365,7 @@ const TweetReactionView = ({
                                         </WalletText>
                                     </WalletContainer>
                                 </QaplaTooltipThree>
-                                <SendButton onClick={() => { onSend(); ttsRef.current.focus() }}
+                                <SendButton onClick={() => { onSend(); if (ttsRef && ttsRef.current) { ttsRef.current.focus(); } }}
                                     disabled={sendButtonDisabled}>
                                     {t('send')}
                                 </SendButton>
