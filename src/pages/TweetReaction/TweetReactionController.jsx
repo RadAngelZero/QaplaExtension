@@ -163,11 +163,7 @@ const TweetReactionController = () => {
                         // Overwrite price value if price is for bits reaction
                         costObject.price = costObject.type === ZAP ? costObject.price : costObject.bitsPrice;
 
-                        if (!subscribersCosts[i - 1]) {
-                            subscribersCosts.push(costObject);
-                        } else {
-                            subscribersCosts[i - 1] = costObject;
-                        }
+                        subscribersCosts[i - 1] = costObject;
 
                         if (subscribersCosts.length === 3) {
                             setCostsUpdates(subscribersCosts[i - 1]);
@@ -579,7 +575,8 @@ const TweetReactionController = () => {
                 avatarId={user.avatarId}
                 avatarBackground={user.avatarBackground}
                 selectedVibe={selectedVibe}
-                onChangeSelectedVibe={setSelectedVibe} />
+                onChangeSelectedVibe={setSelectedVibe}
+                userTwitchId={user.twitchId} />
             <GiphyMediaSelectorDialog open={openGiphyDialog}
                 onClose={() => setOpenGiphyDialog(false)}
                 mediaType={giphyDialogMediaType}
