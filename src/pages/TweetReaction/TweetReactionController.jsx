@@ -204,7 +204,7 @@ const TweetReactionController = () => {
                      * See 4.3 on the next url for more information
                      * https://dev.twitch.tv/docs/extensions/guidelines-and-policies#4-content-policy
                      */
-                    // emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
+                    emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
 
                     setEmotes(emotes);
 
