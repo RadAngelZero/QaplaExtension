@@ -1,16 +1,31 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, Dialog, DialogContent, Tooltip, Typography, tooltipClasses } from '@mui/material';
+import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList } from '@mui/material';
 import styled from '@emotion/styled';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
-import { emoteExplosion, emoteTunnel, generateDrop, manageWind, resetEngine, spawnFirework, startEmoteFireworks, startEmoteRain, startMatterEngine } from '../utilities/OverlayEmotesAnimation';
+import { isUserFollowing } from '../services/twitch';
+
+import {
+    emoteExplosion,
+    emoteTunnel,
+    generateDrop,
+    manageWind,
+    resetEngine,
+    spawnFirework,
+    startEmoteFireworks,
+    startEmoteRain,
+    startMatterEngine
+} from '../utilities/OverlayEmotesAnimation';
 
 import { ReactComponent as CloseIcon } from '../assets/Icons/Close.svg';
 import { ReactComponent as ArrowDown } from '../assets/Icons/ArrowDown.svg';
 import { ReactComponent as BackIcon } from '../assets/Icons/Back.svg';
 import { ReactComponent as CheckCircle } from '../assets/Icons/CheckCircle.svg';
+import { ReactComponent as Lock } from './../assets/Icons/Lock.svg';
 
-import { EMOTE_RAIN, EMOTE_FIREWORKS, EMOTE_EXPLOSION, EMOTE_TUNNEL } from '../utilities/Constants';
+import { useTwitch } from '../hooks/TwitchProvider';
+import { useAuth } from '../hooks/AuthProvider';
+import { EMOTE_EXPLOSION, EMOTE_FIREWORKS, EMOTE_RAIN, EMOTE_TUNNEL } from '../constants';
 
 const emoteAnimationsData = [
     {
@@ -227,15 +242,14 @@ const EmoteAnimationListOptionText = styled(Typography)({
 });
 
 const EmotesScrollContainer = styled(Box)({
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '30px',
     marginTop: '44px',
+    backgroundColor: '#141539',
     overflowY: 'scroll',
     '&::-webkit-scrollbar': {
         display: 'none',
     }
 });
+
 const EmoteSection = styled(Box)({
     display: 'flex',
     flexDirection: 'column',
@@ -279,14 +293,30 @@ const ConfirmButton = styled(Button)({
     padding: '16px 24px',
     borderRadius: '100px',
     color: '#0D1022',
+    boxShadow: '0px 8px 30px rgba(0, 255, 221, 0.25)',
+    fontSize: '20px',
+    fontWeight: '600',
+    color: '#0D1022',
     '&:hover': {
         backgroundColor: '#00FFDD',
         opacity: 1,
     },
 });
 
-const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnimation, setSelectedEmotes, selectedEmotes }) => {
+const LockedIcon = styled(Box)({
+    position: 'absolute',
+    bottom: '0px',
+    right: '-3px'
+});
 
+const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl, onEmoteAnimationSelected }) => {
+    const [emoteExplosionInterval, setEmoteExplosionInterval] = useState(null);
+    const [emoteTunnelInterval, setEmoteTunnelInterval] = useState(null);
+    const [emoteAnimationPreviewInterval, setEmoteAnimationPreviewInterval] = useState(null);
+    const [openEmoteAnimationList, setOpenEmoteAnimationList] = useState(false);
+    const [isFollower, setIsFollower] = useState(false);
+    const [selectedAnimation, setSelectedAnimation] = useState(null);
+    const [selectedEmotes, setSelectedEmotes] = useState([]);
     const emoteExplosionContainer = useRef();
     const emoteTunelContainer = useRef();
     const matterjsContainerRain = useRef();
@@ -296,40 +326,45 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
     const emotePreviewContainer = useRef();
     const matterjsPreviewContainer = useRef();
     const matterjsPreviewEngine = useRef();
+    const user = useAuth();
+    const twitch = useTwitch();
+    const { t } = useTranslation();
 
-    const [emoteExplosionInterval, setEmoteExplosionInterval] = useState(null);
-    const [emoteTunnelInterval, setEmoteTunnelInterval] = useState(null);
-    const [emoteAnimationPreviewInterval, setEmoteAnimationPreviewInterval] = useState(null);
+    useEffect(() => {
+        async function checkFollowStatus() {
+            const isFollower = await isUserFollowing(twitch.viewer.id, user.twitchExtensionData.channelId, user.twitchExtensionData.helixToken);
 
-    const [randomEmotesArray, setRandomEmotesArray] = useState(null);
-    const [emotesArray, setEmotesArray] = useState([]);
+            setIsFollower(isFollower);
+        }
 
-    const [openEmoteAnimationList, setOpenEmoteAnimationList] = useState(false);
-
+        if (user && user.twitchExtensionData && user.twitchExtensionData.channelId && user.twitchExtensionData.helixToken) {
+            checkFollowStatus();
+        }
+    }, [user]);
 
     useEffect(() => {
         if (!open) return;
         clearIntervals();
         clearPreviewIntervals();
-        if (!emoteAnimation)
+        if (!selectedAnimation)
             startDeqButtons();
-        if (emoteAnimation)
+        if (selectedAnimation)
             startPreview();
-    }, [emoteAnimation]);
+    }, [open, selectedAnimation]);
 
     const startDeqButtons = () => {
         setTimeout(() => {
-            startMatterEngine(matterjsContainerRain, matterjsEngineRain, 222, 222);
-            startMatterEngine(matterjsContainerFireworks, matterjsEngineFireworks, 222, 222);
-            startEmoteRain(matterjsEngineRain.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'], 9999, 222, 222, 0.4);
-            startEmoteFireworks(matterjsEngineFireworks.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'], 9999, 222, 222, 0.2)
-            emoteExplosion(emoteExplosionContainer.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'], 222, 222);
-            emoteTunnel(emoteTunelContainer.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'], 10);
+            startMatterEngine(matterjsContainerRain.current, matterjsEngineRain, 222, 222);
+            startMatterEngine(matterjsContainerFireworks.current, matterjsEngineFireworks, 222, 222);
+            startEmoteRain(matterjsEngineRain.current, [randomEmoteUrl], 9999, 222, 222, 0.4);
+            startEmoteFireworks(matterjsEngineFireworks.current, [randomEmoteUrl], 9999, 222, 222, 0.2)
+            emoteExplosion(emoteExplosionContainer.current, [randomEmoteUrl], 222, 222);
+            emoteTunnel(emoteTunelContainer.current, [randomEmoteUrl], 10);
             setEmoteExplosionInterval(setInterval(() => {
-                emoteExplosion(emoteExplosionContainer.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'], 222, 222);
+                emoteExplosion(emoteExplosionContainer.current, [randomEmoteUrl], 222, 222);
             }, 3000))
             setEmoteTunnelInterval(setInterval(() => {
-                emoteTunnel(emoteTunelContainer.current, ['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'], 10);
+                emoteTunnel(emoteTunelContainer.current, [randomEmoteUrl], 10);
             }, 12000))
         }, 50);
     }
@@ -340,25 +375,24 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
     };
 
     const startPreview = () => {
-        setRandomEmotesArray(['https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0', 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0']);
         setTimeout(() => {
-            startMatterEngine(matterjsPreviewContainer, matterjsPreviewEngine, 467, 220);
-            if (emoteAnimation === EMOTE_RAIN) {
-                startEmoteRain(matterjsPreviewEngine.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 9999, 467, 220, 0.4);
+            startMatterEngine(matterjsPreviewContainer.current, matterjsPreviewEngine, 467, 220);
+            if (selectedAnimation === EMOTE_RAIN) {
+                startEmoteRain(matterjsPreviewEngine.current, selectedEmotes.length > 0 ? selectedEmotes : [randomEmoteUrl], 9999, 467, 220, 0.4);
             }
-            if (emoteAnimation === EMOTE_FIREWORKS) {
-                startEmoteFireworks(matterjsPreviewEngine.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 9999, 467, 220, 0.2);
+            if (selectedAnimation === EMOTE_FIREWORKS) {
+                startEmoteFireworks(matterjsPreviewEngine.current, selectedEmotes.length > 0 ? selectedEmotes : [randomEmoteUrl], 9999, 467, 220, 0.2);
             }
-            if (emoteAnimation === EMOTE_EXPLOSION) {
-                emoteExplosion(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 467, 220);
+            if (selectedAnimation === EMOTE_EXPLOSION) {
+                emoteExplosion(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : [randomEmoteUrl], 467, 220);
                 setEmoteAnimationPreviewInterval(setInterval(() => {
-                    emoteExplosion(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 467, 220);
+                    emoteExplosion(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : [randomEmoteUrl], 467, 220);
                 }, 3000));
             }
-            if (emoteAnimation === EMOTE_TUNNEL) {
-                emoteTunnel(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 3, 'emote-preview-container');
+            if (selectedAnimation === EMOTE_TUNNEL) {
+                emoteTunnel(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : [randomEmoteUrl], 3, 'emote-preview-container');
                 setEmoteAnimationPreviewInterval(setInterval(() => {
-                    emoteTunnel(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 3, 'emote-preview-container');
+                    emoteTunnel(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : [randomEmoteUrl], 3, 'emote-preview-container');
                 }, 5000));
             }
         }, 50);
@@ -373,12 +407,18 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
     }
 
     const handleEmoteAnimationChange = (animationName) => {
-        onDeqButton(animationName);
-        resetEngine(matterjsPreviewEngine);
-        clearPreviewIntervals();
-        setTimeout(() => {
-            startPreview();
-        }, 100)
+        try {
+            setOpenEmoteAnimationList(false);
+            setSelectedAnimation(animationName);
+            resetEngine(matterjsPreviewEngine);
+            clearPreviewIntervals();
+            setTimeout(() => {
+                startPreview();
+            }, 100);
+        } catch (error) {
+            // It is normal if matter.js always triggers an error here, does not affects functionality of the extension
+            console.log(error);
+        }
     };
 
     const handleEmoteAdded = (emoteURL) => {
@@ -388,33 +428,39 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
         } else {
             tempEmoteArr.push(emoteURL);
         }
+
         setSelectedEmotes(tempEmoteArr);
         clearPreviewIntervals();
-        if (emoteAnimation === EMOTE_RAIN) {
-            generateDrop(matterjsPreviewEngine.current, tempEmoteArr.length > 0 ? tempEmoteArr : randomEmotesArray, 9999, 0, 467, 0.4);
-            manageWind(matterjsPreviewEngine.current, 9999, 0)
-        }
-        if (emoteAnimation === EMOTE_FIREWORKS) {
-            spawnFirework(matterjsPreviewEngine.current, tempEmoteArr.length > 0 ? tempEmoteArr : randomEmotesArray, 9999, 0, 467, 220, 0.2);
-        }
-        if (emoteAnimation === EMOTE_EXPLOSION) {
-            emoteExplosion(emotePreviewContainer.current, tempEmoteArr.length > 0 ? tempEmoteArr : randomEmotesArray, 467, 220);
-            setEmoteAnimationPreviewInterval(setInterval(() => {
-                emoteExplosion(emotePreviewContainer.current, tempEmoteArr.length > 0 ? tempEmoteArr : randomEmotesArray, 467, 220);
-            }, 3000));
-        }
-        if (emoteAnimation === EMOTE_TUNNEL) {
-            emoteTunnel(emotePreviewContainer.current, tempEmoteArr.length > 0 ? tempEmoteArr : randomEmotesArray, 3, 'emote-preview-container');
-            setEmoteAnimationPreviewInterval(setInterval(() => {
-                emoteTunnel(emotePreviewContainer.current, tempEmoteArr.length > 0 ? tempEmoteArr : randomEmotesArray, 3, 'emote-preview-container');
-            }, 5000));
+
+        switch (selectedAnimation) {
+            case EMOTE_RAIN:
+                generateDrop(matterjsPreviewEngine.current, tempEmoteArr.length > 0 ? tempEmoteArr : [randomEmoteUrl], 9999, 0, 467, 0.4);
+                manageWind(matterjsPreviewEngine.current, 9999, 0);
+                break;
+            case EMOTE_FIREWORKS:
+                spawnFirework(matterjsPreviewEngine.current, tempEmoteArr.length > 0 ? tempEmoteArr : [randomEmoteUrl], 9999, 0, 467, 220, 0.2);
+                break;
+            case EMOTE_EXPLOSION:
+                emoteExplosion(emotePreviewContainer.current, tempEmoteArr.length > 0 ? tempEmoteArr : [randomEmoteUrl], 467, 220);
+                setEmoteAnimationPreviewInterval(setInterval(() => {
+                    emoteExplosion(emotePreviewContainer.current, tempEmoteArr.length > 0 ? tempEmoteArr : [randomEmoteUrl], 467, 220);
+                }, 3000));
+                break;
+            case EMOTE_TUNNEL:
+                emoteTunnel(emotePreviewContainer.current, tempEmoteArr.length > 0 ? tempEmoteArr : [randomEmoteUrl], 3, 'emote-preview-container');
+                setEmoteAnimationPreviewInterval(setInterval(() => {
+                    emoteTunnel(emotePreviewContainer.current, tempEmoteArr.length > 0 ? tempEmoteArr : [randomEmoteUrl], 3, 'emote-preview-container');
+                }, 5000));
+                break;
+            default:
+                break;
         }
     };
 
     const backHandler = () => {
         clearPreviewIntervals();
         setSelectedEmotes([]);
-        onDeqButton(null);
+        setSelectedAnimation(null);
     }
 
     const closeHandler = () => {
@@ -424,24 +470,78 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
     }
 
     const confirmHandler = () => {
-        console.log('confirm emotes and animation');
+        onEmoteAnimationSelected(selectedEmotes, selectedAnimation);
+        setSelectedEmotes([]);
+        setSelectedAnimation(null);
         clearPreviewIntervals();
         onClose();
     }
 
+    const renderEmoteSection = (emoteCategory, key) => {
+        let locked = false;
+
+        /* Only allow user to user emotes who have unlocked on the channel (by follow or subscriptions)
+         * Bits are unlocked by default because the user sending the reaction is sending it with bits
+         */
+        switch (key) {
+            case 'follower':
+                locked = !isFollower;
+                break;
+            case 'subTier1':
+                locked = !twitch.viewer.subscriptionStatus;
+                break;
+            case 'subTier2':
+                locked = !twitch.viewer.subscriptionStatus || twitch.viewer.subscriptionStatus.tier < 2000;
+                break;
+            case 'subTier3':
+                locked = !twitch.viewer.subscriptionStatus || twitch.viewer.subscriptionStatus.tier < 3000;
+                break;
+            default:
+                break;
+        }
+
+        return (emoteCategory.map((emote) => (
+            <EmoteContainer>
+                <EmoteImg src={emote.images.url_4x}
+                    key={`emote-${emote.id}`}
+                    onClick={(event) => {
+                    if (!locked) {
+                        if (selectedEmotes.length >= 3 && !selectedEmotes.includes(emote.images.url_4x))
+                            return event.currentTarget.classList.add('negate-emote');
+                        handleEmoteAdded(emote.images.url_4x);
+                    }
+                }}
+                onAnimationEnd={(event) => {
+                    event.currentTarget.classList.remove('negate-emote');
+                }} />
+                {locked &&
+                    <LockedIcon>
+                        <Lock />
+                    </LockedIcon>
+                }
+                {selectedEmotes.includes(emote.images.url_4x) &&
+                    <CheckCircle style={{
+                        width: '22px',
+                        height: '22px',
+                        marginLeft: '-22px',
+                    }} />
+                }
+            </EmoteContainer>
+        )));
+    }
+
     return (
         <BigDialog open={open}
-            onClose={closeHandler}
-        >
+            onClose={closeHandler}>
             <HeaderContainer>
-                {emoteAnimation ?
+                {selectedAnimation ?
                     <BackIcon style={{ marginRight: '-40px', cursor: 'pointer' }} onClick={backHandler} />
                     :
                     <CloseIcon style={{ marginRight: '-40px', cursor: 'pointer' }} onClick={closeHandler} />
                 }
-                <Title>{emoteAnimation ? `Choose up to 3 Emotes ` : `Full Screen Emote Animations`}</Title>
+                <Title>{selectedAnimation ? `Choose up to 3 Emotes ` : `Full Screen Emote Animations`}</Title>
             </HeaderContainer>
-            {emoteAnimation ?
+            {selectedAnimation ?
                 <>
                     <style>{`
                         .negate-emote{
@@ -461,79 +561,68 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
                             }
                         }
                     `}</style>
-                    <EmotePreview ref={matterjsPreviewContainer}>
-                        <canvas height={220} width={467} style={{ position: 'absolute', borderRadius: '20px', overflow: 'hidden' }}></canvas>
+                    <EmotePreview>
+                        <div ref={matterjsPreviewContainer}>
+                            <canvas height={220} width={467} style={{ position: 'absolute', borderRadius: '20px', overflow: 'hidden' }}></canvas>
+                        </div>
                         <div id='emote-preview-container' ref={emotePreviewContainer} style={{ overflow: 'hidden', width: '467px', height: '220px', position: 'absolute', borderRadius: '20px' }}></div>
                         <EmoteAnimationDropdown placement="bottom" open={openEmoteAnimationList} onClose={() => setOpenEmoteAnimationList(false)} title={<React.Fragment>
                             <EmoteAnimationList>
                                 <EmoteAnimationListOptionContainer onClick={() => setOpenEmoteAnimationList(false)}>
                                     <EmoteAnimationListOptionText>
-                                        {emoteAnimationsData[emoteAnimationsData.findIndex((element) => element.id === emoteAnimation)].display}
+                                        {emoteAnimationsData[emoteAnimationsData.findIndex((element) => element.id === selectedAnimation)].display}
                                     </EmoteAnimationListOptionText>
                                     <ArrowDown style={{ rotate: '180deg', marginLeft: '15px' }} />
                                 </EmoteAnimationListOptionContainer>
-
-                                {emoteAnimationsData.map((element) => {
-                                    if (element.id === emoteAnimation) return;
-                                    return (<EmoteAnimationListOptionContainer onClick={() => {
-                                        handleEmoteAnimationChange(element.id);
-                                    }}>
-                                        <EmoteAnimationListOptionText>
-                                            {element.display}
-                                        </EmoteAnimationListOptionText>
-                                    </EmoteAnimationListOptionContainer>)
-                                })}
+                                {emoteAnimationsData.map((element) => (
+                                    element.id !== selectedAnimation ?
+                                        <EmoteAnimationListOptionContainer onClick={() => {
+                                            handleEmoteAnimationChange(element.id);
+                                        }}>
+                                            <EmoteAnimationListOptionText>
+                                                {element.display}
+                                            </EmoteAnimationListOptionText>
+                                        </EmoteAnimationListOptionContainer>
+                                    :
+                                        null
+                                ))}
                             </EmoteAnimationList>
                         </React.Fragment>}>
                             <EmoteAnimationDropdownButton onClick={() => setOpenEmoteAnimationList(true)}>
                                 <EmoteAnimationDropdownButtonText>
-                                    {emoteAnimationsData[emoteAnimationsData.findIndex((element) => element.id === emoteAnimation)].display}
+                                    {emoteAnimationsData[emoteAnimationsData.findIndex((element) => element.id === selectedAnimation)].display}
                                 </EmoteAnimationDropdownButtonText>
                                 <ArrowDown />
                             </EmoteAnimationDropdownButton>
                         </EmoteAnimationDropdown>
                     </EmotePreview>
                     <EmotesScrollContainer>
-                        {emotesData.map((element) => {
-                            return (
-                                <EmoteSection>
-                                    <EmoteSectionHeader>{element.sectionHeader}</EmoteSectionHeader>
-                                    <EmotesContainer>
-                                        {element.emotes.map((emote) => {
-                                            return (
-                                                <EmoteContainer>
-                                                    <EmoteImg src={emote.url} id={`emote-${emote.id}`} onClick={(event) => {
-                                                        if (selectedEmotes.length >= 3 && !selectedEmotes.includes(emote.url))
-                                                            return event.currentTarget.classList.add('negate-emote');
-                                                        handleEmoteAdded(emote.url);
-                                                    }} onAnimationEnd={(event) => {
-                                                        event.currentTarget.classList.remove('negate-emote');
-                                                    }} />
-                                                    {selectedEmotes.includes(emote.url) &&
-                                                        <CheckCircle style={{
-                                                            width: '22px',
-                                                            height: '22px',
-                                                            marginLeft: '-22px',
-                                                        }} />
-                                                    }
-                                                </EmoteContainer>
-                                            );
-                                        })}
-                                    </EmotesContainer>
-                                </EmoteSection>
-                            )
-                        })}
+                        {Object.keys(emotes)
+                            .filter((emoteCategory) => emotes[emoteCategory].data[0].length > 0)
+                            .map((emoteCategory) => (
+                            <React.Fragment key={emoteCategory}>
+                                <EmoteSectionHeader>
+                                    {t(emotes[emoteCategory].key)}
+                                </EmoteSectionHeader>
+                                <ImageList cols={5} gap={32} style={{
+                                    marginBottom: '32px'
+                                }}>
+                                    {renderEmoteSection(emotes[emoteCategory].data[0], emotes[emoteCategory].key)}
+                                </ImageList>
+                            </React.Fragment>
+                        ))}
                         <div style={{ height: '18%' }} />
                     </EmotesScrollContainer>
                     {selectedEmotes.length > 0 &&
-                        <ConfirmButton onClick={confirmHandler}>{`Confirm`}</ConfirmButton>
+                        <ConfirmButton onClick={confirmHandler}>
+                            {`Confirm`}
+                        </ConfirmButton>
                     }
                 </>
                 :
                 <DeqContainer>
                     <DeqButton id='matterjs-container-rain' ref={matterjsContainerRain} onClick={() => {
-                        console.log(onDeqButton);
-                        onDeqButton(EMOTE_RAIN);
+                        setSelectedAnimation(EMOTE_RAIN);
                         clearIntervals();
                         startPreview(EMOTE_RAIN);
                     }}>
@@ -543,7 +632,7 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
                         <DeqText>💧 Rain</DeqText>
                     </DeqButton>
                     <DeqButton id='matterjs-container-fireworks' ref={matterjsContainerFireworks} onClick={() => {
-                        onDeqButton(EMOTE_FIREWORKS);
+                        setSelectedAnimation(EMOTE_FIREWORKS);
                         clearIntervals();
                         startPreview(EMOTE_FIREWORKS);
                     }}>
@@ -553,7 +642,7 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
                         <DeqText>🎆 Fireworks</DeqText>
                     </DeqButton>
                     <DeqButton onClick={() => {
-                        onDeqButton(EMOTE_EXPLOSION);
+                        setSelectedAnimation(EMOTE_EXPLOSION);
                         clearIntervals();
                         startPreview(EMOTE_EXPLOSION);
                     }}>
@@ -561,7 +650,7 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
                         <DeqText>💣 Bomb</DeqText>
                     </DeqButton>
                     <DeqButton onClick={() => {
-                        onDeqButton(EMOTE_TUNNEL);
+                        setSelectedAnimation(EMOTE_TUNNEL);
                         clearIntervals();
                         startPreview(EMOTE_TUNNEL);
                     }}>
@@ -571,7 +660,7 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
                 </DeqContainer>
             }
         </BigDialog>
-    )
+    );
 }
 
 export default FullScreenEmoteAnimationDialog;

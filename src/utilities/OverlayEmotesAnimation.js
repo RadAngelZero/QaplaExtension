@@ -186,7 +186,7 @@ export function emoteTunnel(container, emotesArray, duration, containerID = 'emo
 }
 
 export function startMatterEngine(container, refEngine, windowWidth = document.body.clientWidth, windowHeight = document.body.clientHeight) {
-    const canvas = container.current.firstChild;
+    const canvas = container.firstChild;
 
     let engine = Engine.create();
 

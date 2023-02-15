@@ -22,6 +22,7 @@ import {
     AVATAR_OPTION_GIF,
     CUSTOM_TTS_VOICE,
     EMOTE,
+    EMOTE_RAIN,
     GIPHY_GIFS,
     GIPHY_STICKERS,
     GIPHY_TEXT,
@@ -79,7 +80,7 @@ const TweetReactionController = () => {
     const [openReactionsSnoozedDialog, setOpenReactionsSnoozedDialog] = useState(false);
     const [costsUpdates, setCostsUpdates] = useState(null);
     const [openEmotesAnimationSelectorDialog, setOpenEmotesAnimationSelectorDialog] = useState(false);
-    const [emoteAnimation, setEmoteAnimation] = useState(null);
+    const [selectedEmoteAnimation, setSelectedEmoteAnimation] = useState(EMOTE_RAIN);
     const [selectedEmotes, setSelectedEmotes] = useState([]);
     const twitch = useTwitch();
     const user = useAuth();
@@ -192,7 +193,7 @@ const TweetReactionController = () => {
                      * See 4.3 on the next url for more information
                      * https://dev.twitch.tv/docs/extensions/guidelines-and-policies#4-content-policy
                      */
-                    emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
+                    // emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
 
                     setEmotes(emotes);
 
@@ -201,7 +202,7 @@ const TweetReactionController = () => {
                     if (array) {
                         const randomNumber = Math.floor(Math.random() * array.data[0].length);
 
-                        return setRandomEmoteUrl(array.data[0][randomNumber].images.url_1x);
+                        return setRandomEmoteUrl(array.data[0][randomNumber].images.url_4x);
                     }
                 }
             }
@@ -263,7 +264,7 @@ const TweetReactionController = () => {
                 setOpen3DTextDialog(true);
                 break;
             case EMOTE:
-                setOpenEmoteRainDialog(true);
+                setOpenEmotesAnimationSelectorDialog(true);
                 break;
             case AVATAR:
                 if (user.avatarId) {
@@ -311,7 +312,7 @@ const TweetReactionController = () => {
             onRemove: () => setSelectedEmote(null),
             timestamp: new Date().getTime()
         });
-        setOpenEmoteRainDialog(false);
+        setOpenEmotesAnimationSelectorDialog(false);
     }
 
     const onAvatarAnimationSelected = (animationId) => {
@@ -346,6 +347,21 @@ const TweetReactionController = () => {
         }
     }
 
+    const onEmoteAnimationSelected = (selectedEmotes, selectedAnimation) => {
+        setSelectedEmoteAnimation(selectedAnimation);
+        setSelectedEmotes(selectedEmotes);
+        setOpenEmotesAnimationSelectorDialog(false);
+
+        // Necessary to show pill on UI
+        setSelectedEmote({
+            url: selectedEmotes[0],
+            title: selectedAnimation,
+            type: EMOTE,
+            onRemove: () => { setSelectedEmotes([]); setSelectedEmote(null); },
+            timestamp: new Date().getTime()
+        });
+    }
+
     const writeReaction = async (bits, channelPointsReaction = false, zapsCost) => {
         let messageExtraData = selectedVoiceBot ?
             {
@@ -359,12 +375,6 @@ const TweetReactionController = () => {
             custom3DText
             :
             {};
-
-        const emoteArray = [];
-
-        if (selectedEmote) {
-            emoteArray.push(selectedEmote.url);
-        }
 
         await sendReaction(
             bits,
@@ -384,7 +394,8 @@ const TweetReactionController = () => {
             messageExtraData,
             {
                 type: EMOTE,
-                emojis: emoteArray
+                emojis: selectedEmotes,
+                animationId: selectedEmoteAnimation
             },
             (new Date()).getTime(),
             user.avatarId,
@@ -494,6 +505,7 @@ const TweetReactionController = () => {
         setExtraTip(null);
         setSelectedVoiceBot(null);
         setCustom3DText(null);
+        setSelectedEmotes([]);
         setSelectedEmote(null);
         setSending(false);
         setAvatarAnimation(null);
@@ -599,10 +611,6 @@ const TweetReactionController = () => {
                 onClose={() => setOpen3DTextDialog(false)}
                 defaultMessage={message}
                 on3DTextSelected={on3DTextSelected} />
-            <EmoteRainDialog open={openEmoteRainDialog}
-                onClose={() => setOpenEmoteRainDialog(false)}
-                emotes={emotes}
-                onEmoteSelected={onEmoteSelected} />
             <EmptyReactionDialog open={openEmptyReactionDialog}
                 onClose={() => setOpenEmptyReactionDialog(false)} />
             <CreateAvatarDialog open={openCreateAvatarDialog}
@@ -624,11 +632,9 @@ const TweetReactionController = () => {
                 onClose={() => setOpenReactionsSnoozedDialog(false)} />
             <FullScreenEmoteAnimationDialog open={openEmotesAnimationSelectorDialog}
                 onClose={() => setOpenEmotesAnimationSelectorDialog(false)}
-                onDeqButton={setEmoteAnimation}
-                emoteAnimation={emoteAnimation}
-                setSelectedEmotes={setSelectedEmotes}
-                selectedEmotes={selectedEmotes}
-            />
+                emotes={emotes}
+                randomEmoteUrl={randomEmoteUrl}
+                onEmoteAnimationSelected={onEmoteAnimationSelected} />
         </>
     );
 }
