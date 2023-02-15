@@ -430,7 +430,7 @@ const TweetReactionController = () => {
             ReactionHasMedia: Boolean(selectedMedia).valueOf(),
             ReactionHasCustomVoice: messageExtraData.voiceAPIName !== undefined,
             ReactionHasGiphyText: messageExtraData.giphyText !== {},
-            ReactionHasEmoteRain: emoteArray.length > 0,
+            ReactionHasEmoteRain: selectedEmotes.length > 0,
             ReactionHasAvatarAnimation: Boolean(avatarAnimation).valueOf(),
             SentTo: streamerUid,
             UserHasAvatar: Boolean(user.avatarId).valueOf(),
