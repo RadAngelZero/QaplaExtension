@@ -1132,15 +1132,21 @@ const TweetReactionView = ({
                                 <VibesContainer>
                                     <VibeContainer onClick={() => onVibeChanged(HAPPY_VIBE)}>
                                         <VibeImage src={happyVibe} />
-                                        <VibeText>Happy</VibeText>
+                                        <VibeText>
+                                            {t('vibes.happy')}
+                                        </VibeText>
                                     </VibeContainer>
                                     <VibeContainer onClick={() => onVibeChanged(ANGRY_VIBE)}>
                                         <VibeImage src={angryVibe} />
-                                        <VibeText>Angry</VibeText>
+                                        <VibeText>
+                                            {t('vibes.angry')}
+                                        </VibeText>
                                     </VibeContainer>
                                     <VibeContainer onClick={() => onVibeChanged(SAD_VIBE)}>
                                         <VibeImage src={sadVibe} />
-                                        <VibeText>Sad</VibeText>
+                                        <VibeText>
+                                            {t('vibes.sad')}
+                                        </VibeText>
                                     </VibeContainer>
                                 </VibesContainer>
                             </React.Fragment>

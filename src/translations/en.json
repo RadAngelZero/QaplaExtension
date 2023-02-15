@@ -5,6 +5,12 @@
             "instructions": "Please visit Qapla GG’s Dashboard to\nconfigure the extension",
             "openDashboard": "Open Dashboard"
         },
+        "TweetReactionController": {
+            "emoteRain": "Rain",
+            "emoteFireworks": "Fireworks",
+            "emoteExplosion": "Bomb",
+            "emoteTunnel": "Warp"
+        },
         "TweetReactionView": {
             "gifs": "Gif",
             "stickers": "Sticker",
@@ -64,6 +70,11 @@
                 "editAvatarTextP1": "You can always",
                 "editAvatarTextP2": " edit you avatar ",
                 "editAvatarTextP3": "from the dropdwon menu"
+            },
+            "vibes": {
+                "happy": "Happy",
+                "angry": "Angry",
+                "sad": "Sad"
             }
         },
         "dialogs": {
@@ -86,13 +97,6 @@
             "Create3DTextDialog": {
                 "sample": "Sample",
                 "typeToCreate": "Type to create"
-            },
-            "EmoteRainDialog": {
-                "follower": "Follower",
-                "bits": "Bits",
-                "subTier1": "Sub Tier 1",
-                "subTier2": "Sub Tier 2",
-                "subTier3": "Sub Tier 3"
             },
             "ReactionSentDialog": {
                 "sent": "Boom. Sent.",
@@ -133,6 +137,16 @@
                 "reactionsSnoozed": "Reactions snoozed 😴",
                 "streamsHasReactionsDisabled": "The streamer has their reactions disabled at the moment. Ask your streamer to turn them on!",
                 "understood": "Understood"
+            },
+            "FullScreenEmoteAnimationDialog": {
+                "chooseEmotes": "Choose up to 3 Emotes",
+                "fullScreenAnimations": "Full Screen Emote Animations",
+                "confirm": "Confirm",
+                "follower": "Follower",
+                "bits": "Bits",
+                "subTier1": "Sub Tier 1",
+                "subTier2": "Sub Tier 2",
+                "subTier3": "Sub Tier 3"
             }
         }
     }

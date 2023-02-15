@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useTwitch } from '../../hooks/TwitchProvider';
 import { useAuth } from '../../hooks/AuthProvider';
@@ -87,6 +88,7 @@ const TweetReactionController = () => {
     const twitch = useTwitch();
     const user = useAuth();
     const segment = useSegment();
+    const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionController' })
 
     let reactionPaid = false; // Flag for purchases with Twitch, it does not work using useState but it works this way
 
@@ -364,7 +366,7 @@ const TweetReactionController = () => {
         // Necessary to show pill on UI
         setSelectedEmote({
             url: selectedEmotes[0],
-            title: selectedAnimation,
+            title: t(selectedAnimation),
             type: EMOTE,
             onRemove: () => { setSelectedEmotes([]); setSelectedEmote(null); },
             timestamp: new Date().getTime()

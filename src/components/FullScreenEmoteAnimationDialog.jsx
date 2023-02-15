@@ -328,7 +328,7 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
     const matterjsPreviewEngine = useRef();
     const user = useAuth();
     const twitch = useTwitch();
-    const { t } = useTranslation();
+    const { t } = useTranslation('translation', { keyPrefix: 'dialogs.FullScreenEmoteAnimationDialog' });
 
     useEffect(() => {
         async function checkFollowStatus() {
@@ -539,7 +539,7 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
                     :
                     <CloseIcon style={{ marginRight: '-40px', cursor: 'pointer' }} onClick={closeHandler} />
                 }
-                <Title>{selectedAnimation ? `Choose up to 3 Emotes ` : `Full Screen Emote Animations`}</Title>
+                <Title>{selectedAnimation ? t('chooseEmotes') : t('fullScreenAnimations')}</Title>
             </HeaderContainer>
             {selectedAnimation ?
                 <>
@@ -566,7 +566,8 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
                             <canvas height={220} width={467} style={{ position: 'absolute', borderRadius: '20px', overflow: 'hidden' }}></canvas>
                         </div>
                         <div id='emote-preview-container' ref={emotePreviewContainer} style={{ overflow: 'hidden', width: '467px', height: '220px', position: 'absolute', borderRadius: '20px' }}></div>
-                        <EmoteAnimationDropdown placement="bottom" open={openEmoteAnimationList} onClose={() => setOpenEmoteAnimationList(false)} title={<React.Fragment>
+                        <EmoteAnimationDropdown placement="bottom" open={openEmoteAnimationList} onClose={() => setOpenEmoteAnimationList(false)} title={
+                            <React.Fragment>
                             <EmoteAnimationList>
                                 <EmoteAnimationListOptionContainer onClick={() => setOpenEmoteAnimationList(false)}>
                                     <EmoteAnimationListOptionText>
@@ -587,7 +588,8 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
                                         null
                                 ))}
                             </EmoteAnimationList>
-                        </React.Fragment>}>
+                            </React.Fragment>
+                        }>
                             <EmoteAnimationDropdownButton onClick={() => setOpenEmoteAnimationList(true)}>
                                 <EmoteAnimationDropdownButtonText>
                                     {emoteAnimationsData[emoteAnimationsData.findIndex((element) => element.id === selectedAnimation)].display}
@@ -615,7 +617,7 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
                     </EmotesScrollContainer>
                     {selectedEmotes.length > 0 &&
                         <ConfirmButton onClick={confirmHandler}>
-                            {`Confirm`}
+                            {t('confirm')}
                         </ConfirmButton>
                     }
                 </>

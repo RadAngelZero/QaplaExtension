@@ -5,6 +5,12 @@
             "instructions": "Por favor vista el Dashboard de Qapla GG para\nconfigurar la extensión",
             "openDashboard": "Abrir Dashboard"
         },
+        "TweetReactionController": {
+            "emoteRain": "Rain",
+            "emoteFireworks": "Fireworks",
+            "emoteExplosion": "Bomb",
+            "emoteTunnel": "Warp"
+        },
         "TweetReactionView": {
             "gifs": "Gif",
             "stickers": "Sticker",
@@ -64,6 +70,11 @@
                 "editAvatarTextP1": "Siempre puedes",
                 "editAvatarTextP2": " editar tu avatar ",
                 "editAvatarTextP3": "desde este menu"
+            },
+            "vibes": {
+                "happy": "Feliz",
+                "angry": "Enojado",
+                "sad": "Triste"
             }
         },
         "dialogs": {
@@ -86,13 +97,6 @@
             "Create3DTextDialog": {
                 "sample": "Ejemplo",
                 "typeToCreate": "Escribe para crear"
-            },
-            "EmoteRainDialog": {
-                "follower": "Seguidor",
-                "bits": "Bits",
-                "subTier1": "Sub Nivel 1",
-                "subTier2": "Sub Nivel 2",
-                "subTier3": "Sub Nivel 3"
             },
             "ReactionSentDialog": {
                 "sent": "Boom. Enviado.",
@@ -131,6 +135,16 @@
                 "reactionsSnoozed": "Reactions deshabilitadas 😴",
                 "streamsHasReactionsDisabled": "El streamer deshabilito las reacciones por el momento ¡Pidele que las encienda!",
                 "understood": "Entendido"
+            },
+            "FullScreenEmoteAnimationDialog": {
+                "chooseEmotes": "Escoje hasta 3 Emotes",
+                "fullScreenAnimations": "Animaciones de emotes full screen",
+                "confirm": "Confirmar",
+                "follower": "Seguidor",
+                "bits": "Bits",
+                "subTier1": "Sub Nivel 1",
+                "subTier2": "Sub Nivel 2",
+                "subTier3": "Sub Nivel 3"
             }
         }
     }
