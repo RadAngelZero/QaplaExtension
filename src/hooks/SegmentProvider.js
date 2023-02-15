@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import { AnalyticsBrowser } from '@segment/analytics-next'
+import { AnalyticsBrowser } from '@segment/analytics-next';
 
 const SegmentContext = createContext(null);
 
