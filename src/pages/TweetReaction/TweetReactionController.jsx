@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useTwitch } from '../../hooks/TwitchProvider';
 import { useAuth } from '../../hooks/AuthProvider';
+import { useSegment } from '../../hooks/SegmentProvider';
 
 import {
     getAvailableExtraTips,
@@ -22,6 +23,7 @@ import {
     AVATAR_OPTION_GIF,
     CUSTOM_TTS_VOICE,
     EMOTE,
+    EMOTE_RAIN,
     GIPHY_GIFS,
     GIPHY_STICKERS,
     GIPHY_TEXT,
@@ -36,13 +38,13 @@ import MemeMediaSelectorDialog from '../../components/MemeMediaSelectorDialog';
 import ReactionTierSelectorDialog from '../../components/ReactionTierSelectorDialog';
 import ChooseBotVoiceDialog from '../../components/ChooseBotVoiceDialog';
 import Create3DTextDialog from '../../components/Create3DTextDialog';
-import EmoteRainDialog from '../../components/EmoteRainDialog';
 import ReactionSentDialog from '../../components/ReactionSentDialog';
 import NoReactionsDialog from '../../components/NoReactionsDialog';
 import EmptyReactionDialog from '../../components/EmptyReactionDialog';
 import CreateAvatarDialog from '../../components/CreateAvatarDialog';
 import ChooseAvatarAnimationDialog from '../../components/ChooseAvatarAnimationDialog';
 import ReactionsSnoozedDialog from '../../components/ReactionsSnoozedDialog';
+import FullScreenEmoteAnimationDialog from '../../components/FullScreenEmoteAnimationDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -63,7 +65,6 @@ const TweetReactionController = () => {
     const [open3DTextDialog, setOpen3DTextDialog] = useState(false);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState(undefined);
     const [emotes, setEmotes] = useState([]);
-    const [openEmoteRainDialog, setOpenEmoteRainDialog] = useState(false);
     const [selectedEmote, setSelectedEmote] = useState(null);
     const [numberOfReactions, setNumberOfReactions] = useState(0);
     const [availableTips, setAvailableTips] = useState([]);
@@ -79,8 +80,13 @@ const TweetReactionController = () => {
     const [openReactionsSnoozedDialog, setOpenReactionsSnoozedDialog] = useState(false);
     const [costsUpdates, setCostsUpdates] = useState(null);
     const [selectedVibe, setSelectedVibe] = useState(HAPPY_VIBE);
+    const [segmentTrackMade, setSegmentTrackMade] = useState(false);
+    const [openEmotesAnimationSelectorDialog, setOpenEmotesAnimationSelectorDialog] = useState(false);
+    const [selectedEmoteAnimation, setSelectedEmoteAnimation] = useState(EMOTE_RAIN);
+    const [selectedEmotes, setSelectedEmotes] = useState([]);
     const twitch = useTwitch();
     const user = useAuth();
+    const segment = useSegment();
 
     let reactionPaid = false; // Flag for purchases with Twitch, it does not work using useState but it works this way
 
@@ -95,6 +101,16 @@ const TweetReactionController = () => {
 
         loadTips();
     }, []);
+
+    useEffect(() => {
+        if (user && user.uid && !segmentTrackMade) {
+            segment.track('Viewer Opened Extension', {
+                Uid: user.uid
+            });
+
+            setSegmentTrackMade(true);
+        }
+    }, [user, segmentTrackMade]);
 
     useEffect(() => {
         /**
@@ -186,7 +202,7 @@ const TweetReactionController = () => {
                      * See 4.3 on the next url for more information
                      * https://dev.twitch.tv/docs/extensions/guidelines-and-policies#4-content-policy
                      */
-                    emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
+                    // emotes = emotes.filter((emoteList) => (emoteList.key !== 'global'));
 
                     setEmotes(emotes);
 
@@ -195,7 +211,7 @@ const TweetReactionController = () => {
                     if (array) {
                         const randomNumber = Math.floor(Math.random() * array.data[0].length);
 
-                        return setRandomEmoteUrl(array.data[0][randomNumber].images.url_1x);
+                        return setRandomEmoteUrl(array.data[0][randomNumber].images.url_4x);
                     }
                 }
             }
@@ -257,7 +273,7 @@ const TweetReactionController = () => {
                 setOpen3DTextDialog(true);
                 break;
             case EMOTE:
-                setOpenEmoteRainDialog(true);
+                setOpenEmotesAnimationSelectorDialog(true);
                 break;
             case AVATAR:
                 if (user.avatarId) {
@@ -305,7 +321,7 @@ const TweetReactionController = () => {
             onRemove: () => setSelectedEmote(null),
             timestamp: new Date().getTime()
         });
-        setOpenEmoteRainDialog(false);
+        setOpenEmotesAnimationSelectorDialog(false);
     }
 
     const onAvatarAnimationSelected = (animationId) => {
@@ -340,6 +356,21 @@ const TweetReactionController = () => {
         }
     }
 
+    const onEmoteAnimationSelected = (selectedEmotes, selectedAnimation) => {
+        setSelectedEmoteAnimation(selectedAnimation);
+        setSelectedEmotes(selectedEmotes);
+        setOpenEmotesAnimationSelectorDialog(false);
+
+        // Necessary to show pill on UI
+        setSelectedEmote({
+            url: selectedEmotes[0],
+            title: selectedAnimation,
+            type: EMOTE,
+            onRemove: () => { setSelectedEmotes([]); setSelectedEmote(null); },
+            timestamp: new Date().getTime()
+        });
+    }
+
     const writeReaction = async (bits, channelPointsReaction = false, zapsCost) => {
         let messageExtraData = selectedVoiceBot ?
             {
@@ -353,12 +384,6 @@ const TweetReactionController = () => {
             custom3DText
             :
             {};
-
-        const emoteArray = [];
-
-        if (selectedEmote) {
-            emoteArray.push(selectedEmote.url);
-        }
 
         await sendReaction(
             bits,
@@ -378,7 +403,8 @@ const TweetReactionController = () => {
             messageExtraData,
             {
                 type: EMOTE,
-                emojis: emoteArray
+                emojis: selectedEmotes,
+                animationId: selectedEmoteAnimation
             },
             (new Date()).getTime(),
             user.avatarId,
@@ -393,6 +419,23 @@ const TweetReactionController = () => {
         }
 
         setOpenSentDialog(true);
+
+        const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
+        segment.track('Reaction Sent', {
+            Bits: bits,
+            ExtraBits: channelPointsReaction ? bits : currentReactionCost - bits,
+            IsZapReaction: channelPointsReaction,
+            ReactionCost: currentReactionCost,
+            ReactionHasMessage: message !== '',
+            ReactionHasMedia: Boolean(selectedMedia).valueOf(),
+            ReactionHasCustomVoice: messageExtraData.voiceAPIName !== undefined,
+            ReactionHasGiphyText: messageExtraData.giphyText !== {},
+            ReactionHasEmoteRain: emoteArray.length > 0,
+            ReactionHasAvatarAnimation: Boolean(avatarAnimation).valueOf(),
+            SentTo: streamerUid,
+            UserHasAvatar: Boolean(user.avatarId).valueOf(),
+            ZapsCost: zapsCost
+        });
     }
 
     const onSendReaction = async () => {
@@ -489,6 +532,7 @@ const TweetReactionController = () => {
         setExtraTip(null);
         setSelectedVoiceBot(null);
         setCustom3DText(null);
+        setSelectedEmotes([]);
         setSelectedEmote(null);
         setSending(false);
         setAvatarAnimation(null);
@@ -597,10 +641,6 @@ const TweetReactionController = () => {
                 onClose={() => setOpen3DTextDialog(false)}
                 defaultMessage={message}
                 on3DTextSelected={on3DTextSelected} />
-            <EmoteRainDialog open={openEmoteRainDialog}
-                onClose={() => setOpenEmoteRainDialog(false)}
-                emotes={emotes}
-                onEmoteSelected={onEmoteSelected} />
             <EmptyReactionDialog open={openEmptyReactionDialog}
                 onClose={() => setOpenEmptyReactionDialog(false)} />
             <CreateAvatarDialog open={openCreateAvatarDialog}
@@ -620,6 +660,11 @@ const TweetReactionController = () => {
                 onUpgradeReaction={(level) => { onUpgradeReaction(level, null); setOpenNoReactionsDialog(false); }} />
             <ReactionsSnoozedDialog open={openReactionsSnoozedDialog}
                 onClose={() => setOpenReactionsSnoozedDialog(false)} />
+            <FullScreenEmoteAnimationDialog open={openEmotesAnimationSelectorDialog}
+                onClose={() => setOpenEmotesAnimationSelectorDialog(false)}
+                emotes={emotes}
+                randomEmoteUrl={randomEmoteUrl}
+                onEmoteAnimationSelected={onEmoteAnimationSelected} />
         </>
     );
 }
