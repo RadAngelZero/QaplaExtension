@@ -931,7 +931,8 @@ const TweetReactionView = ({
     availableTips,
     avatarAnimation,
     avatarId,
-    avatarBackground
+    avatarBackground,
+    userTwitchId
 }) => {
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
     const [toolTipStep, setTooltipStep] = useState(null);
@@ -1135,7 +1136,7 @@ const TweetReactionView = ({
                                         </MenuOptionText>
                                     </MenuOption>
                                     <MenuOption onClick={() => {
-                                        window.open('https://web.qapla.gg/hub/how', '_blank');
+                                        window.open(`https://web.qapla.gg/hub/how?id=${userTwitchId}`, '_blank');
                                     }} style={{ opacity: openAvatarTip ? 0.6 : 1 }}>
                                         <MenuOptionEmoji>
                                             <span role='img' aria-label='Tutorials'>
@@ -1175,7 +1176,7 @@ const TweetReactionView = ({
                                         </React.Fragment>
                                     }>
                                         <MenuOption onClick={() => {
-                                            window.open('https://web.qapla.gg/hub/avatar', '_blank');
+                                            window.open(`https://web.qapla.gg/hub/avatar?id=${userTwitchId}`, '_blank');
                                             onAvatarTooltipClose();
                                         }}>
                                             <MenuOptionEmoji>
@@ -1320,7 +1321,7 @@ const TweetReactionView = ({
                                 }>
                                     <PricesButton startIcon={currentReactionCost.type === ZAP ? <Interactions /> : <Bits />}
                                         onClick={onChangeReactionLevel}>
-                                        {currentReactionCost && currentReactionCost.price.toLocaleString()}
+                                        {currentReactionCost !== undefined && (currentReactionCost.price !== 0 ? currentReactionCost.price.toLocaleString() : t('free'))}
                                     </PricesButton>
                                 </QaplaTooltipTwo>
                                 <QaplaTooltipThree open={toolTipStep === 3} placement='top-start' arrow title={

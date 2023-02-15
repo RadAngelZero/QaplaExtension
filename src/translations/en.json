@@ -21,6 +21,7 @@
             "upgradeToUse": "👀 Upgrade your reaction to use ",
             "contentAvailableWhenUpgradeTo2": "TTS Bot Voice, Animated Avatar & 3D Text",
             "contentAvailableWhenUpgradeTo3": "Emotes Animations",
+            "free": "Free",
             "menu": {
                 "walkthrough": "Extension Walkthrough",
                 "tutorials": "Tutorials",
@@ -76,7 +77,8 @@
                 "reactionTiers": "Reaction Tier",
                 "level1": "Memes + TTS",
                 "level2": "+ 3D Text,\nTTS Voice",
-                "level3": "+ Emote Animation"
+                "level3": "+ Emote Animation",
+                "free": "Free"
             },
             "ChooseBotVoiceDialog": {
                 "chooseAVoice": "Choose a TTS Bot Voice"

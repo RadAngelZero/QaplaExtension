@@ -202,7 +202,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel,
                                     <Bits />
                                 }
                                 <PriceText>
-                                    {costs[0] && costs[0].price.toLocaleString()}
+                                    {costs[0] !== undefined && (costs[0].price !== 0 ? costs[0].price.toLocaleString() : t('free'))}
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
@@ -241,7 +241,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel,
                                     <Bits />
                                 }
                                 <PriceText>
-                                    {costs[1] && costs[1].price.toLocaleString()}
+                                    {costs[1] !== undefined && (costs[1].price !== 0 ? costs[1].price.toLocaleString() : t('free'))}
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
@@ -278,7 +278,7 @@ const ReactionTierSelectorDialog = ({ open, onClose, costs, changeReactionLevel,
                                     <Bits />
                                 }
                                 <PriceText>
-                                    {costs[2] && costs[2].price.toLocaleString()}
+                                    {costs[2] !== undefined && (costs[2].price !== 0 ? costs[2].price.toLocaleString() : t('free'))}
                                 </PriceText>
                             </PriceContainer>
                         </BottomContainer>
