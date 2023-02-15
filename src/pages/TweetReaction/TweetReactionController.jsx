@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useTwitch } from '../../hooks/TwitchProvider';
 import { useAuth } from '../../hooks/AuthProvider';
+import { useSegment } from '../../hooks/SegmentProvider';
 
 import {
     getAvailableExtraTips,
@@ -78,11 +79,13 @@ const TweetReactionController = () => {
     const [avatarAnimation, setAvatarAnimation] = useState(null);
     const [openReactionsSnoozedDialog, setOpenReactionsSnoozedDialog] = useState(false);
     const [costsUpdates, setCostsUpdates] = useState(null);
+    const [segmentTrackMade, setSegmentTrackMade] = useState(false);
     const [openEmotesAnimationSelectorDialog, setOpenEmotesAnimationSelectorDialog] = useState(false);
     const [selectedEmoteAnimation, setSelectedEmoteAnimation] = useState(EMOTE_RAIN);
     const [selectedEmotes, setSelectedEmotes] = useState([]);
     const twitch = useTwitch();
     const user = useAuth();
+    const segment = useSegment();
 
     let reactionPaid = false; // Flag for purchases with Twitch, it does not work using useState but it works this way
 
@@ -97,6 +100,16 @@ const TweetReactionController = () => {
 
         loadTips();
     }, []);
+
+    useEffect(() => {
+        if (user && user.uid && !segmentTrackMade) {
+            segment.track('Viewer Opened Extension', {
+                Uid: user.uid
+            });
+
+            setSegmentTrackMade(true);
+        }
+    }, [user, segmentTrackMade]);
 
     useEffect(() => {
         /**
@@ -404,6 +417,23 @@ const TweetReactionController = () => {
         }
 
         setOpenSentDialog(true);
+
+        const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
+        segment.track('Reaction Sent', {
+            Bits: bits,
+            ExtraBits: channelPointsReaction ? bits : currentReactionCost - bits,
+            IsZapReaction: channelPointsReaction,
+            ReactionCost: currentReactionCost,
+            ReactionHasMessage: message !== '',
+            ReactionHasMedia: Boolean(selectedMedia).valueOf(),
+            ReactionHasCustomVoice: messageExtraData.voiceAPIName !== undefined,
+            ReactionHasGiphyText: messageExtraData.giphyText !== {},
+            ReactionHasEmoteRain: emoteArray.length > 0,
+            ReactionHasAvatarAnimation: Boolean(avatarAnimation).valueOf(),
+            SentTo: streamerUid,
+            UserHasAvatar: Boolean(user.avatarId).valueOf(),
+            ZapsCost: zapsCost
+        });
     }
 
     const onSendReaction = async () => {

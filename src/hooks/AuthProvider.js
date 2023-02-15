@@ -3,12 +3,14 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authWithTwitch, listenToAuthState } from '../services/auth';
 import { listenToUserProfile } from '../services/database';
 import { getUserData } from '../services/twitch';
+import { useSegment } from './SegmentProvider';
 import { useTwitch } from './TwitchProvider';
 
 const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
     const twitch = useTwitch();
+    const segment = useSegment();
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -55,6 +57,7 @@ const AuthProvider = ({ children }) => {
                     // Listen to auth state from firebase
                     listenToAuthState((user) => {
                         if (user) {
+                            segment.identify(user.uid);
                             loadUserProfile(user.uid, {
                                 ...auth,
                                 ...twitch.viewer
