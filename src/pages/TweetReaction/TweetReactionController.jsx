@@ -315,17 +315,6 @@ const TweetReactionController = () => {
         }
     }
 
-    const onEmoteSelected = (emote) => {
-        setSelectedEmote({
-            url: emote,
-            title: 'Emote Raid',
-            type: EMOTE,
-            onRemove: () => setSelectedEmote(null),
-            timestamp: new Date().getTime()
-        });
-        setOpenEmotesAnimationSelectorDialog(false);
-    }
-
     const onAvatarAnimationSelected = (animationId) => {
         setAvatarAnimation({
             url: AVATAR_OPTION_GIF,

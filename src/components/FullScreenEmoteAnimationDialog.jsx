@@ -44,68 +44,7 @@ const emoteAnimationsData = [
         id: EMOTE_TUNNEL,
         display: '🌀 Warp'
     },
-]
-
-const emotesData = [
-    {
-        sectionHeader: 'Followers',
-        emotes: [
-            {
-                id: 'furious-mustache',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0'
-            },
-            {
-                id: 'camping',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'
-            },
-            {
-                id: 'furious-mustache',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0'
-            },
-            {
-                id: 'camping',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'
-            },
-            {
-                id: 'furious-mustache',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0'
-            },
-            {
-                id: 'camping',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'
-            },
-            {
-                id: 'furious-mustache',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0'
-            },
-            {
-                id: 'camping',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'
-            },
-            {
-                id: 'furious-mustache',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/304489309/static/light/3.0'
-            },
-            {
-                id: 'camping',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_291135bb36d24d33bf53860128b5095c/static/light/3.0'
-            },
-        ],
-    },
-    {
-        sectionHeader: 'Tier 1',
-        emotes: [
-            {
-                id: 'cool-cat',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/58127/default/dark/1.0'
-            },
-            {
-                id: 'kappa',
-                url: 'https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/1.0'
-            },
-        ],
-    }
-]
+];
 
 const BigDialog = styled(Dialog)({
     '.MuiDialog-root': {
@@ -250,22 +189,12 @@ const EmotesScrollContainer = styled(Box)({
     }
 });
 
-const EmoteSection = styled(Box)({
-    display: 'flex',
-    flexDirection: 'column',
-});
 const EmoteSectionHeader = styled(Typography)({
     color: '#fff',
     fontSize: '20px',
     fontWeight: '500',
     lineHeight: '24px',
     marginBottom: '22px',
-});
-
-const EmotesContainer = styled(Box)({
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '22px 0px'
 });
 
 const EmoteContainer = styled(Box)({
@@ -296,7 +225,6 @@ const ConfirmButton = styled(Button)({
     boxShadow: '0px 8px 30px rgba(0, 255, 221, 0.25)',
     fontSize: '20px',
     fontWeight: '600',
-    color: '#0D1022',
     '&:hover': {
         backgroundColor: '#00FFDD',
         opacity: 1,
@@ -631,7 +559,12 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
                         <canvas width={222} height={222} id='matterjs-canvas-rain' style={{ position: 'absolute', borderRadius: '20px', overflow: 'hidden' }}>
 
                         </canvas>
-                        <DeqText>💧 Rain</DeqText>
+                        <DeqText>
+                            <span role='img' aria-label='Rain animation'>
+                                💧
+                            </span>
+                            Rain
+                        </DeqText>
                     </DeqButton>
                     <DeqButton id='matterjs-container-fireworks' ref={matterjsContainerFireworks} onClick={() => {
                         setSelectedAnimation(EMOTE_FIREWORKS);
@@ -641,7 +574,12 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
                         <canvas width={222} height={222} id='matterjs-canvas-fireworks' style={{ position: 'absolute', borderRadius: '20px', overflow: 'hidden' }}>
 
                         </canvas>
-                        <DeqText>🎆 Fireworks</DeqText>
+                        <DeqText>
+                            <span role='img' aria-label='Fireworks animation'>
+                                🎆
+                            </span>
+                            Fireworks
+                        </DeqText>
                     </DeqButton>
                     <DeqButton onClick={() => {
                         setSelectedAnimation(EMOTE_EXPLOSION);
@@ -649,7 +587,12 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
                         startPreview(EMOTE_EXPLOSION);
                     }}>
                         <div id='emote-explosion-container' ref={emoteExplosionContainer} style={{ overflow: 'hidden', width: '222px', height: '222px', position: 'absolute', borderRadius: '20px' }}></div>
-                        <DeqText>💣 Bomb</DeqText>
+                        <DeqText>
+                            <span role='img' aria-label='Bomb animation'>
+                                💣
+                            </span>
+                            Bomb
+                        </DeqText>
                     </DeqButton>
                     <DeqButton onClick={() => {
                         setSelectedAnimation(EMOTE_TUNNEL);
@@ -657,7 +600,12 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, emotes, randomEmoteUrl,
                         startPreview(EMOTE_TUNNEL);
                     }}>
                         <div id='emote-tunel-container' style={{ overflow: 'hidden', width: '222px', height: '222px', position: 'absolute', borderRadius: '20px' }} ref={emoteTunelContainer}></div>
-                        <DeqText>🌀 Warp</DeqText>
+                        <DeqText>
+                            <span role='img' aria-label='Warp animation'>
+                                🌀
+                            </span>
+                            Warp
+                        </DeqText>
                     </DeqButton>
                 </DeqContainer>
             }
