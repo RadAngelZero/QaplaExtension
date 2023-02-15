@@ -1,9 +1,10 @@
 import React, { createContext, useContext } from 'react';
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 const SegmentContext = createContext(null);
 
 const SegmentProvider = ({ children }) => {
-    const segment = window.analytics ? window.analytics : null;
+    const segment = AnalyticsBrowser.load({ writeKey: '2aMup1UfHD1G1GBHlRj9Ew5gpdq5AVER' });
 
     return (
         <SegmentContext.Provider value={segment}>
