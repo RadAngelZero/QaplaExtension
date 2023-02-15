@@ -3,7 +3,7 @@ import { Box, Button, Dialog, DialogContent, Tooltip, Typography, tooltipClasses
 import styled from '@emotion/styled';
 // import { useTranslation } from 'react-i18next';
 
-import { emoteExplosion, emoteTunnel, generateDrop, resetEngine, spawnFirework, startEmoteFireworks, startEmoteRain, startMatterEngine } from '../utilities/OverlayEmotesAnimation';
+import { emoteExplosion, emoteTunnel, generateDrop, manageWind, resetEngine, spawnFirework, startEmoteFireworks, startEmoteRain, startMatterEngine } from '../utilities/OverlayEmotesAnimation';
 
 import { ReactComponent as CloseIcon } from '../assets/Icons/Close.svg';
 import { ReactComponent as ArrowDown } from '../assets/Icons/ArrowDown.svg';
@@ -271,11 +271,13 @@ const EmoteImg = styled('img')({
 
 const ConfirmButton = styled(Button)({
     position: 'absolute',
-    left: 'auto',
-    right: 'auto',
-    bottom: '24px',
+    left: '50%',
+    transform: 'translate(-50%, 0)',
+    bottom: '64px',
     backgroundColor: '#00FFDD',
     textTransform: 'none',
+    padding: '16px 24px',
+    borderRadius: '100px',
     color: '#0D1022',
     '&:hover': {
         backgroundColor: '#00FFDD',
@@ -342,21 +344,21 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
         setTimeout(() => {
             startMatterEngine(matterjsPreviewContainer, matterjsPreviewEngine, 467, 220);
             if (emoteAnimation === EMOTE_RAIN) {
-                startEmoteRain(matterjsPreviewEngine.current, randomEmotesArray, 9999, 467, 220, 0.4);
+                startEmoteRain(matterjsPreviewEngine.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 9999, 467, 220, 0.4);
             }
             if (emoteAnimation === EMOTE_FIREWORKS) {
-                startEmoteFireworks(matterjsPreviewEngine.current, randomEmotesArray, 9999, 467, 220, 0.2);
+                startEmoteFireworks(matterjsPreviewEngine.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 9999, 467, 220, 0.2);
             }
             if (emoteAnimation === EMOTE_EXPLOSION) {
-                emoteExplosion(emotePreviewContainer.current, randomEmotesArray, 467, 220);
+                emoteExplosion(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 467, 220);
                 setEmoteAnimationPreviewInterval(setInterval(() => {
-                    emoteExplosion(emotePreviewContainer.current, randomEmotesArray, 467, 220);
+                    emoteExplosion(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 467, 220);
                 }, 3000));
             }
             if (emoteAnimation === EMOTE_TUNNEL) {
-                emoteTunnel(emotePreviewContainer.current, randomEmotesArray, 3, 'emote-preview-container');
+                emoteTunnel(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 3, 'emote-preview-container');
                 setEmoteAnimationPreviewInterval(setInterval(() => {
-                    emoteTunnel(emotePreviewContainer.current, randomEmotesArray, 3, 'emote-preview-container');
+                    emoteTunnel(emotePreviewContainer.current, selectedEmotes.length > 0 ? selectedEmotes : randomEmotesArray, 3, 'emote-preview-container');
                 }, 5000));
             }
         }, 50);
@@ -374,24 +376,9 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
         onDeqButton(animationName);
         resetEngine(matterjsPreviewEngine);
         clearPreviewIntervals();
-        if (animationName === EMOTE_RAIN) {
-            startEmoteRain(matterjsPreviewEngine.current, randomEmotesArray, 9999, 467, 220, 0.4);
-        }
-        if (animationName === EMOTE_FIREWORKS) {
-            startEmoteFireworks(matterjsPreviewEngine.current, randomEmotesArray, 9999, 467, 220, 0.2);
-        }
-        if (animationName === EMOTE_EXPLOSION) {
-            emoteExplosion(emotePreviewContainer.current, randomEmotesArray, 467, 220);
-            setEmoteAnimationPreviewInterval(setInterval(() => {
-                emoteExplosion(emotePreviewContainer.current, randomEmotesArray, 467, 220);
-            }, 3000));
-        }
-        if (animationName === EMOTE_TUNNEL) {
-            emoteTunnel(emotePreviewContainer.current, randomEmotesArray, 3, 'emote-preview-container');
-            setEmoteAnimationPreviewInterval(setInterval(() => {
-                emoteTunnel(emotePreviewContainer.current, randomEmotesArray, 3, 'emote-preview-container');
-            }, 5000));
-        }
+        setTimeout(() => {
+            startPreview();
+        }, 100)
     };
 
     const handleEmoteAdded = (emoteURL) => {
@@ -405,6 +392,7 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
         clearPreviewIntervals();
         if (emoteAnimation === EMOTE_RAIN) {
             generateDrop(matterjsPreviewEngine.current, tempEmoteArr.length > 0 ? tempEmoteArr : randomEmotesArray, 9999, 0, 467, 0.4);
+            manageWind(matterjsPreviewEngine.current, 9999, 0)
         }
         if (emoteAnimation === EMOTE_FIREWORKS) {
             spawnFirework(matterjsPreviewEngine.current, tempEmoteArr.length > 0 ? tempEmoteArr : randomEmotesArray, 9999, 0, 467, 220, 0.2);
@@ -431,6 +419,12 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
 
     const closeHandler = () => {
         clearIntervals();
+        clearPreviewIntervals();
+        onClose();
+    }
+
+    const confirmHandler = () => {
+        console.log('confirm emotes and animation');
         clearPreviewIntervals();
         onClose();
     }
@@ -531,6 +525,9 @@ const FullScreenEmoteAnimationDialog = ({ open, onClose, onDeqButton, emoteAnima
                         })}
                         <div style={{ height: '18%' }} />
                     </EmotesScrollContainer>
+                    {selectedEmotes.length > 0 &&
+                        <ConfirmButton onClick={confirmHandler}>{`Confirm`}</ConfirmButton>
+                    }
                 </>
                 :
                 <DeqContainer>
