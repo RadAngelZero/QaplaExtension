@@ -316,9 +316,10 @@ export function getAvailableExtraTips() {
  * @param {number} avatarBackground.angle Avatar gradient angle
  * @param {Array<string>} avatarBackground.colors Array of colors for gradient background
  * @param {string | undefined} avatarAnimationId Avatar animation identifier
+ * @param {string} vibe Selected vibe for the reaction
  * @param {boolean} pointsChannelInteractions True if reaction was sent with channel points
  */
-export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, avatarAnimationId, pointsChannelInteractions) {
+export async function sendReaction(bits, uid, userName, twitchUserName, userPhotoURL, streamerUid, streamerName, media, message, messageExtraData, emoteRaid, timestamp, avatarId, avatarBackground, avatarAnimationId, vibe, pointsChannelInteractions) {
     const streamerDonations = createChild(`/StreamersDonations/${streamerUid}`);
 
     const reactionReference = await push(streamerDonations, {
@@ -342,6 +343,7 @@ export async function sendReaction(bits, uid, userName, twitchUserName, userPhot
         twitchUserName,
         userName,
         photoURL: userPhotoURL,
+        vibe,
         pointsChannelInteractions, // Flag to identify if the reaction was sent with Channel Points or Bits
         read: false
     });

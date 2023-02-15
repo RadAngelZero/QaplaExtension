@@ -17,6 +17,11 @@ export const ZAP = 'zap';
 
 export const AVATAR_OPTION_GIF = 'https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/AvatarsReactionsGifs%2FAvatarIcon.gif?alt=media&token=0166f97e-ab75-4e6a-bc08-a3bad5060284';
 
+// Reactions Vibes
+export const ANGRY_VIBE = 'angryVibe';
+export const HAPPY_VIBE = 'happyVibe';
+export const SAD_VIBE = 'sadVibe';
+
 // Overlay emotes animations
 export const EMOTE_RAIN = 'emoteRain';
 export const EMOTE_EXPLOSION = 'emoteExplosion';

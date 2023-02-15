@@ -27,6 +27,7 @@ import {
     GIPHY_GIFS,
     GIPHY_STICKERS,
     GIPHY_TEXT,
+    HAPPY_VIBE,
     MEMES,
     ZAP
 } from '../../constants';
@@ -64,7 +65,6 @@ const TweetReactionController = () => {
     const [open3DTextDialog, setOpen3DTextDialog] = useState(false);
     const [randomEmoteUrl, setRandomEmoteUrl] = useState(undefined);
     const [emotes, setEmotes] = useState([]);
-    const [openEmoteRainDialog, setOpenEmoteRainDialog] = useState(false);
     const [selectedEmote, setSelectedEmote] = useState(null);
     const [numberOfReactions, setNumberOfReactions] = useState(0);
     const [availableTips, setAvailableTips] = useState([]);
@@ -79,6 +79,7 @@ const TweetReactionController = () => {
     const [avatarAnimation, setAvatarAnimation] = useState(null);
     const [openReactionsSnoozedDialog, setOpenReactionsSnoozedDialog] = useState(false);
     const [costsUpdates, setCostsUpdates] = useState(null);
+    const [selectedVibe, setSelectedVibe] = useState(HAPPY_VIBE);
     const [segmentTrackMade, setSegmentTrackMade] = useState(false);
     const [openEmotesAnimationSelectorDialog, setOpenEmotesAnimationSelectorDialog] = useState(false);
     const [selectedEmoteAnimation, setSelectedEmoteAnimation] = useState(EMOTE_RAIN);
@@ -409,6 +410,7 @@ const TweetReactionController = () => {
             user.avatarId,
             user.avatarBackground,
             avatarAnimation ? avatarAnimation.id : '',
+            selectedVibe,
             channelPointsReaction
         );
 
@@ -616,6 +618,8 @@ const TweetReactionController = () => {
                 avatarAnimation={avatarAnimation}
                 avatarId={user.avatarId}
                 avatarBackground={user.avatarBackground}
+                selectedVibe={selectedVibe}
+                onChangeSelectedVibe={setSelectedVibe}
                 userTwitchId={user.twitchId} />
             <GiphyMediaSelectorDialog open={openGiphyDialog}
                 onClose={() => setOpenGiphyDialog(false)}
