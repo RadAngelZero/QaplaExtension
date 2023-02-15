@@ -1,6 +1,8 @@
 import { gsap } from 'gsap';
 import { Engine, Render, Runner, Bodies, Composite, Body, Events } from 'matter-js';
 
+window.timeouts = {};
+
 export function emoteExplosion(container, emotesArray, windowWidth = document.body.clientWidth, windowHeight = document.body.clientHeight) {
     let flyingMen = [];
 
@@ -94,7 +96,7 @@ export function startEmoteRain(engine, emotesArray, duration, windowWidth = docu
     engine.world.gravity.y = 0.4
     engine.world.gravity.x = 0.02
 
-    setTimeout(() => {
+    window.timeouts.clearRain = setTimeout(() => {
         resetEngine(engine);
     }, (duration + 5) * 1000);
 
@@ -106,14 +108,14 @@ export function startEmoteRain(engine, emotesArray, duration, windowWidth = docu
 
 }
 
-function resetEngine(engine) {
+export function resetEngine(engine) {
+    Events.off(engine, 'collisionStart', () => { });
     engine.world.gravity.y = 1;
     engine.world.gravity.x = 0;
-    Events.off(engine, 'collisionStart');
     Composite.clear(engine.world, false, true);
 }
 
-function generateDrop(engine, emotesArray, duration, count, windowWidth, scale) {
+export function generateDrop(engine, emotesArray, duration, count, windowWidth, scale) {
     if (count >= duration * 1000) return;
     let randomInterval = Math.floor((Math.random() * 100) + 20);
     let randomXPos = Math.floor((Math.random() * (windowWidth - 100)) + 100);
@@ -134,27 +136,27 @@ function generateDrop(engine, emotesArray, duration, count, windowWidth, scale) 
 
     Composite.add(engine.world, drop);
 
-    setTimeout(() => {
+    window.timeouts.generateDrop = setTimeout(() => {
         generateDrop(engine, emotesArray, duration, count + randomInterval, windowWidth, scale);
     }, randomInterval);
 
 }
 
-function manageWind(engine, duration, count) {
+export function manageWind(engine, duration, count) {
     if (count >= (duration + 4.5) * 1000) return;
 
     let randomInterval = Math.floor((Math.random() * 800) + 200);
 
     engine.world.gravity.x = engine.world.gravity.x >= 0 ? -0.2 : 0.2;
 
-    setTimeout(() => {
+    window.timeouts.manageWind = setTimeout(() => {
         manageWind(engine, duration, count + randomInterval);
     }, randomInterval);
 
 }
 
 // https://www.youtube.com/watch?v=4NhLMNkyeh4
-export function emoteTunnel(container, emotesArray, duration) {
+export function emoteTunnel(container, emotesArray, duration, containerID = 'emote-tunel-container') {
     for (let i = 0; i < 25; i++) {
         const randomEmoteIndex = Math.floor(Math.random() * emotesArray.length);
         const confetti = document.createElement('div');
@@ -169,7 +171,7 @@ export function emoteTunnel(container, emotesArray, duration) {
     const TLCONF = gsap.timeline();
 
     TLCONF
-        .to('#emote-tunel-container img', {
+        .to(`#${containerID} img`, {
             y: 'random(-400,400)',
             x: 'random(-400,400)',
             z: 'random(0,1000)',
@@ -261,7 +263,7 @@ export function spawnFirework(engine, emotesArray, amount = 0, count = 1, window
         })
     }, 2000);
 
-    setTimeout(() => {
+    window.timeouts.spawnFirework = setTimeout(() => {
         spawnFirework(engine, emotesArray, amount, count + 1, windowWidth, windowHeight, scale);
     }, randomDelay);
 }

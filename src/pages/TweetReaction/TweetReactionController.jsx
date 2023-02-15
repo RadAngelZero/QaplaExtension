@@ -78,6 +78,9 @@ const TweetReactionController = () => {
     const [avatarAnimation, setAvatarAnimation] = useState(null);
     const [openReactionsSnoozedDialog, setOpenReactionsSnoozedDialog] = useState(false);
     const [costsUpdates, setCostsUpdates] = useState(null);
+    const [openEmotesAnimationSelectorDialog, setOpenEmotesAnimationSelectorDialog] = useState(false);
+    const [emoteAnimation, setEmoteAnimation] = useState(null);
+    const [selectedEmotes, setSelectedEmotes] = useState([]);
     const twitch = useTwitch();
     const user = useAuth();
 
@@ -619,8 +622,12 @@ const TweetReactionController = () => {
                 onUpgradeReaction={(level) => { onUpgradeReaction(level, null); setOpenNoReactionsDialog(false); }} />
             <ReactionsSnoozedDialog open={openReactionsSnoozedDialog}
                 onClose={() => setOpenReactionsSnoozedDialog(false)} />
-            <FullScreenEmoteAnimationDialog open={true}
-                onClose={() => console.log('close')}
+            <FullScreenEmoteAnimationDialog open={openEmotesAnimationSelectorDialog}
+                onClose={() => setOpenEmotesAnimationSelectorDialog(false)}
+                onDeqButton={setEmoteAnimation}
+                emoteAnimation={emoteAnimation}
+                setSelectedEmotes={setSelectedEmotes}
+                selectedEmotes={selectedEmotes}
             />
         </>
     );
