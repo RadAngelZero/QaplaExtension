@@ -198,6 +198,7 @@ const EmoteSectionHeader = styled(Typography)({
 });
 
 const EmoteContainer = styled(Box)({
+    position: 'relative',
     display: 'flex',
     flexBasis: '16.66%',
     width: '56px',
