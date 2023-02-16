@@ -85,6 +85,8 @@ const TweetReactionController = () => {
     const [openEmotesAnimationSelectorDialog, setOpenEmotesAnimationSelectorDialog] = useState(false);
     const [selectedEmoteAnimation, setSelectedEmoteAnimation] = useState(EMOTE_RAIN);
     const [selectedEmotes, setSelectedEmotes] = useState([]);
+    const [avatarWasCreatedForAnimation, setAvatarWasCreatedForAnimation] = useState(true);
+    const [openVibeMenu, setOpenVibeMenu] = useState(false);
     const twitch = useTwitch();
     const user = useAuth();
     const segment = useSegment();
@@ -121,9 +123,13 @@ const TweetReactionController = () => {
          */
         if (openCreateAvatarDialog && user && user.avatarId) {
             setOpenCreateAvatarDialog(false);
-            setOpenAnimationAvatarDialog(true);
+            if (avatarWasCreatedForAnimation) {
+                setOpenAnimationAvatarDialog(true);
+            } else {
+                setOpenVibeMenu(true);
+            }
         }
-    }, [openCreateAvatarDialog, user]);
+    }, [openCreateAvatarDialog, user, avatarWasCreatedForAnimation]);
 
     useEffect(() => {
         async function getStreamerData(streamerId) {
@@ -360,6 +366,11 @@ const TweetReactionController = () => {
             onRemove: () => { setSelectedEmotes([]); setSelectedEmote(null); },
             timestamp: new Date().getTime()
         });
+    }
+
+    const createAvatarForTTS = () => {
+        setOpenCreateAvatarDialog(true);
+        setAvatarWasCreatedForAnimation(false);
     }
 
     const writeReaction = async (bits, channelPointsReaction = false, zapsCost) => {
@@ -611,7 +622,10 @@ const TweetReactionController = () => {
                 avatarBackground={user.avatarBackground}
                 selectedVibe={selectedVibe}
                 onChangeSelectedVibe={setSelectedVibe}
-                userTwitchId={user.twitchId} />
+                userTwitchId={user.twitchId}
+                createAvatarForTTS={createAvatarForTTS}
+                openVibeMenu={openVibeMenu}
+                setOpenVibeMenu={setOpenVibeMenu} />
             <GiphyMediaSelectorDialog open={openGiphyDialog}
                 onClose={() => setOpenGiphyDialog(false)}
                 mediaType={giphyDialogMediaType}

@@ -1005,7 +1005,10 @@ const TweetReactionView = ({
     avatarBackground,
     selectedVibe,
     onChangeSelectedVibe,
-    userTwitchId
+    userTwitchId,
+    createAvatarForTTS,
+    openVibeMenu,
+    setOpenVibeMenu
 }) => {
     const noEnabledOptions = allMediaOptionsTypes.filter((type) => !mediaSelectorBarOptions.includes(type));
     const [toolTipStep, setTooltipStep] = useState(null);
@@ -1013,7 +1016,6 @@ const TweetReactionView = ({
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
     const [openAvatarTip, setOpenAvatarTip] = useState(false);
-    const [openVibeMenu, setOpenVibeMenu] = useState(false);
     const ttsRef = useRef();
     const { t } = useTranslation('translation', { keyPrefix: 'TweetReactionView' });
     const VibesObject = {
@@ -1151,7 +1153,7 @@ const TweetReactionView = ({
                                 </VibesContainer>
                             </React.Fragment>
                         }>
-                            <ImageDisplayContainer onClick={() => setOpenVibeMenu(true)}>
+                            <ImageDisplayContainer onClick={() => avatarId ? setOpenVibeMenu(true) : createAvatarForTTS()}>
                                 {avatarId ?
                                     <AvatarImage src={`https://api.readyplayer.me/v1/avatars/${avatarId}.png?scene=fullbody-portrait-v1-transparent`}
                                         alt='User avatar image'
@@ -1160,7 +1162,7 @@ const TweetReactionView = ({
                                                 getLinearGradientBackground(avatarBackground.angle, avatarBackground.colors)
                                                 :
                                                 'linear-gradient(95.31deg, #FF669D 1.88%, #9746FF 95.17%)'
-                                        }} ></AvatarImage>
+                                        }} />
                                     :
                                     <UserImage
                                         src={userImage} />
@@ -1313,19 +1315,6 @@ const TweetReactionView = ({
                                             <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
                                         </MenuOption>
                                     </AvatartTipOnMenu>
-                                    <MenuOption onClick={() => {
-                                        window.open('https://www.discord.gg/6GBHn78', '_blank');
-                                    }} style={{ opacity: openAvatarTip ? 0.6 : 1 }}>
-                                        <MenuOptionEmoji>
-                                            <span role='img' aria-label='Support'>
-                                                💬
-                                            </span>
-                                        </MenuOptionEmoji>
-                                        <MenuOptionText>
-                                            {t('menu.support')}
-                                        </MenuOptionText>
-                                        <ExternalLinkWhite style={{ marginLeft: 'auto' }} />
-                                    </MenuOption>
                                 </MenuOptionsContainer>
                             </React.Fragment>
                         } >
