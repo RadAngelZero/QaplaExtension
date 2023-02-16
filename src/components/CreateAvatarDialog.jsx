@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as ExternalLink } from './../assets/Icons/ExternalLink.svg';
-import CreateAvi from './../assets/Images/CreateAvi.png';
 
 const CloseIconButton = styled(IconButton)({
     position: 'absolute',
@@ -77,7 +76,7 @@ const CreateAvatarDialog = ({ open, onClose, userTwitchId }) => {
                 <Close />
             </CloseIconButton>
             <Content>
-                <img src={CreateAvi}
+                <img src={'./assets/CreateAvi.png'}
                     style={{
                         width: '211px',
                         height: '113px'
