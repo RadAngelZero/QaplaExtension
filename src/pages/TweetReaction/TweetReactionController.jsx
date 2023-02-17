@@ -46,6 +46,7 @@ import CreateAvatarDialog from '../../components/CreateAvatarDialog';
 import ChooseAvatarAnimationDialog from '../../components/ChooseAvatarAnimationDialog';
 import ReactionsSnoozedDialog from '../../components/ReactionsSnoozedDialog';
 import FullScreenEmoteAnimationDialog from '../../components/FullScreenEmoteAnimationDialog';
+import ReactionsDeckDialog from '../../components/ReactionsDeckDialog';
 
 const TweetReactionController = () => {
     const [message, setMessage] = useState('');
@@ -670,6 +671,10 @@ const TweetReactionController = () => {
                 emotes={emotes}
                 randomEmoteUrl={randomEmoteUrl}
                 onEmoteAnimationSelected={onEmoteAnimationSelected} />
+            <ReactionsDeckDialog
+                open={true}
+                userTwitchId={user.twitchId}
+            />
         </>
     );
 }
