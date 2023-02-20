@@ -302,11 +302,16 @@ const ReactionsDeckDialog = ({
             imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
             label: 'Woooo'
         },
-        // {
-        //     id: 'heart-parrot',
-        //     imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-        //     label: 'Love'
-        // },
+        {
+            id: 'heart-parrot',
+            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
+            label: 'Love'
+        },
+        {
+            id: 'heart-parrot',
+            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
+            label: 'Love'
+        },
     ]);
 
     const bottomSheetRef = useRef();
@@ -399,7 +404,9 @@ const ReactionsDeckDialog = ({
                     </MenuButtonContainer>
                 </MenuPopUp>
             </HeaderContainer>
-            <Subtitle>{`Add clips to your Meme Deck`}</Subtitle>
+            {deckButtonsData.length >= maxDeckButtons && deckButtonsData[maxDeckButtons - 1].empty &&
+                <Subtitle>{`Add clips to your Meme Deck`}</Subtitle>
+            }
             <DeckButtonsContainer>
                 {deckButtonsData.map((element) => {
 
