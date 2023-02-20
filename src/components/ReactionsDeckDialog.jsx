@@ -8,51 +8,9 @@ import { ReactComponent as Menu } from './../assets/Icons/Menu.svg';
 import { ReactComponent as CloseMenu } from './../assets/Icons/CloseMenu.svg';
 import { ReactComponent as ExternalLinkWhite } from './../assets/Icons/ExternalLinkWhite.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
+import { ReactComponent as VideoIcon } from './../assets/Icons/VideoIcon.svg';
 window.scrolls = {};
 window.scrolls.DeckChips = { x: 0, scroll: 0 };
-
-const DeckButtonsData = [
-    {
-        id: 'heart-parrot',
-        imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-        label: 'Love'
-    },
-    {
-        id: 'wow-sloth',
-        imgURL: 'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
-        label: 'WOW'
-    },
-    {
-        id: 'cry-pikachu',
-        imgURL: 'https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif',
-        label: 'Cry'
-    },
-    {
-        id: 'wooo-homer',
-        imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
-        label: 'Woooo'
-    },
-    {
-        id: 'heart-parrot',
-        imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-        label: 'Love'
-    },
-    {
-        id: 'wow-sloth',
-        imgURL: 'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
-        label: 'WOW'
-    },
-    {
-        id: 'cry-pikachu',
-        imgURL: 'https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif',
-        label: 'Cry'
-    },
-    {
-        id: 'wooo-homer',
-        imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
-        label: 'Woooo'
-    },
-];
 
 const BigDialog = styled(Dialog)({
     '.MuiDialog-root': {
@@ -163,12 +121,21 @@ const HeaderBitsText = styled(Typography)({
     lineHeight: '19px',
 });
 
+const Subtitle = styled(Typography)({
+    color: '#fff',
+    fontSize: '16px',
+    fontWeight: '500',
+    lineHeight: '19px',
+    textAlign: 'center',
+    margin: '20px auto 0px auto',
+});
+
 const DeckButtonsContainer = styled(Box)({
     display: 'flex',
     flexWrap: 'wrap',
     gap: '18px',
     justifyContent: 'space-between',
-    marginTop: '24px',
+    marginTop: '30px',
     overflowY: 'scroll',
     paddingBottom: '100px',
     '&::-webkit-scrollbar': {
@@ -179,15 +146,59 @@ const DeckButtonsContainer = styled(Box)({
 const DeckButton = styled(Box)({
     display: 'flex',
     flexBasis: '48%',
-    height: '168px',
+    height: '156px',
     borderRadius: '12px',
     overflow: 'hidden',
     cursor: 'pointer',
 });
 
+const DeckButtonAvailable = styled(Box)({
+    display: 'flex',
+    flexBasis: '48%',
+    height: '156px',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    backgroundColor: '#3B4BF973',
+    padding: '2.5px',
+    webkitBoxSizing: 'border-box',
+    mozBoxSizing: 'border-box',
+    boxSizing: 'border-box',
+});
+
+const DeckButtonAvailableInnerContainer = styled(Box)({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    width: '100%',
+    height: '100%',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    backgroundColor: '#0D1021',
+});
+
+const DeckButtonAvailableAddButton = styled(Button)({
+    backgroundColor: '#3B4BF9',
+    borderRadius: '100px',
+    padding: '10px 21px',
+    color: '#fff',
+    fontSize: '16px',
+    fontWeight: '700',
+    lineHeight: '19px',
+    textAlign: 'center',
+    '&:hover': {
+        backgroundColor: '#3B4BF9',
+    },
+    textTransform: 'none',
+});
+
 const DeckButtonText = styled(Typography)({
     color: '#fff',
-    fontSize: '15px',
+    fontFamily: 'Impact, Inter',
+    textTransform: 'uppercase',
+    fontSize: '22px',
     fontWeight: '500',
     lineHeight: '19px',
     margin: 'auto auto 12px auto',
@@ -248,7 +259,7 @@ const BottomSheetChipEmoji = styled(Typography)({
 const BottomSheetChipText = styled(Typography)({
     color: '#fff',
     background: 'linear-gradient(227.05deg, #FFD3FB 9.95%, #F5FFCB 48.86%, #9FFFDD 90.28%)',
-    fontSize: '16px',
+    fontSize: '18px',
     fontWeight: '600',
     lineHeight: '19px',
     webkitBackgroundClip: 'text',
@@ -269,10 +280,50 @@ const ReactionsDeckDialog = ({
 
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
+    const [maxDeckButtons, setMaxDeckButtons] = useState(6);
+    const [deckButtonsData, setDeckButtonsData] = useState([
+        {
+            id: 'heart-parrot',
+            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
+            label: 'Love'
+        },
+        {
+            id: 'wow-sloth',
+            imgURL: 'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
+            label: 'WOW'
+        },
+        {
+            id: 'cry-pikachu',
+            imgURL: 'https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif',
+            label: 'Cry'
+        },
+        {
+            id: 'wooo-homer',
+            imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
+            label: 'Woooo'
+        },
+        // {
+        //     id: 'heart-parrot',
+        //     imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
+        //     label: 'Love'
+        // },
+    ]);
 
     const bottomSheetRef = useRef();
 
     const { t } = useTranslation('translation');
+
+    useEffect(() => {
+        if (deckButtonsData.length < maxDeckButtons) {
+            console.log('add button')
+            let deckButtonsTemp = [...deckButtonsData];
+            for (let i = deckButtonsData.length; i < maxDeckButtons; i++) {
+                console.log('added button', i)
+                deckButtonsTemp.push({ empty: true });
+            }
+            setDeckButtonsData(deckButtonsTemp);
+        }
+    }, []);
 
     const onMouseDownScroll = (event) => {
         window.scrolls.DeckChips = { x: event.clientX, scroll: bottomSheetRef.current.scrollLeft };
@@ -291,6 +342,14 @@ const ReactionsDeckDialog = ({
         // bottomSheetRef.scrollLeft = scrollLeft - clientX + event.clientX;
         // bottomSheetRef.scrollTop = scrollTop - clientY + event.clientY;
     };
+
+    const handleUploadMeme = () => {
+        console.log('upload meme');
+    }
+
+    const handleButtonSelection = (buttonID) => {
+        console.log(buttonID)
+    }
 
     return (
         <BigDialog open={open}>
@@ -340,10 +399,22 @@ const ReactionsDeckDialog = ({
                     </MenuButtonContainer>
                 </MenuPopUp>
             </HeaderContainer>
+            <Subtitle>{`Add clips to your Meme Deck`}</Subtitle>
             <DeckButtonsContainer>
-                {DeckButtonsData.map((element) => {
+                {deckButtonsData.map((element) => {
+
+                    if (element.empty) {
+                        return (
+                            <DeckButtonAvailable onClick={handleUploadMeme}>
+                                <DeckButtonAvailableInnerContainer>
+                                    <VideoIcon />
+                                    <DeckButtonAvailableAddButton>{`Add Meme`}</DeckButtonAvailableAddButton>
+                                </DeckButtonAvailableInnerContainer>
+                            </DeckButtonAvailable>
+                        )
+                    }
                     return (
-                        <DeckButton style={{
+                        <DeckButton onClick={() => handleButtonSelection(element.id)} style={{
                             background: `url('${element.imgURL}') center center / cover no-repeat`,
                         }}>
                             <DeckButtonText>{element.label}</DeckButtonText>
