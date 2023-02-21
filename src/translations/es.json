@@ -3,7 +3,8 @@
         "Config": {
             "welcome": "Bienvenido",
             "instructions": "Por favor vista el Dashboard de Qapla GG para\nconfigurar la extensión",
-            "openDashboard": "Abrir Dashboard"
+            "openDashboard": "Abrir Dashboard",
+            "watchConfigGuide": "Ver guía de configuración"
         },
         "TweetReactionController": {
             "emoteRain": "Rain",
