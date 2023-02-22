@@ -15,7 +15,8 @@ import {
     getReactionPriceDefaultForSubs,
     getAreReactionsEnabledFlag,
     listenForStreamerReactionPrice,
-    listenForStreamerReactionPriceForSubs
+    listenForStreamerReactionPriceForSubs,
+    getUserReactionsDetailsWithStreamer
 } from '../../services/database';
 import { getStreamerEmotes } from '../../services/functions';
 
@@ -87,6 +88,7 @@ const TweetReactionController = () => {
     const [selectedEmotes, setSelectedEmotes] = useState([]);
     const [avatarWasCreatedForAnimation, setAvatarWasCreatedForAnimation] = useState(true);
     const [openVibeMenu, setOpenVibeMenu] = useState(false);
+    const [isFirstReaction, setIsFirstReaction] = useState(false);
     const twitch = useTwitch();
     const user = useAuth();
     const segment = useSegment();
@@ -105,6 +107,21 @@ const TweetReactionController = () => {
 
         loadTips();
     }, []);
+
+    useEffect(() => {
+        async function makeFirstReactionFree() {
+            const userHasReactedBefore = await getUserReactionsDetailsWithStreamer(user.uid, streamerUid);
+
+            // If the user has no details of reactions with this streamer make their first reaction level 3 and free
+            if (!userHasReactedBefore.exists()) {
+                setIsFirstReaction(true);
+            }
+        }
+
+        if (user && user.uid && streamerUid) {
+            makeFirstReactionFree();
+        }
+    }, [user, streamerUid]);
 
     useEffect(() => {
         if (user && user.uid && !segmentTrackMade) {
@@ -346,6 +363,8 @@ const TweetReactionController = () => {
                 setAvatarAnimation(null);
                 break;
             case 2:
+                setSelectedEmotes(null);
+                setSelectedEmoteAnimation(EMOTE_RAIN);
                 setSelectedEmote(null);
                 break;
             default:
@@ -420,9 +439,11 @@ const TweetReactionController = () => {
             await substractZaps(user.uid, streamerUid, zapsCost);
         }
 
+        setIsFirstReaction(false);
+
         setOpenSentDialog(true);
 
-        const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
+        const currentReactionCost = getCurrentReactionCost();
         segment.track('Reaction Sent', {
             Bits: bits,
             ExtraBits: channelPointsReaction ? bits : currentReactionCost - bits,
@@ -456,7 +477,7 @@ const TweetReactionController = () => {
                  * If the streamer is a Qapla premium user and the user using the extension is a subscriber of the channel, show the
                  * preferential reactions costs for subs defined by the streamer
                  */
-                const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
+                const currentReactionCost = getCurrentReactionCost();
                 if (currentReactionCost.type !== ZAP) {
                     twitch.bits.onTransactionComplete((transactionObject) => {
                         if (transactionObject.initiator === 'current_user') {
@@ -544,8 +565,17 @@ const TweetReactionController = () => {
         setOpenSentDialog(false);
     }
 
+    const getCurrentReactionCost = () => {
+        return !isFirstReaction ? ((streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1]) : { price: 0, type: ZAP };
+    }
+
+    const getCurrentCostsForReactionsTiers = () => {
+        return !isFirstReaction ? ((streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts : costs) : [{ price: 0, type: ZAP }, { price: 0, type: ZAP }, { price: 0, type: ZAP }];
+    }
+
+    const tier = !isFirstReaction ? reactionLevel : 3;
     let availableContent = [];
-    switch (reactionLevel) {
+    switch (tier) {
         case 1:
             availableContent = [
                 GIPHY_GIFS,
@@ -587,8 +617,8 @@ const TweetReactionController = () => {
      * If the streamer is a Qapla premium user and the user using the extension is a subscriber of the channel, show the
      * preferential reactions costs for subs defined by the streamer
      */
-    const currentReactionCost = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts[reactionLevel - 1] : costs[reactionLevel - 1];
-    const costsPerReactionLevel = (streamerIsPremium && twitch.viewer.subscriptionStatus) ? subscribersCosts : costs;
+    const currentReactionCost = getCurrentReactionCost();
+    const costsPerReactionLevel = getCurrentCostsForReactionsTiers();
 
     return (
         <>
@@ -603,7 +633,6 @@ const TweetReactionController = () => {
                 selectedMedia={selectedMedia}
                 cleanSelectedMedia={() => setSelectedMedia(null)}
                 mediaSelectorBarOptions={availableContent}
-                reactionLevel={reactionLevel}
                 tipping={tipping}
                 toggleTipping={toggleTipping}
                 extraTip={extraTip}
