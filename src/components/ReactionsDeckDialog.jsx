@@ -9,6 +9,7 @@ import { ReactComponent as CloseMenu } from './../assets/Icons/CloseMenu.svg';
 import { ReactComponent as ExternalLinkWhite } from './../assets/Icons/ExternalLinkWhite.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import { ReactComponent as VideoIcon } from './../assets/Icons/VideoIcon.svg';
+import AddMemeDialog from './AddMemeDialog';
 window.scrolls = {};
 window.scrolls.DeckChips = { x: 0, scroll: 0 };
 
@@ -281,6 +282,7 @@ const ReactionsDeckDialog = ({
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
     const [maxDeckButtons, setMaxDeckButtons] = useState(6);
+    const [openAddMemeDialog, setopenAddMemeDialog] = useState(true);
     const [deckButtonsData, setDeckButtonsData] = useState([
         {
             id: 'heart-parrot',
@@ -449,6 +451,7 @@ const ReactionsDeckDialog = ({
                     <BottomSheetChipText>{`Edit Avatar`}</BottomSheetChipText>
                 </BottomSheetChip>
             </BottomSheet>
+            <AddMemeDialog open={openAddMemeDialog} onClose={() => setopenAddMemeDialog(false)} />
         </BigDialog>
     )
 
