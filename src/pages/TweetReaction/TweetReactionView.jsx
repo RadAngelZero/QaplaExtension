@@ -1104,6 +1104,15 @@ const TweetReactionView = ({
         setOpenVibeMenu(false);
     }
 
+    const onTTSInputKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            onSend();
+            if (ttsRef && ttsRef.current) {
+                ttsRef.current.focus();
+            }
+        }
+    }
+
     // Disable the Send button if the cost is not fetched yet or if the reaction is already being sent
     const sendButtonDisabled = currentReactionCost === undefined || sending;
 
@@ -1214,6 +1223,7 @@ const TweetReactionView = ({
                                             autoFocus
                                             value={message}
                                             inputRef={ttsRef}
+                                            onKeyDown={onTTSInputKeyPress}
                                             onChange={(e) => enableUI ? setMessage(e.target.value) : null} />
                                         {!message &&
                                             <OptionalLabel>

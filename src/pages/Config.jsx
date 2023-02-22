@@ -3,9 +3,11 @@ import styled from '@emotion/styled';
 import { Box, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-import { ReactComponent as ExternalLink } from './../assets/Icons/ExternalLink.svg';
 import { useSegment } from '../hooks/SegmentProvider';
 import { useAuth } from '../hooks/AuthProvider';
+
+import { ReactComponent as Video } from './../assets/Icons/Video.svg';
+import { ReactComponent as ExternalLink } from './../assets/Icons/ExternalLink.svg';
 
 const Container = styled(Box)({
     height: '100vh',
@@ -68,6 +70,14 @@ const CardButton = styled(Button)({
     }
 });
 
+const CardSecondaryButton = styled(Button)({
+    marginTop: '16px',
+    fontSize: '18px',
+    fontWeight: '700',
+    color: '#FFF',
+    textTransform: 'none'
+});
+
 const Config = () => {
     const { t } = useTranslation('translation', { keyPrefix: 'Config' });
     const segment = useSegment();
@@ -103,11 +113,18 @@ const Config = () => {
                     {t('instructions')}
                 </CardInstructions>
                 <CardButton fullWidth
-                    endIcon={<ExternalLink fill='#141833' />}
+                    startIcon={<ExternalLink fill='#141833' />}
                     href={uri}
                     target='_blank'>
                     {t('openDashboard')}
                 </CardButton>
+                <CardSecondaryButton fullWidth
+                    variant='text'
+                    startIcon={<Video />}
+                    href='https://youtu.be/DYo4eAgLX0U'
+                    target='_blank'>
+                    {t('watchConfigGuide')}
+                </CardSecondaryButton>
             </Card>
         </Container>
     );

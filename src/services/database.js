@@ -392,3 +392,21 @@ export async function getAreReactionsEnabledFlag(streamerUid) {
 
     return get(query(reactionsEnabled));
 }
+
+//////////////////////
+// User To Streamer Donations
+//////////////////////
+
+/**
+ * Gets the UserToStreamerDonations node of the given user for the given streamer, this can be used
+ * to check if the user has reacted with the streamer before, the number of reactions sent historically,
+ * and last time the user reacted
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Streamer identifier
+ * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
+ */
+export async function getUserReactionsDetailsWithStreamer(uid, streamerUid) {
+    const userReactionsWithStreamer = child(database, `/UserToStreamerDonations/${uid}/${streamerUid}`);
+
+    return get(query(userReactionsWithStreamer));
+}
