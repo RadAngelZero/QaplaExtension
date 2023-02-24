@@ -392,3 +392,35 @@ export async function getAreReactionsEnabledFlag(streamerUid) {
 
     return get(query(reactionsEnabled));
 }
+
+//////////////////////
+// Users Viewers Memes Decks
+//////////////////////
+
+/**
+ * Gets the deck of the given viewer with the given streamer
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Streamer identifier
+ * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
+ */
+export async function getViewerDeck(uid, streamerUid) {
+    const viewerDeck = child(database, `/UsersViewersMemesDecks/${uid}/${streamerUid}`);
+
+    return get(query(viewerDeck));
+}
+
+//////////////////////
+// Users Subs Memes Decks
+//////////////////////
+
+/**
+ * Gets the deck of the given sub with the given streamer
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Streamer identifier
+ * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
+ */
+export async function getSubsDeck(uid, streamerUid) {
+    const viewerDeck = child(database, `/UsersSubsMemesDecks/${uid}/${streamerUid}`);
+
+    return get(query(viewerDeck));
+}

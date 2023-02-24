@@ -273,64 +273,20 @@ const BottomSheetChipText = styled(Typography)({
 const ReactionsDeckDialog = ({
     open,
     onClose,
-    emotes,
-    randomEmoteUrl,
-    onEmoteAnimationSelected,
+    deckData,
+    userIsSub,
+    onSendMeme,
+    quickReactionCost,
     userTwitchId,
 }) => {
 
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
-    const [maxDeckButtons, setMaxDeckButtons] = useState(6);
-    const [openAddMemeDialog, setopenAddMemeDialog] = useState(true);
-    const [deckButtonsData, setDeckButtonsData] = useState([
-        {
-            id: 'heart-parrot',
-            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-            label: 'Love'
-        },
-        {
-            id: 'wow-sloth',
-            imgURL: 'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
-            label: 'WOW'
-        },
-        {
-            id: 'cry-pikachu',
-            imgURL: 'https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif',
-            label: 'Cry'
-        },
-        {
-            id: 'wooo-homer',
-            imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
-            label: 'Woooo'
-        },
-        {
-            id: 'heart-parrot',
-            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-            label: 'Love'
-        },
-        {
-            id: 'heart-parrot',
-            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-            label: 'Love'
-        },
-    ]);
+    const [openAddMemeDialog, setopenAddMemeDialog] = useState(false);
 
     const bottomSheetRef = useRef();
 
     const { t } = useTranslation('translation');
-
-    useEffect(() => {
-        if (deckButtonsData.length < maxDeckButtons) {
-            console.log('add button')
-            let deckButtonsTemp = [...deckButtonsData];
-            for (let i = deckButtonsData.length; i < maxDeckButtons; i++) {
-                console.log('added button', i)
-                deckButtonsTemp.push({ empty: true });
-            }
-            setDeckButtonsData(deckButtonsTemp);
-        }
-    }, []);
 
     const onMouseDownScroll = (event) => {
         window.scrolls.DeckChips = { x: event.clientX, scroll: bottomSheetRef.current.scrollLeft };
@@ -354,8 +310,15 @@ const ReactionsDeckDialog = ({
         console.log('upload meme');
     }
 
-    const handleButtonSelection = (buttonID) => {
-        console.log(buttonID)
+    const numberOfButtons = userIsSub ? 8 : 4;
+    const deck = new Array(numberOfButtons);
+
+    for (let i = 0; i < deck.length; i++) {
+        if (deckData && deckData[i]) {
+            deck[i] = deckData[i];
+        } else {
+            deck[i] = null;
+        }
     }
 
     return (
@@ -364,7 +327,11 @@ const ReactionsDeckDialog = ({
                 <HeaderTitleContainer>
                     <HeaderText>{`Quick Reactions`}</HeaderText>
                     <Bits style={{ margin: '0px 4px', width: '16px', height: '16px' }} />
-                    <HeaderBitsText>{`100`}</HeaderBitsText>
+                    {quickReactionCost &&
+                        <HeaderBitsText>
+                            {quickReactionCost.price}
+                        </HeaderBitsText>
+                    }
                 </HeaderTitleContainer>
                 <MenuPopUp open={openMenu} placement='bottom-end' title={
                     <React.Fragment>
@@ -406,31 +373,33 @@ const ReactionsDeckDialog = ({
                     </MenuButtonContainer>
                 </MenuPopUp>
             </HeaderContainer>
-            {deckButtonsData.length >= maxDeckButtons && deckButtonsData[maxDeckButtons - 1].empty &&
-                <Subtitle>{`Add clips to your Meme Deck`}</Subtitle>
-            }
-            <DeckButtonsContainer>
-                {deckButtonsData.map((element) => {
-
-                    if (element.empty) {
-                        return (
-                            <DeckButtonAvailable onClick={handleUploadMeme}>
+            {deckData &&
+                <>
+                {!deckData[numberOfButtons - 1] &&
+                    <Subtitle>{`Add clips to your Meme Deck`}</Subtitle>
+                }
+                <DeckButtonsContainer>
+                    {deck.map((element, index) => (
+                        !element ?
+                            <DeckButtonAvailable key={`empty-slot-${index}`}
+                                onClick={handleUploadMeme}>
                                 <DeckButtonAvailableInnerContainer>
                                     <VideoIcon />
                                     <DeckButtonAvailableAddButton>{`Add Meme`}</DeckButtonAvailableAddButton>
                                 </DeckButtonAvailableInnerContainer>
                             </DeckButtonAvailable>
-                        )
-                    }
-                    return (
-                        <DeckButton onClick={() => handleButtonSelection(element.id)} style={{
-                            background: `url('${element.imgURL}') center center / cover no-repeat`,
-                        }}>
-                            <DeckButtonText>{element.label}</DeckButtonText>
-                        </DeckButton>
-                    );
-                })}
-            </DeckButtonsContainer>
+                            :
+                            <DeckButton key={element.id}
+                                onClick={() => onSendMeme(element)}
+                                style={{
+                                    background: `url('${element.url}') center center / cover no-repeat`,
+                                }}>
+                                <DeckButtonText>{element.name}</DeckButtonText>
+                            </DeckButton>
+                    ))}
+                </DeckButtonsContainer>
+                </>
+            }
             <BottomSheet ref={bottomSheetRef} onMouseDown={onMouseDownScroll}>
                 <BottomSheetChip onClick={() => { console.log('a') }}>
                     <BottomSheetChipAvatar>
