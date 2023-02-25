@@ -10,6 +10,7 @@ import { ReactComponent as ExternalLinkWhite } from './../assets/Icons/ExternalL
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import { ReactComponent as VideoIcon } from './../assets/Icons/VideoIcon.svg';
 import AddMemeDialog from './AddMemeDialog';
+import DeckButton from './Deck/DeckButton';
 window.scrolls = {};
 window.scrolls.DeckChips = { x: 0, scroll: 0 };
 
@@ -142,15 +143,6 @@ const DeckButtonsContainer = styled(Box)({
     '&::-webkit-scrollbar': {
         display: 'none',
     }
-});
-
-const DeckButton = styled(Box)({
-    display: 'flex',
-    flexBasis: '48%',
-    height: '156px',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    cursor: 'pointer',
 });
 
 const DeckButtonAvailable = styled(Box)({
@@ -309,6 +301,7 @@ const ReactionsDeckDialog = ({
 
     const handleUploadMeme = () => {
         console.log('upload meme');
+        setopenAddMemeDialog(true)
     }
 
     const numberOfButtons = userIsSub ? 8 : 4;
@@ -426,7 +419,6 @@ const ReactionsDeckDialog = ({
                 onMemeUploaded={onMemeUploaded} />
         </BigDialog>
     )
-
 }
 
 export default ReactionsDeckDialog;

@@ -7,8 +7,9 @@ import { useDropzone } from 'react-dropzone';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Cloud } from './../assets/Icons/Cloud.svg';
-import { ReactComponent as VideoPlus } from './../assets/Icons/VideoPlus.svg';
+import { ReactComponent as Featured } from './../assets/Icons/Featured.svg';
 import { ReactComponent as VideoLibrary } from './../assets/Icons/VideoLibrary.svg';
+import MemeLibraryDialog from './MemeLibraryDialog';
 
 
 const BigDialog = styled(Dialog)({
@@ -119,7 +120,10 @@ const AddMemeDialog = ({
     onClose,
     onMemeUploaded
 }) => {
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({
+    const [openMemeLib, setOpenMemeLib] = useState(false);
+    const [startTab, setStartTab] = useState(0);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
             'video/mp4': ['.mp4'],
             'video/mpeg': ['.mpeg'],
@@ -143,13 +147,19 @@ const AddMemeDialog = ({
                 display: isDragActive ? 'none' : 'flex'
             }}>
                 <BottomSheetOptionContainer>
-                    <VideoPlus />
-                    <BottomSheetOptionTextContainer>
+                    <Featured />
+                    <BottomSheetOptionTextContainer onClick={() => {
+                        setStartTab(0);
+                        setOpenMemeLib(true);
+                    }}>
                         <BottomSheetOptionHeader>{`Add from subscribers library`}</BottomSheetOptionHeader>
                         <BottomSheetOptionSubtitle>{`Choose a meme from subscribers uploads`}</BottomSheetOptionSubtitle>
                     </BottomSheetOptionTextContainer>
                 </BottomSheetOptionContainer>
-                <BottomSheetOptionContainer>
+                <BottomSheetOptionContainer onClick={() => {
+                        setStartTab(1);
+                        setOpenMemeLib(true);
+                    }}>
                     <VideoLibrary />
                     <BottomSheetOptionTextContainer>
                         <BottomSheetOptionHeader>{`Choose from general library`}</BottomSheetOptionHeader>
@@ -157,6 +167,7 @@ const AddMemeDialog = ({
                     </BottomSheetOptionTextContainer>
                 </BottomSheetOptionContainer>
             </BottomSheet>
+            <MemeLibraryDialog open={openMemeLib} startTab={startTab} onClose={() => setOpenMemeLib(false)}/>
         </BigDialog>
     );
 }
