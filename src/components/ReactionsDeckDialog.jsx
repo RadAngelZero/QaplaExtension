@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList } from '@mui/material';
+import React, { useState, useRef } from 'react';
+import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
@@ -278,11 +278,12 @@ const ReactionsDeckDialog = ({
     onSendMeme,
     quickReactionCost,
     userTwitchId,
+    onMemeUploaded
 }) => {
 
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
-    const [openAddMemeDialog, setopenAddMemeDialog] = useState(false);
+    const [openAddMemeDialog, setopenAddMemeDialog] = useState(true);
 
     const bottomSheetRef = useRef();
 
@@ -420,7 +421,9 @@ const ReactionsDeckDialog = ({
                     <BottomSheetChipText>{`Edit Avatar`}</BottomSheetChipText>
                 </BottomSheetChip>
             </BottomSheet>
-            <AddMemeDialog open={openAddMemeDialog} onClose={() => setopenAddMemeDialog(false)} />
+            <AddMemeDialog open={openAddMemeDialog}
+                onClose={() => setopenAddMemeDialog(false)}
+                onMemeUploaded={onMemeUploaded} />
         </BigDialog>
     )
 

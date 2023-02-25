@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '../hooks/AuthProvider';
 import { useTwitch } from '../hooks/TwitchProvider';
@@ -8,6 +8,7 @@ import { getSubsDeck, getViewerDeck, sendReaction, substractZaps } from '../serv
 import { ZAP } from '../constants';
 
 import ReactionsDeckDialog from './ReactionsDeckDialog';
+import { uploadSubMeme } from '../services/storage';
 
 const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
     const [deckData, setDeckData] = useState(null);
@@ -88,13 +89,56 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
         }
     }
 
+    const onMemeUploaded = useCallback(async (files, rejectedFiles) => {
+        console.log(rejectedFiles);
+        if (rejectedFiles[0] && rejectedFiles[0].errors && rejectedFiles[0].errors[0] && rejectedFiles[0].errors[0].code) {
+            switch (rejectedFiles[0].errors[0].code) {
+                case 'file-too-large':
+                    // 8mb exceeded
+                    break;
+                case 'file-invalid-type':
+                    // Invalid type
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (files && files[0]) {
+            const file = files[0];
+            try {
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                video.onloadedmetadata = () => {
+                    console.log(video.duration);
+                    if (video.duration <= 8) {
+                        console.log('Upload meme');
+                        uploadSubMeme(file, (progress) => {
+                            console.log(progress);
+                        }, (url) => {
+                            console.log(url);
+                        });
+                    } else {
+                        console.log('Don`t upload meme');
+                    }
+                };
+
+                video.src = URL.createObjectURL(file);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+    }, []);
+
     return (
         <ReactionsDeckDialog open={open}
             userTwitchId={user.twitchId}
             deckData={deckData ? Object.keys(deckData).map((id) => ({ ...deckData[id], id })) : null}
             userIsSub={userIsSub}
             onSendMeme={onSendMeme}
-            quickReactionCost={quickReactionCost} />
+            quickReactionCost={quickReactionCost}
+            onMemeUploaded={onMemeUploaded} />
     );
 }
 

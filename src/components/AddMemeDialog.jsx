@@ -3,6 +3,7 @@ import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList } f
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
+import { useDropzone } from 'react-dropzone';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Cloud } from './../assets/Icons/Cloud.svg';
@@ -47,6 +48,7 @@ const DragDropContainer = styled('div')({
     mozBoxSizing: 'border-box',
     boxSizing: 'border-box',
     marginTop: '106px',
+    cursor: 'pointer'
 });
 
 const DragDropText = styled(Typography)({
@@ -115,32 +117,48 @@ const BottomSheetOptionSubtitle = styled(Typography)({
 const AddMemeDialog = ({
     open,
     onClose,
-    userTwitchId,
+    onMemeUploaded
 }) => {
-    return (<BigDialog open={open}>
-        <Close style={{ position: 'absolute', top: '32px', left: '24px', cursor: 'pointer' }} onClick={onClose} />
-        <DragDropContainer>
-            <Cloud />
-            <DragDropText>{`Upload and share a meme clip`}</DragDropText>
-            <DragDropButton>{`Upload Video File`}</DragDropButton>
-        </DragDropContainer>
-        <BottomSheet>
-            <BottomSheetOptionContainer>
-                <VideoPlus />
-                <BottomSheetOptionTextContainer>
-                    <BottomSheetOptionHeader>{`Add from subscribers library`}</BottomSheetOptionHeader>
-                    <BottomSheetOptionSubtitle>{`Choose a meme from subscribers uploads`}</BottomSheetOptionSubtitle>
-                </BottomSheetOptionTextContainer>
-            </BottomSheetOptionContainer>
-            <BottomSheetOptionContainer>
-                <VideoLibrary />
-                <BottomSheetOptionTextContainer>
-                    <BottomSheetOptionHeader>{`Choose from general library`}</BottomSheetOptionHeader>
-                    <BottomSheetOptionSubtitle>{`For all viewers`}</BottomSheetOptionSubtitle>
-                </BottomSheetOptionTextContainer>
-            </BottomSheetOptionContainer>
-        </BottomSheet>
-    </BigDialog>)
+    const {getRootProps, getInputProps, isDragActive} = useDropzone({
+        accept: {
+            'video/mp4': ['.mp4'],
+            'video/mpeg': ['.mpeg'],
+            'video/quicktime': ['.mov']
+        },
+        maxSize: 9388608, // Max size is 8 MB
+        onDrop: onMemeUploaded,
+        multiple: false
+    });
+
+    return (
+        <BigDialog open={open}>
+            <Close style={{ position: 'absolute', top: '32px', left: '24px', cursor: 'pointer' }} onClick={onClose} />
+            <DragDropContainer {...getRootProps()}>
+                <input {...getInputProps()} />
+                <Cloud />
+                <DragDropText>{`Upload and share a meme clip`}</DragDropText>
+                <DragDropButton>{`Upload Video File`}</DragDropButton>
+            </DragDropContainer>
+            <BottomSheet style={{
+                display: isDragActive ? 'none' : 'flex'
+            }}>
+                <BottomSheetOptionContainer>
+                    <VideoPlus />
+                    <BottomSheetOptionTextContainer>
+                        <BottomSheetOptionHeader>{`Add from subscribers library`}</BottomSheetOptionHeader>
+                        <BottomSheetOptionSubtitle>{`Choose a meme from subscribers uploads`}</BottomSheetOptionSubtitle>
+                    </BottomSheetOptionTextContainer>
+                </BottomSheetOptionContainer>
+                <BottomSheetOptionContainer>
+                    <VideoLibrary />
+                    <BottomSheetOptionTextContainer>
+                        <BottomSheetOptionHeader>{`Choose from general library`}</BottomSheetOptionHeader>
+                        <BottomSheetOptionSubtitle>{`For all viewers`}</BottomSheetOptionSubtitle>
+                    </BottomSheetOptionTextContainer>
+                </BottomSheetOptionContainer>
+            </BottomSheet>
+        </BigDialog>
+    );
 }
 
 export default AddMemeDialog;
