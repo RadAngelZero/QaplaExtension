@@ -10,6 +10,7 @@ import { ReactComponent as ExternalLinkWhite } from './../assets/Icons/ExternalL
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import { ReactComponent as VideoIcon } from './../assets/Icons/VideoIcon.svg';
 import AddMemeDialog from './AddMemeDialog';
+import DeckButton from './Deck/DeckButton';
 window.scrolls = {};
 window.scrolls.DeckChips = { x: 0, scroll: 0 };
 
@@ -144,15 +145,6 @@ const DeckButtonsContainer = styled(Box)({
     }
 });
 
-const DeckButton = styled(Box)({
-    display: 'flex',
-    flexBasis: '48%',
-    height: '156px',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    cursor: 'pointer',
-});
-
 const DeckButtonAvailable = styled(Box)({
     display: 'flex',
     flexBasis: '48%',
@@ -282,7 +274,7 @@ const ReactionsDeckDialog = ({
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
     const [maxDeckButtons, setMaxDeckButtons] = useState(6);
-    const [openAddMemeDialog, setopenAddMemeDialog] = useState(true);
+    const [openAddMemeDialog, setopenAddMemeDialog] = useState(false);
     const [deckButtonsData, setDeckButtonsData] = useState([
         {
             id: 'heart-parrot',
@@ -303,16 +295,6 @@ const ReactionsDeckDialog = ({
             id: 'wooo-homer',
             imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
             label: 'Woooo'
-        },
-        {
-            id: 'heart-parrot',
-            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-            label: 'Love'
-        },
-        {
-            id: 'heart-parrot',
-            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-            label: 'Love'
         },
     ]);
 
@@ -352,6 +334,7 @@ const ReactionsDeckDialog = ({
 
     const handleUploadMeme = () => {
         console.log('upload meme');
+        setopenAddMemeDialog(true)
     }
 
     const handleButtonSelection = (buttonID) => {
@@ -411,7 +394,6 @@ const ReactionsDeckDialog = ({
             }
             <DeckButtonsContainer>
                 {deckButtonsData.map((element) => {
-
                     if (element.empty) {
                         return (
                             <DeckButtonAvailable onClick={handleUploadMeme}>
@@ -423,11 +405,7 @@ const ReactionsDeckDialog = ({
                         )
                     }
                     return (
-                        <DeckButton onClick={() => handleButtonSelection(element.id)} style={{
-                            background: `url('${element.imgURL}') center center / cover no-repeat`,
-                        }}>
-                            <DeckButtonText>{element.label}</DeckButtonText>
-                        </DeckButton>
+                        <DeckButton onClick={() => handleButtonSelection(element.id)} hideInfo={true} data={element}/>
                     );
                 })}
             </DeckButtonsContainer>
@@ -454,7 +432,6 @@ const ReactionsDeckDialog = ({
             <AddMemeDialog open={openAddMemeDialog} onClose={() => setopenAddMemeDialog(false)} />
         </BigDialog>
     )
-
 }
 
 export default ReactionsDeckDialog;
