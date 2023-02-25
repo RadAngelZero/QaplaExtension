@@ -1,10 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { Box, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-
-import { useSegment } from '../hooks/SegmentProvider';
-import { useAuth } from '../hooks/AuthProvider';
 
 import { ReactComponent as Video } from './../assets/Icons/Video.svg';
 import { ReactComponent as ExternalLink } from './../assets/Icons/ExternalLink.svg';
@@ -80,17 +77,6 @@ const CardSecondaryButton = styled(Button)({
 
 const Config = () => {
     const { t } = useTranslation('translation', { keyPrefix: 'Config' });
-    const segment = useSegment();
-    const user = useAuth();
-
-    useEffect(() => {
-
-        if (user && user.twitchExtensionData && user.twitchExtensionData.channelId) {
-            segment.track('Streamer Opened Extension Configuration', {
-                StreamerId: user.twitchExtensionData.channelId
-            });
-        }
-    }, [user]);
 
     /**
      * In another tab of the browser request the user autorization to link their Twitch Account with our Twitch App

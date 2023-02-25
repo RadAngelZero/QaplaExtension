@@ -47,9 +47,9 @@
                 "textP3": "Bar"
             },
             "QaplaTooltipTwo": {
-                "textP1": "Here you can see the Reaction Tier",
-                "textP2": " price in Bits or Zaps",
-                "textP3": "",
+                "textP1": "See",
+                "textP2": " how many Bits or Zaps you need ",
+                "textP3": "to send a reaction",
                 "textP4": "\n\nClick to expand to upgrade or downgrade your reaction"
             },
             "QaplaTooltipThree": {
