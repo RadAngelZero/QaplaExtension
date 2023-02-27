@@ -9,6 +9,7 @@ import { ReactComponent as Cloud } from './../assets/Icons/Cloud.svg';
 import { ReactComponent as Featured } from './../assets/Icons/Featured.svg';
 import { ReactComponent as VideoLibrary } from './../assets/Icons/VideoLibrary.svg';
 import MemeLibraryDialog from './MemeLibraryDialog';
+import NameMemeDialog from './NameMemeDialog';
 
 
 const BigDialog = styled(Dialog)({
@@ -121,6 +122,7 @@ const AddMemeDialog = ({
     userTwitchId,
 }) => {
 
+    const [openNameMeme, setOpenNameMeme] = useState(false);
     const [openMemeLib, setOpenMemeLib] = useState(false);
     const [startTab, setStartTab] = useState(0);
 
@@ -158,6 +160,11 @@ const AddMemeDialog = ({
                 </BottomSheetOptionTextContainer>
             </BottomSheetOptionContainer>
         </BottomSheet>
+        <NameMemeDialog 
+            open={openNameMeme}
+            onClose={() => setOpenNameMeme(false)}
+            toDeck={toDeck}
+        />
         <MemeLibraryDialog
             open={openMemeLib}
             startTab={startTab}
