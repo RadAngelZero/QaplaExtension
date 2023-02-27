@@ -71,7 +71,23 @@ const DeckButtonsContainer = styled(Box)({
     }
 });
 
-
+const ConfirmButton = styled(Button)({
+    position: 'absolute',
+    left: '50%',
+    transform: 'translate(-50%, 0)',
+    bottom: '24px',
+    borderRadius: '100px',
+    textTransform: 'none',
+    color: '#0D1022',
+    padding: '16px 24px',
+    fontSize: '20px',
+    fontWeight: '600',
+    lineHeight: '24px',
+    backgroundColor: '#00FFDD',
+    '&:hover': {
+        backgroundColor: '#00FFDD',
+    },
+});
 
 const StyledTabs = styled((props) => (
     <Tabs
@@ -120,6 +136,7 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
 const MemeLibraryDialog = ({
     open,
     onClose,
+    toDeck,
     startTab,
 }) => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -235,6 +252,12 @@ const MemeLibraryDialog = ({
         setAlreadyOpen(false);
     }
 
+    const handleConfirm = () => {
+        console.log(selectedDeckButtons);
+        // on update user deck go to deck screen
+        toDeck();
+    }
+
     return (<BigDialog open={open}>
         <BottomSheet>
             <TopBarContainer>
@@ -259,6 +282,9 @@ const MemeLibraryDialog = ({
                 })}
             </DeckButtonsContainer>
         </BottomSheet>
+        {selectedDeckButtons.length > 0 &&
+            <ConfirmButton onClick={handleConfirm}>{`Confirm`}</ConfirmButton>
+        }
     </BigDialog>)
 }
 

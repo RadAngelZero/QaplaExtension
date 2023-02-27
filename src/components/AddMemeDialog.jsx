@@ -122,6 +122,11 @@ const AddMemeDialog = ({
     const [openMemeLib, setOpenMemeLib] = useState(false);
     const [startTab, setStartTab] = useState(0);
 
+    const toDeck = () => {
+        setOpenMemeLib(false);
+        onClose();
+    }
+
     return (<BigDialog open={open}>
         <Close style={{ position: 'absolute', top: '32px', left: '24px', cursor: 'pointer' }} onClick={onClose} />
         <DragDropContainer>
@@ -151,7 +156,7 @@ const AddMemeDialog = ({
                 </BottomSheetOptionTextContainer>
             </BottomSheetOptionContainer>
         </BottomSheet>
-        <MemeLibraryDialog open={openMemeLib} startTab={startTab} onClose={() => setOpenMemeLib(false)}/>
+        <MemeLibraryDialog open={openMemeLib} startTab={startTab} onClose={() => setOpenMemeLib(false)} toDeck={toDeck}/>
     </BigDialog>)
 }
 
