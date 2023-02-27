@@ -116,6 +116,8 @@ const BottomSheetOptionSubtitle = styled(Typography)({
 const AddMemeDialog = ({
     open,
     onClose,
+    replacing,
+    handleDeckButtonReplace,
     userTwitchId,
 }) => {
 
@@ -146,9 +148,9 @@ const AddMemeDialog = ({
                 </BottomSheetOptionTextContainer>
             </BottomSheetOptionContainer>
             <BottomSheetOptionContainer onClick={() => {
-                    setStartTab(1);
-                    setOpenMemeLib(true);
-                }}>
+                setStartTab(1);
+                setOpenMemeLib(true);
+            }}>
                 <VideoLibrary />
                 <BottomSheetOptionTextContainer>
                     <BottomSheetOptionHeader>{`Choose from general library`}</BottomSheetOptionHeader>
@@ -156,7 +158,13 @@ const AddMemeDialog = ({
                 </BottomSheetOptionTextContainer>
             </BottomSheetOptionContainer>
         </BottomSheet>
-        <MemeLibraryDialog open={openMemeLib} startTab={startTab} onClose={() => setOpenMemeLib(false)} toDeck={toDeck}/>
+        <MemeLibraryDialog
+            open={openMemeLib}
+            startTab={startTab}
+            onClose={() => setOpenMemeLib(false)}
+            replacing={replacing}
+            handleDeckButtonReplace={handleDeckButtonReplace}
+            toDeck={toDeck} />
     </BigDialog>)
 }
 

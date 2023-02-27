@@ -138,6 +138,8 @@ const MemeLibraryDialog = ({
     onClose,
     toDeck,
     startTab,
+    replacing,
+    handleDeckButtonReplace,
 }) => {
     const [selectedTab, setSelectedTab] = useState(0);
     const [selectedDeckButtons, setSelectedDeckButtons] = useState([
@@ -222,13 +224,20 @@ const MemeLibraryDialog = ({
     const handleButtonSelection = (button) => {
         console.log(button);
         let tempDeckButtons = [...selectedDeckButtons];
-        console.log(tempDeckButtons)
+        console.log(tempDeckButtons);
         // what happens when the meme appears two times and they regreet, well it is another button so this comparation/find should solve it
         if (tempDeckButtons.find((element => button.id === element.id))) {
             let index = tempDeckButtons.findIndex((element) => button.id === element.id);
             tempDeckButtons.splice(index, 1);
             setSelectedDeckButtons(tempDeckButtons);
             return;
+        }
+        if (replacing !== null) {
+            if (selectedDeckButtons.length > 0) {
+                tempDeckButtons[0] = button;
+                setSelectedDeckButtons(tempDeckButtons);
+                return;
+            }
         }
         tempDeckButtons.push(button);
         setSelectedDeckButtons(tempDeckButtons);
@@ -256,6 +265,9 @@ const MemeLibraryDialog = ({
         console.log(selectedDeckButtons);
         // on update user deck go to deck screen
         toDeck();
+        if (replacing !== null) {
+            handleDeckButtonReplace(replacing, selectedDeckButtons[0])
+        }
     }
 
     return (<BigDialog open={open}>
@@ -270,9 +282,10 @@ const MemeLibraryDialog = ({
                 </TabsContainer>
             </TopBarContainer>
             <DeckButtonsContainer>
-                {deckButtonsData.map((element) => {
+                {deckButtonsData.map((element, index) => {
                     return (<DeckButton
                         data={element}
+                        index={index}
                         handleAudioActivation={handleAudioActivation}
                         //onCLick returns all the data
                         onClick={handleButtonSelection}

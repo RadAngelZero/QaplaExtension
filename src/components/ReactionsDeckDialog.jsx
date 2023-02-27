@@ -275,26 +275,43 @@ const ReactionsDeckDialog = ({
     const [openMenu, setOpenMenu] = useState(false);
     const [maxDeckButtons, setMaxDeckButtons] = useState(6);
     const [openAddMemeDialog, setopenAddMemeDialog] = useState(false);
+    const [deckButtonReplaceIndex, setDeckButtonReplaceIndex] = useState(null);
     const [deckButtonsData, setDeckButtonsData] = useState([
         {
             id: 'heart-parrot',
             imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-            label: 'Love'
+            label: 'Love',
+            uploader: {
+                username: 'juansguarnizo',
+                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
+            },
         },
         {
             id: 'wow-sloth',
             imgURL: 'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
-            label: 'WOW'
+            label: 'WOW',
+            uploader: {
+                username: 'juansguarnizo',
+                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
+            },
         },
         {
             id: 'cry-pikachu',
             imgURL: 'https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif',
-            label: 'Cry'
+            label: 'Cry',
+            uploader: {
+                username: 'juansguarnizo',
+                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
+            },
         },
         {
             id: 'wooo-homer',
             imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
-            label: 'Woooo'
+            label: 'Woooo',
+            uploader: {
+                username: 'juansguarnizo',
+                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
+            },
         },
     ]);
 
@@ -339,6 +356,31 @@ const ReactionsDeckDialog = ({
 
     const handleButtonSelection = (buttonID) => {
         console.log(buttonID)
+    }
+
+    const startDeckButtonReplace = (index) => {
+        setDeckButtonReplaceIndex(index);
+        setopenAddMemeDialog(true);
+    }
+
+    const handleDeckButtonReplace = (index, data) => {
+        let tempDeckButtons = [...deckButtonsData];
+        tempDeckButtons[index] = data;
+        setDeckButtonsData(tempDeckButtons);
+        setDeckButtonReplaceIndex(null);
+    }
+
+    const handleDeckButtonRename = (index, label) => {
+        let tempDeckButtons = [...deckButtonsData];
+        tempDeckButtons[index].label = label;
+        setDeckButtonsData(tempDeckButtons);
+    }
+
+    const handleDeckButtonRemove = (index) => {
+        let tempDeckButtons = [...deckButtonsData];
+        tempDeckButtons.splice(index, 1);
+        tempDeckButtons.push({ empty: true });
+        setDeckButtonsData(tempDeckButtons);
     }
 
     return (
@@ -393,7 +435,7 @@ const ReactionsDeckDialog = ({
                 <Subtitle>{`Add clips to your Meme Deck`}</Subtitle>
             }
             <DeckButtonsContainer>
-                {deckButtonsData.map((element) => {
+                {deckButtonsData.map((element, index) => {
                     if (element.empty) {
                         return (
                             <DeckButtonAvailable onClick={handleUploadMeme}>
@@ -405,7 +447,16 @@ const ReactionsDeckDialog = ({
                         )
                     }
                     return (
-                        <DeckButton onClick={() => handleButtonSelection(element.id)} hideInfo={true} data={element}/>
+                        <DeckButton
+                            onClick={() => handleButtonSelection(element.id)}
+                            showEditButton={true}
+                            data={element}
+                            index={index}
+                            onReplace={handleDeckButtonReplace}
+                            startReplace={startDeckButtonReplace}
+                            onRename={handleDeckButtonRename}
+                            onRemove={handleDeckButtonRemove}
+                        />
                     );
                 })}
             </DeckButtonsContainer>
@@ -429,7 +480,12 @@ const ReactionsDeckDialog = ({
                     <BottomSheetChipText>{`Edit Avatar`}</BottomSheetChipText>
                 </BottomSheetChip>
             </BottomSheet>
-            <AddMemeDialog open={openAddMemeDialog} onClose={() => setopenAddMemeDialog(false)} />
+            <AddMemeDialog
+                open={openAddMemeDialog}
+                onClose={() => setopenAddMemeDialog(false)}
+                replacing={deckButtonReplaceIndex}
+                handleDeckButtonReplace={handleDeckButtonReplace}
+            />
         </BigDialog>
     )
 }
