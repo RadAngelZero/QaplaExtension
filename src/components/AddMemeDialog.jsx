@@ -10,6 +10,7 @@ import { ReactComponent as Featured } from './../assets/Icons/Featured.svg';
 import { ReactComponent as VideoLibrary } from './../assets/Icons/VideoLibrary.svg';
 import MemeLibraryDialog from './MemeLibraryDialog';
 import NameMemeDialog from './NameMemeDialog';
+import OnlySubDialog from './OnlySubDialog';
 
 
 const BigDialog = styled(Dialog)({
@@ -172,6 +173,9 @@ const AddMemeDialog = ({
             replacing={replacing}
             handleDeckButtonReplace={handleDeckButtonReplace}
             toDeck={toDeck} />
+        <OnlySubDialog
+            open={false}
+        />
     </BigDialog>)
 }
 
