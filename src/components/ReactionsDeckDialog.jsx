@@ -365,22 +365,55 @@ const ReactionsDeckDialog = ({
 
     const handleDeckButtonReplace = (index, data) => {
         let tempDeckButtons = [...deckButtonsData];
+        let cleanDeckButtons = [];
         tempDeckButtons[index] = data;
         setDeckButtonsData(tempDeckButtons);
         setDeckButtonReplaceIndex(null);
+        tempDeckButtons.every(e => {
+            if (e.empty) {
+                console.log('empty')
+                return false;
+            }
+            cleanDeckButtons.push(e);
+            return true;
+        })
+        // deckButtons without empties
+        console.log(cleanDeckButtons);
     }
 
     const handleDeckButtonRename = (index, label) => {
         let tempDeckButtons = [...deckButtonsData];
+        let cleanDeckButtons = [];
         tempDeckButtons[index].label = label;
         setDeckButtonsData(tempDeckButtons);
+        tempDeckButtons.every(e => {
+            if (e.empty) {
+                console.log('empty')
+                return false;
+            }
+            cleanDeckButtons.push(e);
+            return true;
+        })
+        // deckButtons without empties
+        console.log(cleanDeckButtons);
     }
 
     const handleDeckButtonRemove = (index) => {
         let tempDeckButtons = [...deckButtonsData];
+        let cleanDeckButtons = [];
         tempDeckButtons.splice(index, 1);
         tempDeckButtons.push({ empty: true });
         setDeckButtonsData(tempDeckButtons);
+        tempDeckButtons.every(e => {
+            if (e.empty) {
+                console.log('empty')
+                return false;
+            }
+            cleanDeckButtons.push(e);
+            return true;
+        })
+        // deckButtons without empties
+        console.log(cleanDeckButtons);
     }
 
     return (
