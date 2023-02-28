@@ -17,20 +17,20 @@ function createRef(storageRef) {
  * @param {function} onSuccess Function called after the file was successfully uploaded
  */
 export function uploadSubMeme(subMemeFile, onProgress, onSuccess) {
-    const memeRef = createRef(`/DecksMemes/${subMemeFile.name}`)
+    const filePath = `DecksMemes/${subMemeFile.name}`;
+    const memeRef = createRef(filePath);
     const uploadTask = uploadBytesResumable(memeRef, subMemeFile);
 
     uploadTask.on('state_changed', (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             onProgress(progress);
-            console.log('Upload is ' + progress + '% done');
         },
         (error) => {
             console.log(error.code);
         },
         async () => {
             const url = await getDownloadURL(uploadTask.snapshot.ref);
-            onSuccess(url);
+            onSuccess(url, filePath);
         }
     );
 }

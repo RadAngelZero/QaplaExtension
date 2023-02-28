@@ -403,10 +403,23 @@ export async function getAreReactionsEnabledFlag(streamerUid) {
  * @param {string} streamerUid Streamer identifier
  * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
  */
-export async function getViewerDeck(uid, streamerUid) {
-    const viewerDeck = child(database, `/UsersViewersMemesDecks/${uid}/${streamerUid}`);
+export async function listenToViewerDeck(uid, streamerUid, callback) {
+    const viewerDeck = createChild(`/UsersViewersMemesDecks/${uid}/${streamerUid}`);
 
-    return get(query(viewerDeck));
+    return onValue(query(viewerDeck), callback);
+}
+
+/**
+ * Saves the given meme data on the specified slot index of a viewer deck
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Streamer identifier
+ * @param {number} slotIndex Index of the meme to savee
+ * @param {object} memeData Meme data (width, height, url, etc.)
+ */
+export async function saveMemeOnDeckSlot(uid, streamerUid, slotIndex, memeData) {
+    const viewerDeckSlot = createChild(`/UsersViewersMemesDecks/${uid}/${streamerUid}/${slotIndex}`);
+
+    return await update(viewerDeckSlot, memeData);
 }
 
 //////////////////////
@@ -419,8 +432,8 @@ export async function getViewerDeck(uid, streamerUid) {
  * @param {string} streamerUid Streamer identifier
  * @returns {Promise<DataSnapshot>} Resulting DataSnaphsot of the query
  */
-export async function getSubsDeck(uid, streamerUid) {
-    const viewerDeck = child(database, `/UsersSubsMemesDecks/${uid}/${streamerUid}`);
+export async function listenToSubDeck(uid, streamerUid, callback) {
+    const subDeck = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}`);
 
-    return get(query(viewerDeck));
+    return onValue(query(subDeck), callback);
 }

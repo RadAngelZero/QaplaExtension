@@ -129,7 +129,7 @@ const AddMemeDialog = ({
             'video/mpeg': ['.mpeg'],
             'video/quicktime': ['.mov']
         },
-        maxSize: 9388608, // Max size is 8 MB
+        maxSize: 8388608, // Max size is 8 MB
         onDrop: onMemeUploaded,
         multiple: false
     });
@@ -167,7 +167,9 @@ const AddMemeDialog = ({
                     </BottomSheetOptionTextContainer>
                 </BottomSheetOptionContainer>
             </BottomSheet>
-            <MemeLibraryDialog open={openMemeLib} startTab={startTab} onClose={() => setOpenMemeLib(false)}/>
+            <MemeLibraryDialog open={openMemeLib}
+                startTab={startTab}
+                onClose={() => setOpenMemeLib(false)}/>
         </BigDialog>
     );
 }

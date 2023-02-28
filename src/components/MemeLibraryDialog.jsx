@@ -151,11 +151,11 @@ const MemeLibraryDialog = ({
     ]);
 
     useEffect(() => {
-        console.log(startTab);
         if (open === true && !alreadyOpen) {
             setSelectedTab(startTab);
             setAlreadyOpen(true);
         }
+
         if (selectedTab === 1) {
             setDeckButtonsData([
                 {
@@ -178,6 +178,7 @@ const MemeLibraryDialog = ({
                 },
             ])
         }
+
         if (selectedTab === 0) {
             setDeckButtonsData([
                 {
@@ -203,9 +204,7 @@ const MemeLibraryDialog = ({
     }, [selectedTab, open, startTab])
 
     const handleButtonSelection = (button) => {
-        console.log(button);
         let tempDeckButtons = [...selectedDeckButtons];
-        console.log(tempDeckButtons)
         // what happens when the meme appears two times and they regreet, well it is another button so this comparation/find should solve it
         if (tempDeckButtons.find((element => button.id === element.id))) {
             let index = tempDeckButtons.findIndex((element) => button.id === element.id);
@@ -227,7 +226,6 @@ const MemeLibraryDialog = ({
 
     const handleTabChange = (event, newValue) => {
         setSelectedTab(newValue);
-        console.log(newValue);
     };
 
     const handleClose = () => {
@@ -235,31 +233,33 @@ const MemeLibraryDialog = ({
         setAlreadyOpen(false);
     }
 
-    return (<BigDialog open={open}>
-        <BottomSheet>
-            <TopBarContainer>
-                <Close style={{ cursor: 'pointer' }} onClick={handleClose} />
-                <TabsContainer>
-                    <StyledTabs value={selectedTab} onChange={handleTabChange}>
-                        <StyledTab icon={<Featured style={{ width: '16px', height: '16px' }} />} iconPosition="start" label="Subscribers" background='#7000FF' />
-                        <StyledTab icon={<VideoLibrary style={{ width: '16px', height: '16px' }} />} iconPosition="start" label="General" />
-                    </StyledTabs>
-                </TabsContainer>
-            </TopBarContainer>
-            <DeckButtonsContainer>
-                {deckButtonsData.map((element) => {
-                    return (<DeckButton
-                        data={element}
-                        handleAudioActivation={handleAudioActivation}
-                        //onCLick returns all the data
-                        onClick={handleButtonSelection}
-                        volumeDeckButton={volumeDeckButton}
-                        selectedDeckButtons={selectedDeckButtons}
-                    />);
-                })}
-            </DeckButtonsContainer>
-        </BottomSheet>
-    </BigDialog>)
+    return (
+        <BigDialog open={open}>
+            <BottomSheet>
+                <TopBarContainer>
+                    <Close style={{ cursor: 'pointer' }} onClick={handleClose} />
+                    <TabsContainer>
+                        <StyledTabs value={selectedTab} onChange={handleTabChange}>
+                            <StyledTab icon={<Featured style={{ width: '16px', height: '16px' }} />} iconPosition="start" label="Subscribers" background='#7000FF' />
+                            <StyledTab icon={<VideoLibrary style={{ width: '16px', height: '16px' }} />} iconPosition="start" label="General" />
+                        </StyledTabs>
+                    </TabsContainer>
+                </TopBarContainer>
+                <DeckButtonsContainer>
+                    {deckButtonsData.map((element) => {
+                        return (<DeckButton
+                            data={element}
+                            handleAudioActivation={handleAudioActivation}
+                            //onCLick returns all the data
+                            onClick={handleButtonSelection}
+                            volumeDeckButton={volumeDeckButton}
+                            selectedDeckButtons={selectedDeckButtons}
+                        />);
+                    })}
+                </DeckButtonsContainer>
+            </BottomSheet>
+        </BigDialog>
+    );
 }
 
 export default MemeLibraryDialog;

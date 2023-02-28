@@ -29,7 +29,7 @@ const DeckButtonMediaContainer = styled(Box)({
     right: 0,
 });
 
-const DeckButtonImgGif = styled('img')({
+const DeckButtonVideo = styled('video')({
     width: '100%',
     objectFit: 'cover',
 });
@@ -95,61 +95,68 @@ const DeckButton = ({
 
     const [hovered, setHovered] = useState(false);
 
-    return (<DeckButtonContainer id={`deck-button-${data.id}`}
-        onMouseEnter={(event) => {
-            setHovered(true);
-            if (hideInfo) return;
-            event.currentTarget.children[1].children[0].classList.add('show-on-hover');
-            event.currentTarget.children[1].children[1].children[0].classList.add('show-on-hover');
-            event.currentTarget.children[1].children[1].children[1].classList.add('show-on-hover');
-        }}
-        onMouseLeave={(event) => {
-            setHovered(false);
-            if (hideInfo) return;
-            event.currentTarget.children[1].children[0].classList.remove('show-on-hover');
-            event.currentTarget.children[1].children[1].children[0].classList.remove('show-on-hover');
-            event.currentTarget.children[1].children[1].children[1].classList.remove('show-on-hover');
-        }}
-        onClick={(event) => {
-            onClick(data);
-            if (hideInfo) return;
-        }}>
-        <DeckButtonMediaContainer>
-            <DeckButtonImgGif src={data.imgURL} />
-        </DeckButtonMediaContainer>
-        {!hideInfo &&
-            <HideUntilHoverContainer>
-                <UserContainer>
-                    <UserAvatar src={data.uploader.avatarImg} />
-                    <UserName>{data.uploader.username}</UserName>
-                </UserContainer>
-                <ButtonsContainer>
-                    {volumeDeckButton === data ?
-                        <VolumeOn style={{ opacity: '1 !important' }} onClick={(event) => handleAudioActivation(data, event)} />
-                        :
-                        <VolumeOff style={{
-                            transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                            opacity: 0,
-                        }} onClick={(event) => handleAudioActivation(data, event)} />
-                    }
-                    {selectedDeckButtons.find((button) => button.id === data.id) ?
-                        <CheckDeck style={{ opacity: 1 }} />
-                        :
-                        <SelectDeck style={{
-                            transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                            opacity: hovered ? 1 : 0,
-                        }} />
-                    }
-                </ButtonsContainer>
-            </HideUntilHoverContainer>
-        }
-        <DeckButtonText>{data.label}</DeckButtonText>
-        <style>{`
-        .show-on-hover {
-            opacity: 1 !important;
-        }
-    `}</style>
-    </DeckButtonContainer>)
+    return (
+        <DeckButtonContainer id={`deck-button-${data.id}`}
+            onMouseEnter={(event) => {
+                setHovered(true);
+                if (hideInfo) return;
+                event.currentTarget.children[1].children[0].classList.add('show-on-hover');
+                event.currentTarget.children[1].children[1].children[0].classList.add('show-on-hover');
+                event.currentTarget.children[1].children[1].children[1].classList.add('show-on-hover');
+            }}
+            onMouseLeave={(event) => {
+                setHovered(false);
+                if (hideInfo) return;
+                event.currentTarget.children[1].children[0].classList.remove('show-on-hover');
+                event.currentTarget.children[1].children[1].children[0].classList.remove('show-on-hover');
+                event.currentTarget.children[1].children[1].children[1].classList.remove('show-on-hover');
+            }}
+            onClick={(event) => {
+                onClick(data);
+                if (hideInfo) return;
+            }}>
+            <DeckButtonMediaContainer>
+                <DeckButtonVideo src={data.url}
+                    autoPlay
+                    loop
+                    muted />
+            </DeckButtonMediaContainer>
+            {!hideInfo &&
+                <HideUntilHoverContainer>
+                    <UserContainer>
+                        <UserAvatar src={data.uploader.avatarImg} />
+                        <UserName>{data.uploader.username}</UserName>
+                    </UserContainer>
+                    <ButtonsContainer>
+                        {volumeDeckButton === data ?
+                            <VolumeOn style={{ opacity: '1 !important' }} onClick={(event) => handleAudioActivation(data, event)} />
+                            :
+                            <VolumeOff style={{
+                                transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                                opacity: 0,
+                            }} onClick={(event) => handleAudioActivation(data, event)} />
+                        }
+                        {selectedDeckButtons.find((button) => button.id === data.id) ?
+                            <CheckDeck style={{ opacity: 1 }} />
+                            :
+                            <SelectDeck style={{
+                                transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                                opacity: hovered ? 1 : 0,
+                            }} />
+                        }
+                    </ButtonsContainer>
+                </HideUntilHoverContainer>
+            }
+            <DeckButtonText>
+                {data.name}
+            </DeckButtonText>
+            <style>{`
+                .show-on-hover {
+                    opacity: 1 !important;
+                }
+            `}</style>
+        </DeckButtonContainer>
+    );
 }
 
 export default DeckButton

@@ -270,12 +270,12 @@ const ReactionsDeckDialog = ({
     onSendMeme,
     quickReactionCost,
     userTwitchId,
+    onUploadMeme,
     onMemeUploaded
 }) => {
 
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
-    const [openAddMemeDialog, setopenAddMemeDialog] = useState(true);
 
     const bottomSheetRef = useRef();
 
@@ -298,11 +298,6 @@ const ReactionsDeckDialog = ({
         // bottomSheetRef.scrollLeft = scrollLeft - clientX + event.clientX;
         // bottomSheetRef.scrollTop = scrollTop - clientY + event.clientY;
     };
-
-    const handleUploadMeme = () => {
-        console.log('upload meme');
-        setopenAddMemeDialog(true)
-    }
 
     const numberOfButtons = userIsSub ? 8 : 4;
     const deck = new Array(numberOfButtons);
@@ -345,7 +340,7 @@ const ReactionsDeckDialog = ({
                             </MenuOption>
                         </MenuOptionsContainer>
                     </React.Fragment>
-                } >
+                }>
                     <MenuButtonContainer>
                         <MenuHintText style={{
                             opacity: hoverMenu ? '0.6' : '0',
@@ -374,9 +369,9 @@ const ReactionsDeckDialog = ({
                 }
                 <DeckButtonsContainer>
                     {deck.map((element, index) => (
-                        !element ?
+                        (!element ?
                             <DeckButtonAvailable key={`empty-slot-${index}`}
-                                onClick={handleUploadMeme}>
+                                onClick={onUploadMeme}>
                                 <DeckButtonAvailableInnerContainer>
                                     <VideoIcon />
                                     <DeckButtonAvailableAddButton>{`Add Meme`}</DeckButtonAvailableAddButton>
@@ -385,11 +380,9 @@ const ReactionsDeckDialog = ({
                             :
                             <DeckButton key={element.id}
                                 onClick={() => onSendMeme(element)}
-                                style={{
-                                    background: `url('${element.url}') center center / cover no-repeat`,
-                                }}>
-                                <DeckButtonText>{element.name}</DeckButtonText>
-                            </DeckButton>
+                                hideInfo={true}
+                                data={element} />
+                        )
                     ))}
                 </DeckButtonsContainer>
                 </>
@@ -414,9 +407,6 @@ const ReactionsDeckDialog = ({
                     <BottomSheetChipText>{`Edit Avatar`}</BottomSheetChipText>
                 </BottomSheetChip>
             </BottomSheet>
-            <AddMemeDialog open={openAddMemeDialog}
-                onClose={() => setopenAddMemeDialog(false)}
-                onMemeUploaded={onMemeUploaded} />
         </BigDialog>
     )
 }

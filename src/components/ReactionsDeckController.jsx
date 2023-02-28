@@ -3,17 +3,20 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../hooks/AuthProvider';
 import { useTwitch } from '../hooks/TwitchProvider';
 
-import { getSubsDeck, getViewerDeck, sendReaction, substractZaps } from '../services/database';
+import { listenToSubDeck, listenToViewerDeck, saveMemeOnDeckSlot, sendReaction, substractZaps } from '../services/database';
+import { uploadSubMeme } from '../services/storage';
+import { subsMemesModeration } from '../services/functions';
 
 import { ZAP } from '../constants';
 
 import ReactionsDeckDialog from './ReactionsDeckDialog';
-import { uploadSubMeme } from '../services/storage';
+import AddMemeDialog from './AddMemeDialog';
 
 const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
     const [deckData, setDeckData] = useState(null);
     const [quickReactionCost, setQuickReactionCost] = useState(null);
     const [userIsSub, setUserIsSub] = useState(false);
+    const [openAddMemeDialog, setopenAddMemeDialog] = useState(true);
     const user = useAuth();
     const twitch = useTwitch();
 
@@ -23,15 +26,17 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
                 if (twitch.viewer.subscriptionStatus) {
                     setUserIsSub(true);
                     // Load sub deck
-                    const deck = await getSubsDeck('613408163', streamerUid);
-                    setDeckData(deck.exists() ? deck.val() : {});
-                    setQuickReactionCost({ type: ZAP, price: 0 });
+                    await listenToSubDeck('613408163', streamerUid, (deck) => {
+                        setDeckData(deck.exists() ? deck.val() : []);
+                        setQuickReactionCost({ type: ZAP, price: 0 });
+                    });
                 } else {
                     setUserIsSub(false);
-                    // Load view deck
-                    const deck = await getViewerDeck('613408163', streamerUid);
-                    setDeckData(deck.exists() ? deck.val() : {});
-                    setQuickReactionCost({ type: ZAP, price: 0 });
+                    // Load viewer deck
+                    await listenToViewerDeck('613408163', streamerUid, (deck) => {
+                        setDeckData(deck.exists() ? deck.val() : []);
+                        setQuickReactionCost({ type: ZAP, price: 0 });
+                    });
                 }
             }
         }
@@ -89,8 +94,11 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
         }
     }
 
+    const onUploadMeme = () => {
+        setopenAddMemeDialog(true);
+    }
+
     const onMemeUploaded = useCallback(async (files, rejectedFiles) => {
-        console.log(rejectedFiles);
         if (rejectedFiles[0] && rejectedFiles[0].errors && rejectedFiles[0].errors[0] && rejectedFiles[0].errors[0].code) {
             switch (rejectedFiles[0].errors[0].code) {
                 case 'file-too-large':
@@ -107,16 +115,42 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
         if (files && files[0]) {
             const file = files[0];
             try {
+                // Create a video
                 const video = document.createElement('video');
+                video.autoplay = false;
+
+                // Preload their metadata
                 video.preload = 'metadata';
+
+                // When metadata is ready
                 video.onloadedmetadata = () => {
-                    console.log(video.duration);
+
+                    //Check length of the video
                     if (video.duration <= 8) {
-                        console.log('Upload meme');
                         uploadSubMeme(file, (progress) => {
-                            console.log(progress);
-                        }, (url) => {
-                            console.log(url);
+                        }, async (url, filePath) => {
+                            try {
+                                const result = await subsMemesModeration(filePath);
+                                if (result.data) {
+                                    if (result.data.accepted) {
+                                        // Testing deckData.length
+                                        saveMemeOnDeckSlot(user.uid, streamerUid, deckData.length, {
+                                            url,
+                                            width: video.videoWidth,
+                                            height: video.videoHeight,
+                                            id: 'elasticId',
+                                            name: 'Name'
+                                        });
+                                    } else {
+                                        // Rejected
+                                        console.log('Rejected');
+                                    }
+                                } else {
+                                    // Error?
+                                }
+                            } catch (error) {
+                                console.log(error);
+                            }
                         });
                     } else {
                         console.log('Don`t upload meme');
@@ -129,16 +163,22 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
             }
         }
 
-    }, []);
+    }, [user, streamerUid]);
 
     return (
+        <>
         <ReactionsDeckDialog open={open}
             userTwitchId={user.twitchId}
-            deckData={deckData ? Object.keys(deckData).map((id) => ({ ...deckData[id], id })) : null}
+            deckData={deckData}
             userIsSub={userIsSub}
             onSendMeme={onSendMeme}
             quickReactionCost={quickReactionCost}
+            onUploadMeme={onUploadMeme}
             onMemeUploaded={onMemeUploaded} />
+        <AddMemeDialog open={openAddMemeDialog}
+            onClose={() => setopenAddMemeDialog(false)}
+            onMemeUploaded={onMemeUploaded} />
+        </>
     );
 }
 

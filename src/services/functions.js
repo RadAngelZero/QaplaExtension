@@ -31,3 +31,17 @@ export async function getStreamerEmotes(streamerUid) {
         console.log(error);
     }
 }
+
+/**
+ * Evaluate if a meme contains explicit content or not
+ * @param {string} filePath File path on our google cloud storage bucket
+ */
+export async function subsMemesModeration(filePath) {
+    const videoContentModeration = httpsCallable(functions, 'videoContentModeration');
+
+    try {
+        return await videoContentModeration({ filePath });
+    } catch (error) {
+        console.log(error);
+    }
+}
