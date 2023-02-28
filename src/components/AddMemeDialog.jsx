@@ -10,6 +10,8 @@ import { ReactComponent as Cloud } from './../assets/Icons/Cloud.svg';
 import { ReactComponent as Featured } from './../assets/Icons/Featured.svg';
 import { ReactComponent as VideoLibrary } from './../assets/Icons/VideoLibrary.svg';
 import MemeLibraryDialog from './MemeLibraryDialog';
+import NameMemeDialog from './NameMemeDialog';
+import OnlySubDialog from './OnlySubDialog';
 
 
 const BigDialog = styled(Dialog)({
@@ -118,7 +120,9 @@ const BottomSheetOptionSubtitle = styled(Typography)({
 const AddMemeDialog = ({
     open,
     onClose,
-    onMemeUploaded
+    onMemeUploaded,
+    replacing,
+    handleDeckButtonReplace
 }) => {
     const [openMemeLib, setOpenMemeLib] = useState(false);
     const [startTab, setStartTab] = useState(0);
@@ -133,6 +137,11 @@ const AddMemeDialog = ({
         onDrop: onMemeUploaded,
         multiple: false
     });
+
+    const toDeck = () => {
+        setOpenMemeLib(false);
+        onClose();
+    }
 
     return (
         <BigDialog open={open}>
@@ -167,9 +176,18 @@ const AddMemeDialog = ({
                     </BottomSheetOptionTextContainer>
                 </BottomSheetOptionContainer>
             </BottomSheet>
-            <MemeLibraryDialog open={openMemeLib}
+            <NameMemeDialog
+                open={openNameMeme}
+                onClose={() => setOpenNameMeme(false)}
+                toDeck={toDeck} />
+            <MemeLibraryDialog
+                open={openMemeLib}
                 startTab={startTab}
-                onClose={() => setOpenMemeLib(false)}/>
+                onClose={() => setOpenMemeLib(false)}
+                replacing={replacing}
+                handleDeckButtonReplace={handleDeckButtonReplace}
+                toDeck={toDeck} />
+            <OnlySubDialog open={false} />
         </BigDialog>
     );
 }

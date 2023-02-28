@@ -71,7 +71,23 @@ const DeckButtonsContainer = styled(Box)({
     }
 });
 
-
+const ConfirmButton = styled(Button)({
+    position: 'absolute',
+    left: '50%',
+    transform: 'translate(-50%, 0)',
+    bottom: '24px',
+    borderRadius: '100px',
+    textTransform: 'none',
+    color: '#0D1022',
+    padding: '16px 24px',
+    fontSize: '20px',
+    fontWeight: '600',
+    lineHeight: '24px',
+    backgroundColor: '#00FFDD',
+    '&:hover': {
+        backgroundColor: '#00FFDD',
+    },
+});
 
 const StyledTabs = styled((props) => (
     <Tabs
@@ -120,7 +136,10 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
 const MemeLibraryDialog = ({
     open,
     onClose,
+    toDeck,
     startTab,
+    replacing,
+    handleDeckButtonReplace,
 }) => {
     const [selectedTab, setSelectedTab] = useState(0);
     const [selectedDeckButtons, setSelectedDeckButtons] = useState([
@@ -212,6 +231,13 @@ const MemeLibraryDialog = ({
             setSelectedDeckButtons(tempDeckButtons);
             return;
         }
+        if (replacing !== null) {
+            if (selectedDeckButtons.length > 0) {
+                tempDeckButtons[0] = button;
+                setSelectedDeckButtons(tempDeckButtons);
+                return;
+            }
+        }
         tempDeckButtons.push(button);
         setSelectedDeckButtons(tempDeckButtons);
     }
@@ -233,6 +259,15 @@ const MemeLibraryDialog = ({
         setAlreadyOpen(false);
     }
 
+    const handleConfirm = () => {
+        console.log(selectedDeckButtons);
+        // on update user deck go to deck screen
+        toDeck();
+        if (replacing !== null) {
+            handleDeckButtonReplace(replacing, selectedDeckButtons[0])
+        }
+    }
+
     return (
         <BigDialog open={open}>
             <BottomSheet>
@@ -249,6 +284,7 @@ const MemeLibraryDialog = ({
                     {deckButtonsData.map((element) => {
                         return (<DeckButton
                             data={element}
+                            index={index}
                             handleAudioActivation={handleAudioActivation}
                             //onCLick returns all the data
                             onClick={handleButtonSelection}
@@ -258,6 +294,9 @@ const MemeLibraryDialog = ({
                     })}
                 </DeckButtonsContainer>
             </BottomSheet>
+            {selectedDeckButtons.length > 0 &&
+                <ConfirmButton onClick={handleConfirm}>{`Confirm`}</ConfirmButton>
+            }
         </BigDialog>
     );
 }
