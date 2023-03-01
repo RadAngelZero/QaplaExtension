@@ -257,7 +257,9 @@ const ReactionsDeckDialog = ({
     onSendMeme,
     quickReactionCost,
     userTwitchId,
-    onUploadMeme
+    onUploadMeme,
+    onRename,
+    onRemove
 }) => {
 
     const [hoverMenu, setHoverMenu] = useState(false);
@@ -365,9 +367,13 @@ const ReactionsDeckDialog = ({
                             </DeckButtonAvailable>
                             :
                             <DeckButton key={element.id}
+                                index={index}
                                 onClick={() => onSendMeme(element)}
-                                hideInfo={true}
-                                data={element} />
+                                data={element}
+                                showEditButton
+                                onReplace={onUploadMeme}
+                                onRename={onRename}
+                                onRemove={onRemove} />
                         )
                     ))}
                 </DeckButtonsContainer>

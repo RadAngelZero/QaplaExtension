@@ -172,12 +172,16 @@ const ConfirmButton = styled(Button)({
 const NameMemeDialog = ({
     open,
     onClose,
-    toDeck,
     memeData,
     onAddName
 }) => {
     const [label, setLabel] = useState('');
     const [muteVideo, setMuteVideo] = useState(true);
+
+    const confirmName = async (name) => {
+        await onAddName(name);
+        setLabel('');
+    }
 
     return (
         <BigDialog open={open}>
@@ -185,7 +189,7 @@ const NameMemeDialog = ({
                 <TopBarContainer>
                     <Close style={{ cursor: 'pointer' }} onClick={onClose} />
                     <HeaderText>{`Name your Meme`}</HeaderText>
-                    <SkipButton onClick={() => onAddName('')}>
+                    <SkipButton onClick={() => confirmName('')}>
                         {`Skip`}
                     </SkipButton>
                 </TopBarContainer>
@@ -211,7 +215,7 @@ const NameMemeDialog = ({
                 <TextInput value={label} onChange={(e) => setLabel(e.target.value)} />
                 <Subtitle>{`Make it easier to spot your meme with a `}<SubtitleHighlight>{`short name`}</SubtitleHighlight></Subtitle>
                 {label.length > 0 &&
-                    <ConfirmButton onClick={() => onAddName(label)}>
+                    <ConfirmButton onClick={() => confirmName(label)}>
                         {`Confirm`}
                     </ConfirmButton>
                 }

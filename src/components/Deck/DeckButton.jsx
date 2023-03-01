@@ -137,7 +137,6 @@ const DeckButton = ({
     onClick,
     hideInfo,
     showEditButton,
-    startReplace,
     onReplace,
     onRename,
     onRemove
@@ -153,21 +152,20 @@ const DeckButton = ({
 
     useEffect(() => {
         setLabel(data.name);
-    }, [data])
+    }, [data]);
 
     const handleEditButtonClick = (event) => {
-        console.log('open edit')
         event.stopPropagation();
         setOpenEditOptions(true);
     }
 
-    const handleReplaceStart = (e) => {
+    const replace = (e) => {
         e.stopPropagation();
         setOpenEditOptions(false);
-        startReplace(index);
+        onReplace(index);
     }
 
-    const handleRename = (e) => {
+    const rename = (e) => {
         e.stopPropagation();
         setEditingLabel(true);
         setOpenEditOptions(false);
@@ -177,29 +175,29 @@ const DeckButton = ({
         }, 50);
     }
 
-    const handleRenameOnChange = (e) => {
+    const onLabelChange = (e) => {
         setLabel(e.target.value);
     }
 
-    const handleOutClickRename = (e) => {
+    const onLabelBlur = (e) => {
         setEditingLabel(false);
         onRename(index, label);
     }
 
-    const handleConfirmRename = (e) => {
+    const onLabelKeyDown = (e) => {
         if (e.key === 'Escape') {
             setLabel(oldLabel);
             setEditingLabel(false);
             return;
         }
+
         if (e.key === 'Enter') {
             setEditingLabel(false);
             onRename(index, label);
         }
-        console.log(index);
     }
 
-    const handleRemove = (e) => {
+    const remove = (e) => {
         e.stopPropagation();
         setOpenEditOptions(false);
         onRemove(index);
@@ -228,27 +226,30 @@ const DeckButton = ({
                 if (hideInfo) return;
             }}>
             <DeckButtonMediaContainer>
-                <DeckButtonVideo src={data.url} />
+                <DeckButtonVideo src={data.url}
+                    autoPlay
+                    loop
+                    muted />
             </DeckButtonMediaContainer>
             {!hideInfo &&
                 <HideUntilHoverContainer>
                     <UserContainer>
-                        <UserAvatar src={data.uploader.avatarImg} />
-                        <UserName>{data.uploader.username}</UserName>
+                        {/* <UserAvatar src={data.uploader.avatarImg} />
+                        <UserName>{data.uploader.username}</UserName> */}
                     </UserContainer>
                     {showEditButton ?
                         <EditPopUp open={openEditOptions} placement='bottom-end' onClose={() => setOpenEditOptions(false)} title={
                             <React.Fragment>
                                 <EditPopUpOptionsContainer>
-                                    <EditPopUpOption onClick={(e) => handleReplaceStart(e)}>
+                                    <EditPopUpOption onClick={replace}>
                                         <CircleArrows />
                                         <EditPopUpOptionText>{`Replace`}</EditPopUpOptionText>
                                     </EditPopUpOption>
-                                    <EditPopUpOption onClick={(e) => handleRename(e)}>
+                                    <EditPopUpOption onClick={rename}>
                                         <TextIcon />
                                         <EditPopUpOptionText>{`Rename`}</EditPopUpOptionText>
                                     </EditPopUpOption>
-                                    <EditPopUpOption onClick={(e) => handleRemove(e)}>
+                                    <EditPopUpOption onClick={remove}>
                                         <Delete />
                                         <EditPopUpOptionText style={{ color: '#FF9C9C' }}>{`Remove`}</EditPopUpOptionText>
                                     </EditPopUpOption>
@@ -256,11 +257,12 @@ const DeckButton = ({
                             </React.Fragment>
                         } >
                             <ButtonsContainer>
-                                <EditSquare onClick={(e) => handleEditButtonClick(e)} style={{
-                                    transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                                    opacity: 0,
-                                    cursor: 'pointer',
-                                }} />
+                                <EditSquare onClick={handleEditButtonClick}
+                                    style={{
+                                        transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                                        opacity: 0,
+                                        cursor: 'pointer',
+                                    }} />
                             </ButtonsContainer>
                         </EditPopUp>
 
@@ -295,9 +297,9 @@ const DeckButton = ({
                 style={{
                     cursor: editingLabel ? 'text' : 'pointer'
                 }}
-                onBlur={(e) => handleOutClickRename(e)}
-                onChange={(e) => handleRenameOnChange(e)}
-                onKeyDown={(e) => handleConfirmRename(e)}
+                onBlur={onLabelBlur}
+                onChange={onLabelChange}
+                onKeyDown={onLabelKeyDown}
             />
             <style>{`
                 .show-on-hover {

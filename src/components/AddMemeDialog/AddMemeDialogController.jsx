@@ -11,14 +11,9 @@ import UploadingMemeDialog from '../UploadingMemeDialog';
 
 const AddMemeDialogController = ({ open, onClose, uid, streamerUid, indexToAddMeme }) => {
     const [fileToUpload, setFileToUpload] = useState(null);
-    // const [uploadedMemeData, setUploadedMemeData] = useState(null);
-    const [uploadedMemeData, setUploadedMemeData] = useState({
-        height: 1080,
-        url: "https://firebasestorage.googleapis.com/v0/b/qapplaapp.appspot.com/o/DecksMemes%2Fy2mate.com%20-%20The%20most%20accurate%20it%20is%20Wednesday%20my%20dudes%20in%20lego%20ever_1080p.mp4?alt=media&token=6ef85dcd-bf55-450c-bb6e-1c71529a32e7",
-        width: 1920
-    });
+    const [uploadedMemeData, setUploadedMemeData] = useState(null);
     const [openUploadingMemeDialog, setOpenUploadingMemeDialog] = useState(false);
-    const [openNameMemeDialog, setOpenNameMemeDialog] = useState(true);
+    const [openNameMemeDialog, setOpenNameMemeDialog] = useState(false);
     const [openMemeLibDialog, setOpenMemeLibDialog] = useState(false);
     const [memeLibraryStartTab, setMemeLibraryStartTab] = useState(0);
 
@@ -110,7 +105,6 @@ const AddMemeDialogController = ({ open, onClose, uid, streamerUid, indexToAddMe
 
     }, [uid, streamerUid]);
 
-    console.log(uploadedMemeData);
     return (
         <>
         <AddMemeDialog openDialog={open}

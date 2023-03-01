@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/AuthProvider';
 import { useTwitch } from '../hooks/TwitchProvider';
 
-import { listenToSubDeck, listenToViewerDeck, sendReaction, substractZaps } from '../services/database';
+import { listenToSubDeck, listenToViewerDeck, sendReaction, substractZaps, updateMemeOnSubDeckSlot, writeFullSubDeck } from '../services/database';
 
 import { ZAP } from '../constants';
 
@@ -94,6 +94,7 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
     }
 
     const onUploadMeme = (index) => {
+        console.log(index);
         if (deckData && index < deckData.length) {
             setIndexToAddMeme(index);
         } else {
@@ -101,6 +102,21 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
         }
 
         setopenAddMemeDialog(true);
+    }
+
+    const onRename = (index, newName) => {
+        updateMemeOnSubDeckSlot(user.uid, streamerUid, index, { name: newName });
+    }
+
+    const onRemove = (index) => {
+        const deck = [...deckData];
+        deck.splice(index, 1);
+        const deckObject = {};
+        deck.forEach((deckMeme, index) => {
+            deckObject[index] = deckMeme
+        });
+
+        writeFullSubDeck(user.uid, streamerUid, deckObject);
     }
 
     return (
@@ -111,7 +127,9 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
             userIsSub={userIsSub}
             onSendMeme={onSendMeme}
             quickReactionCost={quickReactionCost}
-            onUploadMeme={onUploadMeme} />
+            onUploadMeme={onUploadMeme}
+            onRename={onRename}
+            onRemove={onRemove} />
         <AddMemeDialogController open={openAddMemeDialog}
             onClose={() => setopenAddMemeDialog(false)}
             uid={user.uid}

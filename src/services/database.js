@@ -419,7 +419,7 @@ export async function listenToViewerDeck(uid, streamerUid, callback) {
 export async function saveMemeOnViewerDeckSlot(uid, streamerUid, slotIndex, memeData) {
     const viewerDeckSlot = createChild(`/UsersViewersMemesDecks/${uid}/${streamerUid}/${slotIndex}`);
 
-    return await update(viewerDeckSlot, memeData);
+    return await set(viewerDeckSlot, memeData);
 }
 
 //////////////////////
@@ -446,7 +446,19 @@ export async function listenToSubDeck(uid, streamerUid, callback) {
  * @param {object} memeData Meme data (width, height, url, etc.)
  */
 export async function saveMemeOnSubDeckSlot(uid, streamerUid, slotIndex, memeData) {
-    const viewerDeckSlot = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}/${slotIndex}`);
+    const subDeckSlot = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}/${slotIndex}`);
 
-    return await update(viewerDeckSlot, memeData);
+    return await set(subDeckSlot, memeData);
+}
+
+export async function updateMemeOnSubDeckSlot(uid, streamerUid, slotIndex, newData) {
+    const subDeckSlot = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}/${slotIndex}`);
+
+    return await update(subDeckSlot, newData);
+}
+
+export async function writeFullSubDeck(uid, streamerUid, deckData) {
+    const subDeckSlot = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}`);
+
+    return await set(subDeckSlot, deckData);
 }
