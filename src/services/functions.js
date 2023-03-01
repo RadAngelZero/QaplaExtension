@@ -45,3 +45,23 @@ export async function subsMemesModeration(filePath) {
         console.log(error);
     }
 }
+
+/**
+ * Index a meme on the elasticsearchs decks_memes index
+ * @param {string} authorUid Uid of the user who uploaded the meme
+ * @param {string} libraryId Library for the meme, generally this will be a streamerUid, to sort the memes from their community
+ * @param {string} name Name of the meme
+ * @param {string} url Url to the meme
+ * @param {number} width Width of the uploaded meme
+ * @param {number} height Height of uploaded meme
+ * @returns {Promise.<{ data : { id: string, indexedObject: Object } }>} Functions response
+ */
+export async function indexSubDeckMeme(authorUid, libraryId, name, url, width, height) {
+    const indexDeckMeme = httpsCallable(functions, 'indexDeckMeme');
+
+    try {
+        return await indexDeckMeme({ authorUid, libraryId, name, url, width, height });
+    } catch (error) {
+        console.log(error);
+    }
+}

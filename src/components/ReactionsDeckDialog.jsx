@@ -2,14 +2,12 @@ import React, { useState, useRef } from 'react';
 import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 
 import { ReactComponent as Menu } from './../assets/Icons/Menu.svg';
 import { ReactComponent as CloseMenu } from './../assets/Icons/CloseMenu.svg';
 import { ReactComponent as ExternalLinkWhite } from './../assets/Icons/ExternalLinkWhite.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import { ReactComponent as VideoIcon } from './../assets/Icons/VideoIcon.svg';
-import AddMemeDialog from './AddMemeDialog';
 import DeckButton from './Deck/DeckButton';
 window.scrolls = {};
 window.scrolls.DeckChips = { x: 0, scroll: 0 };
@@ -187,17 +185,6 @@ const DeckButtonAvailableAddButton = styled(Button)({
     textTransform: 'none',
 });
 
-const DeckButtonText = styled(Typography)({
-    color: '#fff',
-    fontFamily: 'Impact, Inter',
-    textTransform: 'uppercase',
-    fontSize: '22px',
-    fontWeight: '500',
-    lineHeight: '19px',
-    margin: 'auto auto 12px auto',
-    textShadow: '2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000',
-});
-
 const BottomSheet = styled(Box)({
     display: 'flex',
     position: 'absolute',
@@ -270,8 +257,7 @@ const ReactionsDeckDialog = ({
     onSendMeme,
     quickReactionCost,
     userTwitchId,
-    onUploadMeme,
-    onMemeUploaded
+    onUploadMeme
 }) => {
 
     const [hoverMenu, setHoverMenu] = useState(false);
@@ -308,64 +294,6 @@ const ReactionsDeckDialog = ({
         } else {
             deck[i] = null;
         }
-    }
-
-    const startDeckButtonReplace = (index) => {
-        setDeckButtonReplaceIndex(index);
-        setopenAddMemeDialog(true);
-    }
-
-    const handleDeckButtonReplace = (index, data) => {
-        let tempDeckButtons = [...deckButtonsData];
-        let cleanDeckButtons = [];
-        tempDeckButtons[index] = data;
-        setDeckButtonsData(tempDeckButtons);
-        setDeckButtonReplaceIndex(null);
-        tempDeckButtons.every(e => {
-            if (e.empty) {
-                console.log('empty')
-                return false;
-            }
-            cleanDeckButtons.push(e);
-            return true;
-        })
-        // deckButtons without empties
-        console.log(cleanDeckButtons);
-    }
-
-    const handleDeckButtonRename = (index, label) => {
-        let tempDeckButtons = [...deckButtonsData];
-        let cleanDeckButtons = [];
-        tempDeckButtons[index].label = label;
-        setDeckButtonsData(tempDeckButtons);
-        tempDeckButtons.every(e => {
-            if (e.empty) {
-                console.log('empty')
-                return false;
-            }
-            cleanDeckButtons.push(e);
-            return true;
-        })
-        // deckButtons without empties
-        console.log(cleanDeckButtons);
-    }
-
-    const handleDeckButtonRemove = (index) => {
-        let tempDeckButtons = [...deckButtonsData];
-        let cleanDeckButtons = [];
-        tempDeckButtons.splice(index, 1);
-        tempDeckButtons.push({ empty: true });
-        setDeckButtonsData(tempDeckButtons);
-        tempDeckButtons.every(e => {
-            if (e.empty) {
-                console.log('empty')
-                return false;
-            }
-            cleanDeckButtons.push(e);
-            return true;
-        })
-        // deckButtons without empties
-        console.log(cleanDeckButtons);
     }
 
     return (
@@ -429,7 +357,7 @@ const ReactionsDeckDialog = ({
                     {deck.map((element, index) => (
                         (!element ?
                             <DeckButtonAvailable key={`empty-slot-${index}`}
-                                onClick={onUploadMeme}>
+                                onClick={() => onUploadMeme(index)}>
                                 <DeckButtonAvailableInnerContainer>
                                     <VideoIcon />
                                     <DeckButtonAvailableAddButton>{`Add Meme`}</DeckButtonAvailableAddButton>

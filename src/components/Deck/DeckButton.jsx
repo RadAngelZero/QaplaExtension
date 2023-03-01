@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList, Tabs, Tab } from '@mui/material';
+import { Box, Tooltip, Typography, tooltipClasses } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 
 import { ReactComponent as CheckDeck } from './../../assets/Icons/CheckDeck.svg';
 import { ReactComponent as SelectDeck } from './../../assets/Icons/SelectDeck.svg';
@@ -162,11 +161,6 @@ const DeckButton = ({
         setOpenEditOptions(true);
     }
 
-    const handleReplace = (e) => {
-        e.stopPropagation();
-        onReplace(index, data);
-    }
-
     const handleReplaceStart = (e) => {
         e.stopPropagation();
         setOpenEditOptions(false);
@@ -234,7 +228,7 @@ const DeckButton = ({
                 if (hideInfo) return;
             }}>
             <DeckButtonMediaContainer>
-                <DeckButtonImgGif src={data.imgURL} />
+                <DeckButtonVideo src={data.url} />
             </DeckButtonMediaContainer>
             {!hideInfo &&
                 <HideUntilHoverContainer>

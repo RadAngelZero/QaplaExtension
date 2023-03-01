@@ -416,7 +416,7 @@ export async function listenToViewerDeck(uid, streamerUid, callback) {
  * @param {number} slotIndex Index of the meme to savee
  * @param {object} memeData Meme data (width, height, url, etc.)
  */
-export async function saveMemeOnDeckSlot(uid, streamerUid, slotIndex, memeData) {
+export async function saveMemeOnViewerDeckSlot(uid, streamerUid, slotIndex, memeData) {
     const viewerDeckSlot = createChild(`/UsersViewersMemesDecks/${uid}/${streamerUid}/${slotIndex}`);
 
     return await update(viewerDeckSlot, memeData);
@@ -436,4 +436,17 @@ export async function listenToSubDeck(uid, streamerUid, callback) {
     const subDeck = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}`);
 
     return onValue(query(subDeck), callback);
+}
+
+/**
+ * Saves the given meme data on the specified slot index of a sub deck
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Streamer identifier
+ * @param {number} slotIndex Index of the meme to savee
+ * @param {object} memeData Meme data (width, height, url, etc.)
+ */
+export async function saveMemeOnSubDeckSlot(uid, streamerUid, slotIndex, memeData) {
+    const viewerDeckSlot = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}/${slotIndex}`);
+
+    return await update(viewerDeckSlot, memeData);
 }

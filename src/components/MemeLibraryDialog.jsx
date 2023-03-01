@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList, Tabs, Tab } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Dialog, Tabs, Tab } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Featured } from './../assets/Icons/Featured.svg';
@@ -281,7 +280,7 @@ const MemeLibraryDialog = ({
                     </TabsContainer>
                 </TopBarContainer>
                 <DeckButtonsContainer>
-                    {deckButtonsData.map((element) => {
+                    {deckButtonsData.map((element, index) => {
                         return (<DeckButton
                             data={element}
                             index={index}

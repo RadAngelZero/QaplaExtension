@@ -1,18 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList } from '@mui/material';
+import React from 'react';
+import { Box, Button, Dialog, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 import { useDropzone } from 'react-dropzone';
 
-import { ReactComponent as Close } from './../assets/Icons/Close.svg';
-import { ReactComponent as Cloud } from './../assets/Icons/Cloud.svg';
-import { ReactComponent as Featured } from './../assets/Icons/Featured.svg';
-import { ReactComponent as VideoLibrary } from './../assets/Icons/VideoLibrary.svg';
-import MemeLibraryDialog from './MemeLibraryDialog';
-import NameMemeDialog from './NameMemeDialog';
-import OnlySubDialog from './OnlySubDialog';
-
+import { ReactComponent as Close } from './../../assets/Icons/Close.svg';
+import { ReactComponent as Cloud } from './../../assets/Icons/Cloud.svg';
+import { ReactComponent as Featured } from './../../assets/Icons/Featured.svg';
+import { ReactComponent as VideoLibrary } from './../../assets/Icons/VideoLibrary.svg';
 
 const BigDialog = styled(Dialog)({
     '.MuiDialog-root': {
@@ -118,16 +113,14 @@ const BottomSheetOptionSubtitle = styled(Typography)({
 });
 
 const AddMemeDialog = ({
-    open,
+    openDialog,
     onClose,
     onMemeUploaded,
-    replacing,
-    handleDeckButtonReplace
+    setLibraryTab,
+    setOpenMemeLibDialog
 }) => {
-    const [openMemeLib, setOpenMemeLib] = useState(false);
-    const [startTab, setStartTab] = useState(0);
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    const dropzone = useDropzone({
         accept: {
             'video/mp4': ['.mp4'],
             'video/mpeg': ['.mpeg'],
@@ -135,39 +128,37 @@ const AddMemeDialog = ({
         },
         maxSize: 8388608, // Max size is 8 MB
         onDrop: onMemeUploaded,
-        multiple: false
+        multiple: false,
+        noClick: true
     });
 
-    const toDeck = () => {
-        setOpenMemeLib(false);
-        onClose();
-    }
-
     return (
-        <BigDialog open={open}>
+        <BigDialog open={openDialog} {...dropzone.getRootProps()}>
             <Close style={{ position: 'absolute', top: '32px', left: '24px', cursor: 'pointer' }} onClick={onClose} />
-            <DragDropContainer {...getRootProps()}>
-                <input {...getInputProps()} />
+            <DragDropContainer onClick={dropzone.open}>
+                <input {...dropzone.getInputProps()} />
                 <Cloud />
                 <DragDropText>{`Upload and share a meme clip`}</DragDropText>
-                <DragDropButton>{`Upload Video File`}</DragDropButton>
+                <DragDropButton onClick={dropzone.open}>
+                    {`Upload Video File`}
+                </DragDropButton>
             </DragDropContainer>
             <BottomSheet style={{
-                display: isDragActive ? 'none' : 'flex'
+                display: dropzone.isDragActive ? 'none' : 'flex'
             }}>
                 <BottomSheetOptionContainer>
                     <Featured />
                     <BottomSheetOptionTextContainer onClick={() => {
-                        setStartTab(0);
-                        setOpenMemeLib(true);
+                        setLibraryTab(0);
+                        setOpenMemeLibDialog(true);
                     }}>
                         <BottomSheetOptionHeader>{`Add from subscribers library`}</BottomSheetOptionHeader>
                         <BottomSheetOptionSubtitle>{`Choose a meme from subscribers uploads`}</BottomSheetOptionSubtitle>
                     </BottomSheetOptionTextContainer>
                 </BottomSheetOptionContainer>
                 <BottomSheetOptionContainer onClick={() => {
-                        setStartTab(1);
-                        setOpenMemeLib(true);
+                        setLibraryTab(1);
+                        setOpenMemeLibDialog(true);
                     }}>
                     <VideoLibrary />
                     <BottomSheetOptionTextContainer>
@@ -176,18 +167,6 @@ const AddMemeDialog = ({
                     </BottomSheetOptionTextContainer>
                 </BottomSheetOptionContainer>
             </BottomSheet>
-            <NameMemeDialog
-                open={openNameMeme}
-                onClose={() => setOpenNameMeme(false)}
-                toDeck={toDeck} />
-            <MemeLibraryDialog
-                open={openMemeLib}
-                startTab={startTab}
-                onClose={() => setOpenMemeLib(false)}
-                replacing={replacing}
-                handleDeckButtonReplace={handleDeckButtonReplace}
-                toDeck={toDeck} />
-            <OnlySubDialog open={false} />
         </BigDialog>
     );
 }

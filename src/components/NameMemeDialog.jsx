@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList, Tabs, Tab } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Button, Dialog, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
+import { ReactComponent as VolumeOff } from './../assets/Icons/VolumeOff.svg';
+import { ReactComponent as VolumeOn } from './../assets/Icons/VolumeOn.svg';
 
 const BigDialog = styled(Dialog)({
     '.MuiDialog-root': {
@@ -73,6 +74,7 @@ const SkipButton = styled(Button)({
 });
 
 const MediaContainer = styled(Box)({
+    position: 'relative',
     width: 'fit-content',
     maxWidth: '100%',
     maxHeight: '315px',
@@ -82,9 +84,35 @@ const MediaContainer = styled(Box)({
     marginTop: '26px',
 });
 
-const ImgGif = styled('img')({
+const VolumeControlsContainer = styled(Box)({
+    position: 'absolute',
+    top: 14,
+    right: 14
+});
+
+const MemeVideo = styled('video')({
     maxHeight: '315px',
-    objectFit: 'contain',
+    objectFit: 'cover',
+    maxWidth: '100%'
+});
+
+const VideoText = styled(Typography)({
+    position: 'absolute',
+    bottom: 16,
+    left: 0,
+    right: 0,
+    color: '#fff',
+    fontFamily: 'Impact, Inter',
+    textTransform: 'uppercase',
+    fontSize: '22px',
+    fontWeight: '500',
+    lineHeight: '19px',
+    margin: 'auto auto 12px auto',
+    textShadow: '2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000',
+    zIndex: 100,
+    backgroundColor: '#0000',
+    border: 'none',
+    textAlign: 'center'
 });
 
 const TextInput = styled('input')({
@@ -145,45 +173,51 @@ const NameMemeDialog = ({
     open,
     onClose,
     toDeck,
+    memeData,
+    onAddName
 }) => {
-
-    const [imgGif, setImgGif] = useState('https://media.giphy.com/media/TztOD2c0znrtm/giphy-downsized-large.gif');
     const [label, setLabel] = useState('');
+    const [muteVideo, setMuteVideo] = useState(true);
 
-    const handleClose = () => {
-        onClose();
-    }
-
-    const handleSkip = () => {
-        console.log('memeCreateNoName');
-        toDeck();
-    }
-
-    const handleOnLabelChange = (e) => {
-        setLabel(e.target.value);
-    }
-
-    const createMeme = () => {
-        console.log('memeCreate');
-        toDeck();
-    }
-
-    return (<BigDialog open={open}>
-        <BottomSheet>
-            <TopBarContainer>
-                <Close style={{ cursor: 'pointer' }} onClick={handleClose} />
-                <HeaderText>{`Name your Meme`}</HeaderText>
-                <SkipButton onClick={handleSkip}>{`Skip`}</SkipButton>
-            </TopBarContainer>
-            <MediaContainer>
-                <ImgGif src={imgGif} />
-            </MediaContainer>
-            <TextInput value={label} onChange={(e) => {handleOnLabelChange(e)}} />
-            <Subtitle>{`Make it easier to spot your meme with a `}<SubtitleHighlight>{`short name`}</SubtitleHighlight></Subtitle>
-            {label.length > 0 &&
-            <ConfirmButton onClick={createMeme}>{`Confirm`}</ConfirmButton>}
-        </BottomSheet>
-    </BigDialog>)
+    return (
+        <BigDialog open={open}>
+            <BottomSheet>
+                <TopBarContainer>
+                    <Close style={{ cursor: 'pointer' }} onClick={onClose} />
+                    <HeaderText>{`Name your Meme`}</HeaderText>
+                    <SkipButton onClick={() => onAddName('')}>
+                        {`Skip`}
+                    </SkipButton>
+                </TopBarContainer>
+                <MediaContainer>
+                    <VolumeControlsContainer>
+                        {muteVideo ?
+                            <VolumeOff onClick={() => setMuteVideo(false)} />
+                            :
+                            <VolumeOn onClick={() => setMuteVideo(true)} />
+                        }
+                    </VolumeControlsContainer>
+                    <MemeVideo src={memeData.url}
+                        style={{
+                            aspectRatio: memeData.width / memeData.height
+                        }}
+                        autoPlay
+                        muted={muteVideo}
+                        loop />
+                    <VideoText>
+                        {label}
+                    </VideoText>
+                </MediaContainer>
+                <TextInput value={label} onChange={(e) => setLabel(e.target.value)} />
+                <Subtitle>{`Make it easier to spot your meme with a `}<SubtitleHighlight>{`short name`}</SubtitleHighlight></Subtitle>
+                {label.length > 0 &&
+                    <ConfirmButton onClick={() => onAddName(label)}>
+                        {`Confirm`}
+                    </ConfirmButton>
+                }
+            </BottomSheet>
+        </BigDialog>
+    );
 }
 
 export default NameMemeDialog;

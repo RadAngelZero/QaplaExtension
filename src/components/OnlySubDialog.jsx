@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList } from '@mui/material';
+import React from 'react';
+import { Box, Button, Dialog, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 
