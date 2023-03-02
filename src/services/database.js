@@ -442,7 +442,7 @@ export async function listenToSubDeck(uid, streamerUid, callback) {
  * Saves the given meme data on the specified slot index of a sub deck
  * @param {string} uid User identifier
  * @param {string} streamerUid Streamer identifier
- * @param {number} slotIndex Index of the meme to savee
+ * @param {number} slotIndex Index of the meme to save
  * @param {object} memeData Meme data (width, height, url, etc.)
  */
 export async function saveMemeOnSubDeckSlot(uid, streamerUid, slotIndex, memeData) {
@@ -451,12 +451,25 @@ export async function saveMemeOnSubDeckSlot(uid, streamerUid, slotIndex, memeDat
     return await set(subDeckSlot, memeData);
 }
 
+/**
+ * Updates the given meme with the provided data
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Streamer identifier
+ * @param {number} slotIndex Index of the meme to update
+ * @param {object} newData Data to update/add to the meme
+ */
 export async function updateMemeOnSubDeckSlot(uid, streamerUid, slotIndex, newData) {
     const subDeckSlot = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}/${slotIndex}`);
 
     return await update(subDeckSlot, newData);
 }
 
+/**
+ * Overwrite the current sub Deck with the new given Deck
+ * @param {string} uid User identifier
+ * @param {string} streamerUid Streamer identifier
+ * @param {object} deckData New Deck, this data will overwrite the current deck
+ */
 export async function writeFullSubDeck(uid, streamerUid, deckData) {
     const subDeckSlot = createChild(`/UsersSubsMemesDecks/${uid}/${streamerUid}`);
 

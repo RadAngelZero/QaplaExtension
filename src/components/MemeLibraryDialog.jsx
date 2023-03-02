@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Button, Dialog, Tabs, Tab } from '@mui/material';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Box, Button, Dialog, Tabs, Tab, ImageList, ImageListItem } from '@mui/material';
 import styled from '@emotion/styled';
+import { GiphyFetch } from '@giphy/js-fetch-api';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Featured } from './../assets/Icons/Featured.svg';
 import { ReactComponent as VideoLibrary } from './../assets/Icons/VideoLibrary.svg';
 import DeckButton from './Deck/DeckButton';
+import { Grid, Video,  } from '@giphy/react-components';
+import MemeLibraryItem from './MemeLibraryItem';
+import { getDeckMemesFromLibrary } from '../services/elastic';
+
+const gf = new GiphyFetch('Kb3qFoEloWmqsI3ViTJKGkQZjxICJ3bi');
 
 const BigDialog = styled(Dialog)({
     '.MuiDialog-root': {
@@ -58,16 +64,7 @@ const TabsContainer = styled(Box)({
 });
 
 const DeckButtonsContainer = styled(Box)({
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '18px',
-    justifyContent: 'space-between',
-    marginTop: '32px',
-    overflowY: 'scroll',
-    paddingBottom: '100px',
-    '&::-webkit-scrollbar': {
-        display: 'none',
-    }
+    overflow: 'scroll',
 });
 
 const ConfirmButton = styled(Button)({
@@ -136,90 +133,46 @@ const MemeLibraryDialog = ({
     open,
     onClose,
     toDeck,
-    startTab,
+    memeLibraryStartTab,
     replacing,
     handleDeckButtonReplace,
+    streamerUid
 }) => {
     const [selectedTab, setSelectedTab] = useState(0);
-    const [selectedDeckButtons, setSelectedDeckButtons] = useState([
-
-    ]);
+    const [selectedDeckButtons, setSelectedDeckButtons] = useState([]);
     const [alreadyOpen, setAlreadyOpen] = useState(false);
     const [volumeDeckButton, setVolumeDeckButton] = useState({});
-    const [deckButtonsData, setDeckButtonsData] = useState([
-        {
-            id: 'heart-parrot',
-            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-            label: 'Love',
-            uploader: {
-                username: 'juansguarnizo',
-                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-            },
-        },
-        {
-            id: 'wow-sloth',
-            imgURL: 'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
-            label: 'WOW',
-            uploader: {
-                username: 'juansguarnizo',
-                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-            },
-        },
-
-    ]);
+    const [subsLibraryClips, setSubsLibraryClips] = useState([]);
+    const [giphyClips, setGiphyClips] = useState([]);
+    const [clipsFetched, setClipsFetched] = useState(false);
 
     useEffect(() => {
         if (open === true && !alreadyOpen) {
-            setSelectedTab(startTab);
+            setSelectedTab(memeLibraryStartTab);
             setAlreadyOpen(true);
         }
+    }, [selectedTab, open, memeLibraryStartTab]);
 
-        if (selectedTab === 1) {
-            setDeckButtonsData([
-                {
-                    id: 'cry-pikachu',
-                    imgURL: 'https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif',
-                    label: 'Cry',
-                    uploader: {
-                        username: 'juansguarnizo',
-                        avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-                    },
-                },
-                {
-                    id: 'wooo-homer',
-                    imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
-                    label: 'Woooo',
-                    uploader: {
-                        username: 'juansguarnizo',
-                        avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-                    },
-                },
-            ])
+    useEffect(() => {
+        async function loadLibraries() {
+            const subsMemes = await getDeckMemesFromLibrary(0, 50, streamerUid);
+            setSubsLibraryClips(
+                subsMemes.hits.hits.map((meme) => ({
+                    id: meme._id,
+                    ...meme._source
+                }))
+            );
+
+            const gifs = await gf.trending({ offset: 0, limit: 50, type: 'videos' });
+            setGiphyClips(gifs.data);
+
+            setClipsFetched(true);
         }
 
-        if (selectedTab === 0) {
-            setDeckButtonsData([
-                {
-                    id: 'heart-parrot',
-                    imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-                    label: 'Love',
-                    uploader: {
-                        username: 'juansguarnizo',
-                        avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-                    },
-                },
-                {
-                    id: 'wow-sloth',
-                    imgURL: 'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
-                    label: 'WOW',
-                    uploader: {
-                        username: 'juansguarnizo',
-                        avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-                    },
-                },
-            ])
+        if (open && !clipsFetched) {
+            loadLibraries();
         }
-    }, [selectedTab, open, startTab])
+    }, [open, clipsFetched]);
 
     const handleButtonSelection = (button) => {
         let tempDeckButtons = [...selectedDeckButtons];
@@ -280,17 +233,34 @@ const MemeLibraryDialog = ({
                     </TabsContainer>
                 </TopBarContainer>
                 <DeckButtonsContainer>
-                    {deckButtonsData.map((element, index) => {
-                        return (<DeckButton
-                            data={element}
-                            index={index}
-                            handleAudioActivation={handleAudioActivation}
-                            //onCLick returns all the data
-                            onClick={handleButtonSelection}
-                            volumeDeckButton={volumeDeckButton}
-                            selectedDeckButtons={selectedDeckButtons}
-                        />);
-                    })}
+                    <ImageList variant='masonry'
+                        cols={2}
+                        gap={8}>
+                        {selectedTab === 0 ?
+                            subsLibraryClips.map((element, index) => (
+                                <ImageListItem key={element.id} style={{ cursor: 'pointer' }}>
+                                    <MemeLibraryItem data={element}
+                                        id={element.id}
+                                        index={index}
+                                        onClick={handleButtonSelection}
+                                        volumeDeckButton={volumeDeckButton}
+                                        selectedDeckButtons={selectedDeckButtons} />
+                                </ImageListItem>
+                            ))
+                            :
+                            giphyClips.map((element, index) => (
+                                <ImageListItem key={element.id} style={{ cursor: 'pointer' }}>
+                                    <MemeLibraryItem data={element}
+                                        isGiphyVideo
+                                        id={element.id}
+                                        index={index}
+                                        onClick={handleButtonSelection}
+                                        volumeDeckButton={volumeDeckButton}
+                                        selectedDeckButtons={selectedDeckButtons} />
+                                </ImageListItem>
+                            ))
+                        }
+                    </ImageList>
                 </DeckButtonsContainer>
             </BottomSheet>
             {selectedDeckButtons.length > 0 &&

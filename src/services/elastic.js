@@ -127,3 +127,44 @@ export async function updateMemeLastViewed(id) {
 
     return await response.json();
 }
+
+export async function getDeckMemesFromLibrary(from, size, libraryId) {
+    const response = await fetch(`${ELASTIC_URL}/decks_memes/_search`, {
+        method: 'POST',
+        body: JSON.stringify({
+            from,
+            size,
+            query: {
+                bool: {
+                    filter: [{
+                        term: {
+                            libraryId
+                        }
+                    }]
+                }
+            },
+            sort: [
+                {
+                    timesUsed: {
+                        order: 'desc'
+                    },
+                    lastUsed: {
+                        order: 'desc'
+                    },
+                    timesAdded: {
+                        order: 'desc'
+                    },
+                    createdAt: {
+                        order: 'desc'
+                    }
+                }
+            ]
+        }),
+        headers: {
+            Authorization: 'ApiKey N2F4cW40WUJ2dGZIZEo4NWg1TVo6UWFrUDQwQXBTbFdJZDlYZkx4QXhHUQ==',
+            'Content-Type': 'application/json'
+        }
+    });
+
+    return await response.json();
+}

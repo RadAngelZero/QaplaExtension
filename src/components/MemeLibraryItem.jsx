@@ -5,14 +5,14 @@ import { GiphyFetch } from '@giphy/js-fetch-api';
 import { Video } from '@giphy/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { ReactComponent as CheckDeck } from './../../assets/Icons/CheckDeck.svg';
-import { ReactComponent as SelectDeck } from './../../assets/Icons/SelectDeck.svg';
-import { ReactComponent as VolumeOff } from './../../assets/Icons/VolumeOff.svg';
-import { ReactComponent as VolumeOn } from './../../assets/Icons/VolumeOn.svg';
-import { ReactComponent as EditSquare } from './../../assets/Icons/EditSquare.svg';
-import { ReactComponent as CircleArrows } from './../../assets/Icons/CircleArrows.svg';
-import { ReactComponent as TextIcon } from './../../assets/Icons/Text.svg';
-import { ReactComponent as Delete } from './../../assets/Icons/Delete.svg';
+import { ReactComponent as CheckDeck } from './../assets/Icons/CheckDeck.svg';
+import { ReactComponent as SelectDeck } from './../assets/Icons/SelectDeck.svg';
+import { ReactComponent as VolumeOff } from './../assets/Icons/VolumeOff.svg';
+import { ReactComponent as VolumeOn } from './../assets/Icons/VolumeOn.svg';
+import { ReactComponent as EditSquare } from './../assets/Icons/EditSquare.svg';
+import { ReactComponent as CircleArrows } from './../assets/Icons/CircleArrows.svg';
+import { ReactComponent as TextIcon } from './../assets/Icons/Text.svg';
+import { ReactComponent as Delete } from './../assets/Icons/Delete.svg';
 
 const gf = new GiphyFetch('Kb3qFoEloWmqsI3ViTJKGkQZjxICJ3bi');
 
@@ -20,20 +20,14 @@ const DeckButtonContainer = styled(Box)({
     display: 'flex',
     flexDirection: 'column',
     flexBasis: '48%',
-    height: '156px',
     borderRadius: '12px',
     overflow: 'hidden',
     cursor: 'pointer',
-    position: 'relative',
+    position: 'relative'
 });
 
 const DeckButtonMediaContainer = styled(Box)({
-    display: 'flex',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
+    display: 'flex'
 });
 
 const DeckButtonVideo = styled('video')({
@@ -41,7 +35,7 @@ const DeckButtonVideo = styled('video')({
     objectFit: 'cover',
 });
 
-const DeckButtonText = styled('input')({
+const DeckButtonText = styled(Typography)({
     color: '#fff',
     fontFamily: 'Impact, Inter',
     textTransform: 'uppercase',
@@ -53,15 +47,14 @@ const DeckButtonText = styled('input')({
     zIndex: 100,
     backgroundColor: '#0000',
     border: 'none',
-    textAlign: 'center',
-    '&:focus': {
-        border: 'none',
-        outline: 'none',
-        caretColor: '#00FFDD'
-    }
+    position: 'absolute',
+    bottom: '14px',
+    left: 0,
+    right: 0
 });
 
 const HideUntilHoverContainer = styled(Box)({
+    position: 'absolute',
     display: 'flex',
     justifyContent: 'space-between',
     transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
@@ -131,7 +124,7 @@ const EditPopUpOptionText = styled(Box)({
     lineHeight: '17px',
 });
 
-const DeckButton = ({
+const MemeLibraryItem = ({
     data,
     index,
     volumeDeckButton,
@@ -164,7 +157,6 @@ const DeckButton = ({
 
     useEffect(() => {
         async function loadGiphyVideo() {
-            console.log(id);
             const { data } = await gf.gif(id);
             setGiphyVideo(data);
         }
@@ -248,7 +240,7 @@ const DeckButton = ({
                 {isGiphyVideo ?
                     giphyVideo ?
                         <Video gif={giphyVideo}
-                            width={200}
+                            width='100%'
                             muted={muted}
                             controls
                             hideAttribution
@@ -342,4 +334,4 @@ const DeckButton = ({
     );
 }
 
-export default DeckButton
+export default MemeLibraryItem;

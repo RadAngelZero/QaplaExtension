@@ -22,17 +22,17 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
     useEffect(() => {
         async function loadDeck() {
             if (twitch) {
-                if (twitch.viewer.subscriptionStatus) {
+                if (true) {
                     setUserIsSub(true);
                     // Load sub deck
-                    await listenToSubDeck(user.uid, streamerUid, (deck) => {
+                    await listenToSubDeck('613408163', streamerUid, (deck) => {
                         setDeckData(deck.exists() ? deck.val() : []);
                         setQuickReactionCost({ type: ZAP, price: 0 });
                     });
                 } else {
                     setUserIsSub(false);
                     // Load viewer deck
-                    await listenToViewerDeck(user.uid, streamerUid, (deck) => {
+                    await listenToViewerDeck('613408163', streamerUid, (deck) => {
                         setDeckData(deck.exists() ? deck.val() : []);
                         setQuickReactionCost({ type: ZAP, price: 0 });
                     });
@@ -94,7 +94,6 @@ const ReactionsDeckController = ({ open, streamerUid, streamerName }) => {
     }
 
     const onUploadMeme = (index) => {
-        console.log(index);
         if (deckData && index < deckData.length) {
             setIndexToAddMeme(index);
         } else {

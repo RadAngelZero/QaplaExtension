@@ -121,14 +121,13 @@ const AddMemeDialogController = ({ open, onClose, uid, streamerUid, indexToAddMe
         {uploadedMemeData &&
             <NameMemeDialog open={openNameMemeDialog}
                 onClose={() => setOpenNameMemeDialog(false)}
-                toDeck={toDeck}
                 memeData={uploadedMemeData}
                 onAddName={onNameAdded} />
         }
         <MemeLibraryDialog open={openMemeLibDialog}
             memeLibraryStartTab={memeLibraryStartTab}
             onClose={() => setOpenMemeLibDialog(false)}
-            toDeck={toDeck} />
+            streamerUid={streamerUid} />
         <OnlySubDialog open={false} />
         </>
     );
