@@ -17,11 +17,6 @@ const AddMemeDialogController = ({ open, onClose, uid, streamerUid, indexToAddMe
     const [openMemeLibDialog, setOpenMemeLibDialog] = useState(false);
     const [memeLibraryStartTab, setMemeLibraryStartTab] = useState(0);
 
-    const toDeck = () => {
-        setOpenMemeLibDialog(false);
-        onClose();
-    }
-
     const onSuccessfulUpload = (url) => {
         setUploadedMemeData({
             url,

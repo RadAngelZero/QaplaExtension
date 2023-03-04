@@ -1,18 +1,34 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Button, Dialog, Tabs, Tab, ImageList, ImageListItem } from '@mui/material';
 import styled from '@emotion/styled';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import { useTranslation } from 'react-i18next';
+import { VariableSizeGrid as Grid } from 'react-window';
 
 import { ReactComponent as Close } from './../assets/Icons/Close.svg';
 import { ReactComponent as Featured } from './../assets/Icons/Featured.svg';
 import { ReactComponent as VideoLibrary } from './../assets/Icons/VideoLibrary.svg';
 import DeckButton from './Deck/DeckButton';
-import { Grid, Video,  } from '@giphy/react-components';
 import MemeLibraryItem from './MemeLibraryItem';
 import { getDeckMemesFromLibrary } from '../services/elastic';
+import { AutoSizer, CellMeasurer, CellMeasurerCache, createMasonryCellPositioner, InfiniteLoader, Masonry } from 'react-virtualized';
 
 const gf = new GiphyFetch('Kb3qFoEloWmqsI3ViTJKGkQZjxICJ3bi');
+
+const COLUMN_WIDTH = 230 - 18;
+
+/* const cache = new CellMeasurerCache({
+    defaultHeight: 250,
+    defaultWidth: COLUMN_WIDTH,
+    fixedWidth: true,
+});
+
+const cellPositioner = createMasonryCellPositioner({
+    cellMeasurerCache: cache,
+    columnCount: 2,
+    columnWidth: COLUMN_WIDTH,
+    spacer: 18
+}); */
 
 const BigDialog = styled(Dialog)({
     '.MuiDialog-root': {
@@ -32,8 +48,7 @@ const BigDialog = styled(Dialog)({
         borderRadius: '0px',
         webkitBoxSizing: 'border-box',
         mozBoxSizing: 'border-box',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
+        boxSizing: 'border-box'
     },
 });
 
@@ -64,7 +79,8 @@ const TabsContainer = styled(Box)({
 });
 
 const DeckButtonsContainer = styled(Box)({
-    overflow: 'scroll',
+    marginTop: '24px',
+    maxHeight: '100%'
 });
 
 const ConfirmButton = styled(Button)({
@@ -127,7 +143,7 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
     }),
 );
 
-
+let loadedGalleryItemsIndexes = [];
 
 const MemeLibraryDialog = ({
     open,
@@ -143,8 +159,12 @@ const MemeLibraryDialog = ({
     const [alreadyOpen, setAlreadyOpen] = useState(false);
     const [volumeDeckButton, setVolumeDeckButton] = useState({});
     const [subsLibraryClips, setSubsLibraryClips] = useState([]);
+    const [totalResultsOnSubsLibrary, setTotalResultsOnSubsLibrary] = useState(0);
     const [giphyClips, setGiphyClips] = useState([]);
+    const [totalResultsOnGiphyClips, setTotalResultsOnGiphyClips] = useState(0);
     const [clipsFetched, setClipsFetched] = useState(false);
+    const [unmountList, setUnmountList] = useState(false);
+    const [loadingMoreClips, setLoadingMoreClips] = useState(false);
 
     useEffect(() => {
         if (open === true && !alreadyOpen) {
@@ -156,6 +176,8 @@ const MemeLibraryDialog = ({
     useEffect(() => {
         async function loadLibraries() {
             const subsMemes = await getDeckMemesFromLibrary(0, 50, streamerUid);
+
+            setTotalResultsOnSubsLibrary(subsMemes.hits.total.value);
             setSubsLibraryClips(
                 subsMemes.hits.hits.map((meme) => ({
                     id: meme._id,
@@ -163,7 +185,8 @@ const MemeLibraryDialog = ({
                 }))
             );
 
-            const gifs = await gf.trending({ offset: 0, limit: 50, type: 'videos' });
+            const gifs = await gf.trending({ offset: 0, limit: 150, type: 'videos' });
+            setTotalResultsOnGiphyClips(gifs.pagination.total_count);
             setGiphyClips(gifs.data);
 
             setClipsFetched(true);
@@ -173,6 +196,14 @@ const MemeLibraryDialog = ({
             loadLibraries();
         }
     }, [open, clipsFetched]);
+
+    useEffect(() => {
+        if (unmountList) {
+            setTimeout(() => {
+                setUnmountList(false);
+            }, 1000);
+        }
+    }, [unmountList]);
 
     const handleButtonSelection = (button) => {
         let tempDeckButtons = [...selectedDeckButtons];
@@ -194,15 +225,8 @@ const MemeLibraryDialog = ({
         setSelectedDeckButtons(tempDeckButtons);
     }
 
-    const handleAudioActivation = (button, event) => {
-        event.stopPropagation();
-        if (button === volumeDeckButton) {
-            return setVolumeDeckButton({});
-        }
-        setVolumeDeckButton(button);
-    }
-
     const handleTabChange = (event, newValue) => {
+        setUnmountList(true);
         setSelectedTab(newValue);
     };
 
@@ -233,7 +257,15 @@ const MemeLibraryDialog = ({
                     </TabsContainer>
                 </TopBarContainer>
                 <DeckButtonsContainer>
-                    <ImageList variant='masonry'
+                    {selectedTab === 0 ?
+                        null
+                        :
+                        giphyClips.length > 0 ?
+                            <GiphyLibraryGrid giphyClips={giphyClips} />
+                            :
+                            null
+                    }
+                    {/* <ImageList variant='masonry'
                         cols={2}
                         gap={8}>
                         {selectedTab === 0 ?
@@ -260,7 +292,7 @@ const MemeLibraryDialog = ({
                                 </ImageListItem>
                             ))
                         }
-                    </ImageList>
+                    </ImageList> */}
                 </DeckButtonsContainer>
             </BottomSheet>
             {selectedDeckButtons.length > 0 &&
@@ -271,3 +303,119 @@ const MemeLibraryDialog = ({
 }
 
 export default MemeLibraryDialog;
+
+const GiphyLibraryGrid = ({ giphyClips }) => {
+    const gutterSize = 18;
+    const containerWidth = window.innerWidth;
+
+    const cellMeasurerCache = new CellMeasurerCache({
+        defaultHeight: 250,
+        defaultWidth: COLUMN_WIDTH,
+        minHeight: 100,
+        fixedWidth: true
+    });
+
+    // Render each item as a div with a background color
+    const renderItem = ({ index, key, style, parent }) => {
+        const element = giphyClips[index];
+
+        const height = COLUMN_WIDTH * (element.images.original.height / element.images.original.width);
+
+        return (
+            <CellMeasurer
+            cache={cellMeasurerCache}
+            index={index}
+            key={key}
+            parent={parent}>
+                <div key={key} style={{ ...style }}>
+                    <MemeLibraryItem data={element.video.assets['360p']}
+                        height={height}
+                        isGiphyVideo
+                        id={element.id}
+                        index={index}
+                        onClick={() => {}}
+                        volumeDeckButton={() => {}}
+                        selectedDeckButtons={([])} />
+                </div>
+            </CellMeasurer>
+        );
+    };
+
+    return (
+        <Masonry cellCount={giphyClips.length}
+            cellMeasurerCache={cellMeasurerCache}
+            cellPositioner={createMasonryCellPositioner({
+                cellMeasurerCache: cellMeasurerCache,
+                columnCount: 2,
+                columnWidth: COLUMN_WIDTH,
+                spacer: gutterSize
+            })}
+            cellRenderer={renderItem}
+            height={window.innerHeight}
+            width={containerWidth} />
+    )
+}
+
+/* function giphyCellRenderer({ index, key, parent, style }) {
+        const element = giphyClips[index];
+
+        if (element && element.images && element.images.original && element.images.original.height) {
+            const height = COLUMN_WIDTH * (element.images.original.height / element.images.original.width) || 250;
+
+            if (isNaN(height)) {
+                return null;
+            }
+
+            return (
+                <CellMeasurer cache={cache} index={index} key={key} parent={parent}>
+                    <div style={{ ...style, height }}>
+                        <MemeLibraryItem data={element}
+                            height={height}
+                            isGiphyVideo
+                            id={element.id}
+                            index={index}
+                            onClick={() => {}}
+                            volumeDeckButton={() => {}}
+                            selectedDeckButtons={([])} />
+                    </div>
+                </CellMeasurer>
+            );
+        }
+
+        return null;
+    } */
+
+    /* const maybeLoadMore = useInfiniteLoader(loadMoreGiphyClips, {
+        isItemLoaded: (index, items) => { console.log(index, !!items[index]); return !!items[index]},
+        totalItems: 50
+    }); */
+
+/* const SubsLibraryGrid = ({ subsLibraryClips, loadMoreSubsMemes, totalResultsOnSubsLibrary }) => {
+    const maybeLoadMore = useInfiniteLoader(loadMoreSubsMemes, {
+        isItemLoaded: (index, items) => !!items[index],
+        threshold: 3,
+        totalItems: totalResultsOnSubsLibrary
+    });
+
+
+    return (
+        <Masonry onRender={maybeLoadMore}
+            key='SubsMasonry'
+          // Provides the data for our grid items
+          items={subsLibraryClips}
+          columnGutter={18}
+          columnCount={2}
+          overscanBy={20}
+          // This is the grid item component
+          render={({ index, data, width }) => (
+            <MemeLibraryItem data={data}
+                height={width * (data.height / data.width)}
+                id={data.id}
+                index={index}
+                onClick={() => {}}
+                volumeDeckButton={() => {}}
+                selectedDeckButtons={([])} />
+          )}
+        />
+    );
+} */

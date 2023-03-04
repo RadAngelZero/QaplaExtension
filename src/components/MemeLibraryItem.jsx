@@ -137,7 +137,8 @@ const MemeLibraryItem = ({
     id,
     onReplace,
     onRename,
-    onRemove
+    onRemove,
+    height
 }) => {
 
     const [label, setLabel] = useState(data.name);
@@ -235,6 +236,9 @@ const MemeLibraryItem = ({
             onClick={(event) => {
                 onClick(data);
                 if (hideInfo) return;
+            }}
+            style={{
+                height: height
             }}>
             <DeckButtonMediaContainer>
                 {isGiphyVideo ?
@@ -242,10 +246,10 @@ const MemeLibraryItem = ({
                         <Video gif={giphyVideo}
                             width='100%'
                             muted={muted}
-                            controls
                             hideAttribution
                             hideProgressBar
-                            hideMute />
+                            hideMute
+                            ccEnabled={false} />
                         :
                         null
                 :
