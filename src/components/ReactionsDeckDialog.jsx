@@ -2,14 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Box, Button, Dialog, Tooltip, Typography, tooltipClasses, ImageList } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
+import { GridContextProvider, GridDropZone, GridItem, swap } from "react-grid-dnd";
 
 import { ReactComponent as Menu } from './../assets/Icons/Menu.svg';
 import { ReactComponent as CloseMenu } from './../assets/Icons/CloseMenu.svg';
 import { ReactComponent as ExternalLinkWhite } from './../assets/Icons/ExternalLinkWhite.svg';
 import { ReactComponent as Bits } from './../assets/Icons/Bits.svg';
 import { ReactComponent as VideoIcon } from './../assets/Icons/VideoIcon.svg';
-import AddMemeDialog from './AddMemeDialog';
+import { ReactComponent as EditSquare } from './../assets/Icons/EditSquare.svg';
+
 import DeckButton from './Deck/DeckButton';
 window.scrolls = {};
 window.scrolls.DeckChips = { x: 0, scroll: 0 };
@@ -269,51 +270,17 @@ const ReactionsDeckDialog = ({
     randomEmoteUrl,
     onEmoteAnimationSelected,
     userTwitchId,
+    onReorder,
+    onUploadMeme,
+    onRename,
+    onRemove
 }) => {
 
     const [hoverMenu, setHoverMenu] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
-    const [maxDeckButtons, setMaxDeckButtons] = useState(6);
-    const [openAddMemeDialog, setopenAddMemeDialog] = useState(false);
-    const [deckButtonReplaceIndex, setDeckButtonReplaceIndex] = useState(null);
-    const [deckButtonsData, setDeckButtonsData] = useState([
-        {
-            id: 'heart-parrot',
-            imgURL: 'https://media.giphy.com/media/S9oNGC1E42VT2JRysv/giphy.gif',
-            label: 'Love',
-            uploader: {
-                username: 'juansguarnizo',
-                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-            },
-        },
-        {
-            id: 'wow-sloth',
-            imgURL: 'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
-            label: 'WOW',
-            uploader: {
-                username: 'juansguarnizo',
-                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-            },
-        },
-        {
-            id: 'cry-pikachu',
-            imgURL: 'https://media.giphy.com/media/L95W4wv8nnb9K/giphy.gif',
-            label: 'Cry',
-            uploader: {
-                username: 'juansguarnizo',
-                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-            },
-        },
-        {
-            id: 'wooo-homer',
-            imgURL: 'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
-            label: 'Woooo',
-            uploader: {
-                username: 'juansguarnizo',
-                avatarImg: 'https://static-cdn.jtvnw.net/jtv_user_pictures/74586414-e27b-4347-89c5-109e42ac3e1d-profile_image-70x70.png'
-            },
-        },
-    ]);
+    const [editingDeck, setEditingDeck] = useState(false);
+
+    const [tempDeckData, setTempDeckData] = useState([]);
 
     const bottomSheetRef = useRef();
 
@@ -349,80 +316,49 @@ const ReactionsDeckDialog = ({
         // bottomSheetRef.scrollTop = scrollTop - clientY + event.clientY;
     };
 
-    const handleUploadMeme = () => {
-        console.log('upload meme');
-        setopenAddMemeDialog(true)
+    const onDeckButtonMove = (sourceId, sourceIndex, targetIndex, targetId) => {
+        const nextState = swap(tempDeckData, sourceIndex, targetIndex);
+        console.log(nextState)
+        setTempDeckData(nextState);
+    }
+    const handleEditDeckButton = () => {
+        if (!editingDeck) {
+            setTempDeckData([...deckData]);
+            return setEditingDeck(true);
+        }
+        setEditingDeck(false);
+        onReorder(tempDeckData);
     }
 
-    const handleButtonSelection = (buttonID) => {
-        console.log(buttonID)
-    }
+    const numberOfButtons = userIsSub ? 8 : 4;
+    const deck = new Array(numberOfButtons);
 
-    const startDeckButtonReplace = (index) => {
-        setDeckButtonReplaceIndex(index);
-        setopenAddMemeDialog(true);
-    }
-
-    const handleDeckButtonReplace = (index, data) => {
-        let tempDeckButtons = [...deckButtonsData];
-        let cleanDeckButtons = [];
-        tempDeckButtons[index] = data;
-        setDeckButtonsData(tempDeckButtons);
-        setDeckButtonReplaceIndex(null);
-        tempDeckButtons.every(e => {
-            if (e.empty) {
-                console.log('empty')
-                return false;
-            }
-            cleanDeckButtons.push(e);
-            return true;
-        })
-        // deckButtons without empties
-        console.log(cleanDeckButtons);
-    }
-
-    const handleDeckButtonRename = (index, label) => {
-        let tempDeckButtons = [...deckButtonsData];
-        let cleanDeckButtons = [];
-        tempDeckButtons[index].label = label;
-        setDeckButtonsData(tempDeckButtons);
-        tempDeckButtons.every(e => {
-            if (e.empty) {
-                console.log('empty')
-                return false;
-            }
-            cleanDeckButtons.push(e);
-            return true;
-        })
-        // deckButtons without empties
-        console.log(cleanDeckButtons);
-    }
-
-    const handleDeckButtonRemove = (index) => {
-        let tempDeckButtons = [...deckButtonsData];
-        let cleanDeckButtons = [];
-        tempDeckButtons.splice(index, 1);
-        tempDeckButtons.push({ empty: true });
-        setDeckButtonsData(tempDeckButtons);
-        tempDeckButtons.every(e => {
-            if (e.empty) {
-                console.log('empty')
-                return false;
-            }
-            cleanDeckButtons.push(e);
-            return true;
-        })
-        // deckButtons without empties
-        console.log(cleanDeckButtons);
+    for (let i = 0; i < deck.length; i++) {
+        if (deckData && deckData[i]) {
+            deck[i] = deckData[i];
+        } else {
+            deck[i] = null;
+        }
     }
 
     return (
         <BigDialog open={open}>
             <HeaderContainer>
+                <EditSquare style={{ width: '24px', height: '24px', marginRight: '-24px', cursor: 'pointer', backgroundColor: editingDeck ? '#f0f' : '#0000' }} onClick={handleEditDeckButton} />
                 <HeaderTitleContainer>
-                    <HeaderText>{`Quick Reactions`}</HeaderText>
-                    <Bits style={{ margin: '0px 4px', width: '16px', height: '16px' }} />
-                    <HeaderBitsText>{`100`}</HeaderBitsText>
+                    {!editingDeck ?
+                        <>
+                            <HeaderText>{`Quick Reactions`}</HeaderText>
+                            <Bits style={{ margin: '0px 4px', width: '16px', height: '16px' }} />
+                            {quickReactionCost &&
+                                <HeaderBitsText>
+                                    {quickReactionCost.price}
+                                </HeaderBitsText>
+                            }
+                        </>
+                        :
+                        <HeaderText style={{ color: '#fff' }}>{`Reorder your deck buttons`}</HeaderText>
+                    }
                 </HeaderTitleContainer>
                 <MenuPopUp open={openMenu} placement='bottom-end' title={
                     <React.Fragment>
@@ -464,35 +400,73 @@ const ReactionsDeckDialog = ({
                     </MenuButtonContainer>
                 </MenuPopUp>
             </HeaderContainer>
-            {deckButtonsData.length >= maxDeckButtons && deckButtonsData[maxDeckButtons - 1].empty &&
-                <Subtitle>{`Add clips to your Meme Deck`}</Subtitle>
-            }
-            <DeckButtonsContainer>
-                {deckButtonsData.map((element, index) => {
-                    if (element.empty) {
-                        return (
-                            <DeckButtonAvailable onClick={handleUploadMeme}>
-                                <DeckButtonAvailableInnerContainer>
-                                    <VideoIcon />
-                                    <DeckButtonAvailableAddButton>{`Add Meme`}</DeckButtonAvailableAddButton>
-                                </DeckButtonAvailableInnerContainer>
-                            </DeckButtonAvailable>
-                        )
+            {deckData &&
+                <>
+                    {!deckData[numberOfButtons - 1] && !editingDeck &&
+                        <Subtitle>{`Add clips to your Meme Deck`}</Subtitle>
                     }
-                    return (
-                        <DeckButton
-                            onClick={() => handleButtonSelection(element.id)}
-                            showEditButton={true}
-                            data={element}
-                            index={index}
-                            onReplace={handleDeckButtonReplace}
-                            startReplace={startDeckButtonReplace}
-                            onRename={handleDeckButtonRename}
-                            onRemove={handleDeckButtonRemove}
-                        />
-                    );
-                })}
-            </DeckButtonsContainer>
+                    {editingDeck &&
+                        <div style={{ marginTop: '32px' }}>
+                            <GridContextProvider onChange={onDeckButtonMove}>
+                                <GridDropZone
+                                    id="buttons"
+                                    boxesPerRow={2}
+                                    rowHeight={156}
+                                    style={{ height: `${Math.ceil(tempDeckData.length / 2) * 164}px`, width: '100%' }}
+                                >
+                                    {tempDeckData.map((element, index) => (
+                                        <GridItem key={element.id}>
+                                            <div style={{
+                                                width: "96%",
+                                                height: "96%",
+                                                marginTop: index >= 2 ? '16px' : '0px',
+                                                marginLeft: index % 2 ? 'auto' : '0px',
+                                                cursor: 'grabbing',
+                                            }}>
+                                                <DeckButton key={element.id}
+                                                    index={index}
+                                                    onClick={() => { }}
+                                                    data={element}
+                                                    hideInfo
+                                                    reordering={editingDeck}
+                                                    onReplace={() => { }}
+                                                    onRename={() => { }}
+                                                    onRemove={() => { }} />
+                                            </div>
+                                        </GridItem>
+                                    ))}
+                                </GridDropZone>
+                            </GridContextProvider>
+                        </div>
+                    }
+                    <DeckButtonsContainer>
+                        {!editingDeck &&
+                            <>
+                                {deck.map((element, index) => (
+                                    (!element ?
+                                        <DeckButtonAvailable key={`empty-slot-${index}`}
+                                            onClick={() => onUploadMeme(index)}>
+                                            <DeckButtonAvailableInnerContainer>
+                                                <VideoIcon />
+                                                <DeckButtonAvailableAddButton>{`Add Meme`}</DeckButtonAvailableAddButton>
+                                            </DeckButtonAvailableInnerContainer>
+                                        </DeckButtonAvailable>
+                                        :
+                                        <DeckButton key={element.id}
+                                            index={index}
+                                            onClick={() => onSendMeme(element)}
+                                            data={element}
+                                            showEditButton
+                                            onReplace={onUploadMeme}
+                                            onRename={onRename}
+                                            onRemove={onRemove} />
+                                    )
+                                ))}
+                            </>
+                        }
+                    </DeckButtonsContainer>
+                </>
+            }
             <BottomSheet ref={bottomSheetRef} onMouseDown={onMouseDownScroll}>
                 <BottomSheetChip onClick={() => { console.log('a') }}>
                     <BottomSheetChipAvatar>

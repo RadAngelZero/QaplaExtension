@@ -25,6 +25,7 @@ const Router = () => {
         case 'viewer':
             if (user) {
                 if (user.notLinked) {
+                return <TweetReactionController />;
                     return <WeNeedPermissionDialog />;
                 }
 

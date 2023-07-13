@@ -21,7 +21,6 @@ const DeckButtonContainer = styled(Box)({
     height: '156px',
     borderRadius: '12px',
     overflow: 'hidden',
-    cursor: 'pointer',
     position: 'relative',
 });
 
@@ -138,7 +137,9 @@ const DeckButton = ({
     onClick,
     hideInfo,
     showEditButton,
-    startReplace,
+    isGiphyVideo,
+    id,
+    reordering,
     onReplace,
     onRename,
     onRemove
@@ -211,105 +212,127 @@ const DeckButton = ({
         onRemove(index);
     }
 
-    return (<DeckButtonContainer id={`deck-button-${data.id}`}
-        onMouseEnter={(event) => {
-            setHovered(true);
-            if (hideInfo) return;
-            event.currentTarget.children[1].children[0].classList.add('show-on-hover');
-            event.currentTarget.children[1].children[1].children[0].classList.add('show-on-hover');
-            if (showEditButton) return;
-            event.currentTarget.children[1].children[1].children[1].classList.add('show-on-hover');
-        }}
-        onMouseLeave={(event) => {
-            setHovered(false);
-            if (hideInfo) return;
-            event.currentTarget.children[1].children[0].classList.remove('show-on-hover');
-            event.currentTarget.children[1].children[1].children[0].classList.remove('show-on-hover');
-            if (showEditButton) return;
-            event.currentTarget.children[1].children[1].children[1].classList.remove('show-on-hover');
-        }}
-        onClick={(event) => {
-            onClick(data);
-            if (hideInfo) return;
-        }}>
-        <DeckButtonMediaContainer>
-            <DeckButtonImgGif src={data.imgURL} />
-        </DeckButtonMediaContainer>
-        {!hideInfo &&
-            <HideUntilHoverContainer>
-                <UserContainer>
-                    <UserAvatar src={data.uploader.avatarImg} />
-                    <UserName>{data.uploader.username}</UserName>
-                </UserContainer>
-                {showEditButton ?
-                    <EditPopUp open={openEditOptions} placement='bottom-end' onClose={() => setOpenEditOptions(false)} title={
-                        <React.Fragment>
-                            <EditPopUpOptionsContainer>
-                                <EditPopUpOption onClick={(e) => handleReplaceStart(e)}>
-                                    <CircleArrows />
-                                    <EditPopUpOptionText>{`Replace`}</EditPopUpOptionText>
-                                </EditPopUpOption>
-                                <EditPopUpOption onClick={(e) => handleRename(e)}>
-                                    <TextIcon />
-                                    <EditPopUpOptionText>{`Rename`}</EditPopUpOptionText>
-                                </EditPopUpOption>
-                                <EditPopUpOption onClick={(e) => handleRemove(e)}>
-                                    <Delete />
-                                    <EditPopUpOptionText style={{ color: '#FF9C9C' }}>{`Remove`}</EditPopUpOptionText>
-                                </EditPopUpOption>
-                            </EditPopUpOptionsContainer>
-                        </React.Fragment>
-                    } >
-                        <ButtonsContainer>
-                            <EditSquare onClick={(e) => handleEditButtonClick(e)} style={{
-                                transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                                opacity: 0,
-                                cursor: 'pointer',
-                            }} />
-                        </ButtonsContainer>
-                    </EditPopUp>
-
-                    :
-                    <ButtonsContainer>
-                        {volumeDeckButton === data ?
-                            <VolumeOn style={{ opacity: '1 !important' }} onClick={(e) => handleAudioActivation(data, e)} />
-                            :
-                            <VolumeOff style={{
-                                transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                                opacity: 0,
-                            }} onClick={(e) => handleAudioActivation(data, e)} />
-                        }
-                        {selectedDeckButtons.find((button) => button.id === data.id) ?
-                            <CheckDeck style={{ opacity: 1 }} />
-                            :
-                            <SelectDeck style={{
-                                transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                                opacity: hovered ? 1 : 0,
-                            }} />
-                        }
-                    </ButtonsContainer>
-                }
-            </HideUntilHoverContainer>
-        }
-        <DeckButtonText
-            ref={labelRef}
-            type='text'
-            value={label}
-            disabled={!editingLabel}
-            onClick={(e) => { if (editingLabel) e.stopPropagation() }}
-            style={{
-                cursor: editingLabel ? 'text' : 'pointer'
+    return (
+        <DeckButtonContainer style={{ cursor: reordering ? 'grab' : 'pointer' }} id={`deck-button-${data.id}`}
+            onMouseEnter={(event) => {
+                if (reordering) return;
+                setHovered(true);
+                if (hideInfo) return;
+                event.currentTarget.children[1].children[0].classList.add('show-on-hover');
+                event.currentTarget.children[1].children[1].children[0].classList.add('show-on-hover');
+                if (showEditButton) return;
+                event.currentTarget.children[1].children[1].children[1].classList.add('show-on-hover');
             }}
-            onBlur={(e) => handleOutClickRename(e)}
-            onChange={(e) => handleRenameOnChange(e)}
-            onKeyDown={(e) => handleConfirmRename(e)}
-        />
-        <style>{`
-        .show-on-hover {
-            opacity: 1 !important;
-        }
-    `}</style>
-    </DeckButtonContainer>)
+            onMouseLeave={(event) => {
+                if (reordering) return;
+                setHovered(false);
+                if (hideInfo) return;
+                event.currentTarget.children[1].children[0].classList.remove('show-on-hover');
+                event.currentTarget.children[1].children[1].children[0].classList.remove('show-on-hover');
+                if (showEditButton) return;
+                event.currentTarget.children[1].children[1].children[1].classList.remove('show-on-hover');
+            }}
+            onClick={(event) => {
+                if (reordering) return;
+                onClick(data);
+                if (hideInfo) return;
+            }}>
+            <DeckButtonMediaContainer>
+                {isGiphyVideo ?
+                    giphyVideo ?
+                        <Video gif={giphyVideo}
+                            width={200}
+                            muted={muted}
+                            controls
+                            hideAttribution
+                            hideProgressBar
+                            hideMute />
+                        :
+                        null
+                    :
+                    <DeckButtonVideo src={data.url}
+                        autoPlay
+                        loop
+                        muted={muted} />
+                }
+            </DeckButtonMediaContainer>
+            {!hideInfo &&
+                <HideUntilHoverContainer>
+                    <UserContainer>
+                        {/* <UserAvatar src={data.uploader.avatarImg} />
+                        <UserName>{data.uploader.username}</UserName> */}
+                    </UserContainer>
+                    {showEditButton ?
+                        <EditPopUp open={openEditOptions} placement='bottom-end' onClose={() => setOpenEditOptions(false)} title={
+                            <React.Fragment>
+                                <EditPopUpOptionsContainer>
+                                    <EditPopUpOption onClick={replace}>
+                                        <CircleArrows />
+                                        <EditPopUpOptionText>{`Replace`}</EditPopUpOptionText>
+                                    </EditPopUpOption>
+                                    <EditPopUpOption onClick={rename}>
+                                        <TextIcon />
+                                        <EditPopUpOptionText>{`Rename`}</EditPopUpOptionText>
+                                    </EditPopUpOption>
+                                    <EditPopUpOption onClick={remove}>
+                                        <Delete />
+                                        <EditPopUpOptionText style={{ color: '#FF9C9C' }}>{`Remove`}</EditPopUpOptionText>
+                                    </EditPopUpOption>
+                                </EditPopUpOptionsContainer>
+                            </React.Fragment>
+                        } >
+                            <ButtonsContainer>
+                                <EditSquare onClick={handleEditButtonClick}
+                                    style={{
+                                        transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                                        opacity: 0,
+                                        cursor: 'pointer',
+                                    }} />
+                            </ButtonsContainer>
+                        </EditPopUp>
+
+                        :
+                        <ButtonsContainer>
+                            {volumeDeckButton === data ?
+                                <VolumeOn style={{ opacity: '1 !important' }} onClick={(e) => setMuted(!muted)} />
+                                :
+                                <VolumeOff style={{
+                                    transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                                    opacity: 0,
+                                }} onClick={(e) => setMuted(!muted)} />
+                            }
+                            {selectedDeckButtons.find((button) => button.id === data.id) ?
+                                <CheckDeck style={{ opacity: 1 }} />
+                                :
+                                <SelectDeck style={{
+                                    transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                                    opacity: hovered ? 1 : 0,
+                                }} />
+                            }
+                        </ButtonsContainer>
+                    }
+                </HideUntilHoverContainer>
+            }
+            <DeckButtonText
+                ref={labelRef}
+                type='text'
+                value={label}
+                disabled={!editingLabel}
+                onClick={(e) => { if (editingLabel) e.stopPropagation() }}
+                style={{
+                    cursor: editingLabel ? 'text' : 'pointer'
+                }}
+                onBlur={onLabelBlur}
+                onChange={onLabelChange}
+                onKeyDown={onLabelKeyDown}
+            />
+            <style>{`
+                .show-on-hover {
+                    opacity: 1 !important;
+                }
+            `}</style>
+        </DeckButtonContainer>
+    );
 }
 
 export default DeckButton
